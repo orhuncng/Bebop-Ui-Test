@@ -1,1 +1,5 @@
-/build
+bin/
+build/
+.idea/
+.gradle/
+projectname.iml

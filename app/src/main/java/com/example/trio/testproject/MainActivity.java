@@ -84,6 +84,9 @@ public class MainActivity extends AppCompatActivity implements ARDeviceControlle
             DeviceNames.add("Deneme3");
             DeviceNames.add("Deneme4");
             DeviceNames.add("Deneme5");
+            DeviceNames.add("Deneme6");
+            DeviceNames.add("Deneme7");
+            DeviceNames.add("Deneme8");
         }
 
         Intent intent = new Intent(this, Main2Activity.class);

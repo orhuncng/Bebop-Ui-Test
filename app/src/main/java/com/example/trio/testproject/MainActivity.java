@@ -119,6 +119,13 @@ public class MainActivity extends AppCompatActivity implements ARDeviceControlle
         }
     }
 
+    public void openSensor(View view) {
+        Log.e("openSensor", "OpenSensore basıldı");
+
+        Intent intent = new Intent(this, SensorActivity.class);
+        startActivity(intent);
+    }
+
     public void startVideo(View view) {
         deviceController.startVideoStream();
     }

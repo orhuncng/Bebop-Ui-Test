@@ -18,41 +18,133 @@ import java.util.List;
 public class SensorActivity extends AppCompatActivity implements SensorEventListener {
 
     private SensorManager mSensorManager;
+
+    // Sensors to used
     private Sensor mGyro;
+    private Sensor mAccl;
+    private Sensor mLinearAccl;
 
     LinearLayout sensorLayout;
+
+    // Gyro Text Views
     TextView gyroXTextView;
     TextView gyroYTextView;
     TextView gyroZTextView;
+
+    // Acceleration Text Views
+    TextView acclXTextView;
+    TextView acclYTextView;
+    TextView acclZTextView;
+
+    // Linear Acceleration Views
+    TextView linearAcclXTextView;
+    TextView linearAcclYTextView;
+    TextView linearAcclZTextView;
+
+    // Seperator Text
+    TextView seperateGroups;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sensor);
 
-        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        mGyro = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
-
+        // Set sensorLayout to related layout
         sensorLayout = (LinearLayout) findViewById(R.id.sensorLayout);
 
+        // Set Sensor Manager
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+
+        // Get Gyro Sensor from device
+        mGyro = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
         //Adding Gyro Text Views
-        addGyroViews();
+        addGyroViews(mGyro != null);
 
+        // Get Acceleration Sensor from device
+        mAccl = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        //Adding Acceleration Text Views
+        addAcclViews(mAccl != null);
 
-        Log.e("Gyro: ", mGyro.getName());
+        // Get Linear Acceleration Sensor from device
+        mLinearAccl = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+        //Adding Linear Acceleration Text Views
+        addLinearAcclViews(mLinearAccl != null);
+
         //listSensorData();
     }
 
-    private void addGyroViews() {
-        gyroXTextView = new TextView(this);
-        gyroYTextView = new TextView(this);
-        gyroZTextView = new TextView(this);
-        sensorLayout.addView(gyroXTextView);
-        sensorLayout.addView(gyroYTextView);
-        sensorLayout.addView(gyroZTextView);
+    private void addLinearAcclViews(boolean hasLinAcc) {
+        if (hasLinAcc) {
+            linearAcclXTextView = new TextView(this);
+            linearAcclYTextView = new TextView(this);
+            linearAcclZTextView = new TextView(this);
+            sensorLayout.addView(linearAcclXTextView);
+            sensorLayout.addView(linearAcclYTextView);
+            sensorLayout.addView(linearAcclZTextView);
+
+            seperateGroups = new TextView(this);
+            seperateGroups.setText("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+            sensorLayout.addView(seperateGroups);
+
+            Log.e("LinearAccl", "Added");
+        } else {
+            TextView noLinAccl = new TextView(this);
+            noLinAccl.setText("Dont Have Linear Acceleration Sorry :(");
+            sensorLayout.addView(noLinAccl);
+            Log.e("LinearAccl", "Cant added");
+
+        }
+
     }
 
-    private List<Sensor> getSensorList(){
+    private void addAcclViews(boolean hasAccl) {
+        if (hasAccl) {
+            acclXTextView = new TextView(this);
+            acclYTextView = new TextView(this);
+            acclZTextView = new TextView(this);
+            sensorLayout.addView(acclXTextView);
+            sensorLayout.addView(acclYTextView);
+            sensorLayout.addView(acclZTextView);
+
+            seperateGroups = new TextView(this);
+            seperateGroups.setText("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+            sensorLayout.addView(seperateGroups);
+
+            Log.e("Accl", "Added");
+
+        } else {
+            TextView noAccleration = new TextView(this);
+            noAccleration.setText("Dont Have Acceleration Sorry :(");
+            sensorLayout.addView(noAccleration);
+
+            Log.e("Accl", "Cant added");
+        }
+    }
+
+    private void addGyroViews(Boolean hasGyro) {
+        if (hasGyro) {
+            gyroXTextView = new TextView(this);
+            gyroYTextView = new TextView(this);
+            gyroZTextView = new TextView(this);
+            sensorLayout.addView(gyroXTextView);
+            sensorLayout.addView(gyroYTextView);
+            sensorLayout.addView(gyroZTextView);
+
+            seperateGroups = new TextView(this);
+            seperateGroups.setText("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+            sensorLayout.addView(seperateGroups);
+
+            Log.e("Gyro", "Added");
+        } else {
+            TextView noGyro = new TextView(this);
+            noGyro.setText("Dont Have Gyro Sorry :(");
+            sensorLayout.addView(noGyro);
+
+            Log.e("Gyro", "Cant added");
+        }
+    }
+
+    private List<Sensor> getSensorList() {
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
@@ -64,7 +156,7 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
         return deviceSensors;
     }
 
-    private void listSensorData(){
+    private void listSensorData() {
         List<Sensor> deviceSensors = getSensorList();
 
         final int N = deviceSensors.size(); // total number of textviews to add
@@ -87,10 +179,8 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
     @Override
     public void onSensorChanged(SensorEvent event) {
 
-        // The light sensor returns a single value.
-        // Many sensors return 3 values, one for each axis.
-        if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE)
-        {
+        // Gyro sensor to detect turn movements
+        if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
             String gyroDataX = "GyroX:" + Float.toString((float) (event.values[0] * 57.2957795));
             String gyroDataY = "GyroY:" + Float.toString((float) (event.values[1] * 57.2957795));
             String gyroDataZ = "GyroZ:" + Float.toString((float) (event.values[2] * 57.2957795));
@@ -100,6 +190,28 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
             gyroZTextView.setText(gyroDataZ);
         }
 
+
+        // Acceleration sensor for detect head movements along x-y-z
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            String acclX = "AcclX:" + Float.toString(event.values[0]);
+            String acclY = "AcclY:" + Float.toString(event.values[1]);
+            String acclZ = "AcclZ:" + Float.toString(event.values[2]);
+
+            acclXTextView.setText(acclX);
+            acclYTextView.setText(acclY);
+            acclZTextView.setText(acclZ);
+        }
+
+        // Acceleration sensor for detect head movements along x-y-z
+        if (event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION) {
+            String linAcclX = "LinAcclX:" + Float.toString(event.values[0]);
+            String linAcclY = "LinAcclY:" + Float.toString(event.values[1]);
+            String linAcclZ = "LinAcclZ:" + Float.toString(event.values[2]);
+
+            linearAcclXTextView.setText(linAcclX);
+            linearAcclYTextView.setText(linAcclY);
+            linearAcclZTextView.setText(linAcclZ);
+        }
 
 
     }
@@ -112,8 +224,10 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
     @Override
     protected void onResume() {
         super.onResume();
-        Log.e("OnResume" ,"Resume Etti");
+        Log.e("OnResume", "Resume Etti");
         mSensorManager.registerListener(this, mGyro, SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.registerListener(this, mAccl, SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.registerListener(this, mLinearAccl, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     @Override

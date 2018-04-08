@@ -17,12 +17,17 @@ import java.util.List;
 
 public class SensorActivity extends AppCompatActivity implements SensorEventListener {
 
+    float DEFAULT_TIME_CONSTANT = 0.18f;
+
     private SensorManager mSensorManager;
+
+    float deltaZ = 0;
 
     // Sensors to used
     private Sensor mGyro;
     private Sensor mAccl;
     private Sensor mLinearAccl;
+    private Sensor mMagnet;
 
     LinearLayout sensorLayout;
 
@@ -41,8 +46,24 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
     TextView linearAcclYTextView;
     TextView linearAcclZTextView;
 
+    // Linear Magnetometer Views
+    TextView magnetometerXTextView;
+    TextView magnetometerYTextView;
+    TextView magnetometerZTextView;
+
     // Seperator Text
     TextView seperateGroups;
+
+    // Seperator Text
+    TextView averageLast;
+
+    // Acceleration with lowPassFilter Text Views
+    TextView lowPassAcclXTextView;
+    TextView lowPassAcclYTextView;
+    TextView lowPassAcclZTextView;
+
+    float[] gravity = new float[3];
+    float[] linear_acceleration = new float[3];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +91,11 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
         //Adding Linear Acceleration Text Views
         addLinearAcclViews(mLinearAccl != null);
 
+        // Get Magnetic Sensor from device
+        mMagnet = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+        //Adding magnetic Text Views
+        addMagnetoViews(mMagnet != null);
+
         //listSensorData();
     }
 
@@ -94,7 +120,6 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
             Log.e("LinearAccl", "Cant added");
 
         }
-
     }
 
     private void addAcclViews(boolean hasAccl) {
@@ -105,6 +130,17 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
             sensorLayout.addView(acclXTextView);
             sensorLayout.addView(acclYTextView);
             sensorLayout.addView(acclZTextView);
+
+            seperateGroups = new TextView(this);
+            seperateGroups.setText("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+            sensorLayout.addView(seperateGroups);
+
+            lowPassAcclXTextView = new TextView(this);
+            lowPassAcclYTextView = new TextView(this);
+            lowPassAcclZTextView = new TextView(this);
+            sensorLayout.addView(lowPassAcclXTextView);
+            sensorLayout.addView(lowPassAcclYTextView);
+            sensorLayout.addView(lowPassAcclZTextView);
 
             seperateGroups = new TextView(this);
             seperateGroups.setText("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
@@ -141,6 +177,29 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
             sensorLayout.addView(noGyro);
 
             Log.e("Gyro", "Cant added");
+        }
+    }
+
+    private void addMagnetoViews(boolean hasMagnet) {
+        if (hasMagnet) {
+            magnetometerXTextView = new TextView(this);
+            magnetometerYTextView = new TextView(this);
+            magnetometerZTextView = new TextView(this);
+            sensorLayout.addView(magnetometerXTextView);
+            sensorLayout.addView(magnetometerYTextView);
+            sensorLayout.addView(magnetometerZTextView);
+
+            seperateGroups = new TextView(this);
+            seperateGroups.setText("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+            sensorLayout.addView(seperateGroups);
+
+            Log.e("Magneto", "Added");
+        } else {
+            TextView noMagnetoAccl = new TextView(this);
+            noMagnetoAccl.setText("Dont Have Linear Acceleration Sorry :(");
+            sensorLayout.addView(noMagnetoAccl);
+            Log.e("Magneto", "Cant added");
+
         }
     }
 
@@ -193,6 +252,24 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
 
         // Acceleration sensor for detect head movements along x-y-z
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            final float alpha = (float) 0.8;
+
+            gravity[0] = alpha * gravity[0] + (1 - alpha) * event.values[0];
+            gravity[1] = alpha * gravity[1] + (1 - alpha) * event.values[1];
+            gravity[2] = alpha * gravity[2] + (1 - alpha) * event.values[2];
+
+            linear_acceleration[0] = event.values[0] - gravity[0];
+            linear_acceleration[1] = event.values[1] - gravity[1];
+            linear_acceleration[2] = event.values[2] - gravity[2];
+
+            String lowPassacclX = "LowPasAcclX:" + Float.toString(linear_acceleration[0]);
+            String lowPassacclY = "LowPassAcclY:" + Float.toString(linear_acceleration[1]);
+            String lowPassacclZ = "LowPassAcclZ:" + Float.toString(linear_acceleration[2]);
+
+            lowPassAcclXTextView.setText(lowPassacclX);
+            lowPassAcclYTextView.setText(lowPassacclY);
+            lowPassAcclZTextView.setText(lowPassacclZ);
+
             String acclX = "AcclX:" + Float.toString(event.values[0]);
             String acclY = "AcclY:" + Float.toString(event.values[1]);
             String acclZ = "AcclZ:" + Float.toString(event.values[2]);
@@ -211,8 +288,22 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
             linearAcclXTextView.setText(linAcclX);
             linearAcclYTextView.setText(linAcclY);
             linearAcclZTextView.setText(linAcclZ);
+
+            // event.values[0]
+
         }
 
+        // Acceleration sensor for detect head movements along x-y-z
+        if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+            String magneticAcclX = "MagneticX:" + Float.toString(event.values[0]);
+            String magneticAcclY = "MagneticY:" + Float.toString(event.values[1]);
+            String magneticAcclZ = "MagneticZ:" + Float.toString(event.values[2]);
+
+            magnetometerXTextView.setText(magneticAcclX);
+            magnetometerYTextView.setText(magneticAcclY);
+            magnetometerZTextView.setText(magneticAcclZ);
+
+        }
 
     }
 
@@ -228,6 +319,7 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
         mSensorManager.registerListener(this, mGyro, SensorManager.SENSOR_DELAY_NORMAL);
         mSensorManager.registerListener(this, mAccl, SensorManager.SENSOR_DELAY_NORMAL);
         mSensorManager.registerListener(this, mLinearAccl, SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.registerListener(this, mMagnet, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     @Override

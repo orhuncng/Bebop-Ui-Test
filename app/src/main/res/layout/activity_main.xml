@@ -22,10 +22,18 @@
             tools:layout_editor_absoluteX="8dp"
             tools:layout_editor_absoluteY="264dp">
 
-            <com.example.trio.testproject.H264VideoView
-                android:id="@+id/videoView"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                android:layout_height="match_parent">
+
+                <com.example.trio.testproject.H264VideoView
+                    android:id="@+id/videoView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+                <android.opengl.GLSurfaceView android:id="@+id/hudView"
+                    android:layout_width="fill_parent" android:layout_height="fill_parent" />
+            </FrameLayout>
 
         </LinearLayout>
 

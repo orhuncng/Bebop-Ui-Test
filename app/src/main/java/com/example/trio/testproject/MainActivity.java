@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.graphics.PixelFormat;
+import android.opengl.GLSurfaceView;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
@@ -55,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements ARDeviceControlle
     ARDiscoveryServicesDevicesListUpdatedReceiver receiver;
     ARDeviceController deviceController;
     private H264VideoView mVideoView;
+    private GLSurfaceView mHudView;
 
     static {
         ARSDK.loadSDKLibs();
@@ -71,6 +74,12 @@ public class MainActivity extends AppCompatActivity implements ARDeviceControlle
         System.out.println("ON CREATE");
 
         mVideoView = findViewById(R.id.videoView);
+        mHudView = findViewById(R.id.hudView);
+        mHudView.setRenderer(new HudRenderer());
+        //mHudView.setEGLContextClientVersion(2);
+        //mHudView.setEGLConfigChooser(8,8,8,8,16,0);
+        mHudView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
+        //mHudView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
         initDiscoveryService();
         registerReceivers();
     }

@@ -16,6 +16,7 @@ import com.parrot.arsdk.arcontroller.ARFrame;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 

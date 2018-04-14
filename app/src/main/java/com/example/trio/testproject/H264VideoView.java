@@ -1,14 +1,14 @@
 package com.example.trio.testproject;
 
-import android.view.SurfaceView;
-
 import android.content.Context;
+import android.graphics.SurfaceTexture;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Surface;
 import android.view.SurfaceHolder;
-
+import android.view.SurfaceView;
 
 import com.parrot.arsdk.arcontroller.ARCONTROLLER_STREAM_CODEC_TYPE_ENUM;
 import com.parrot.arsdk.arcontroller.ARControllerCodec;
@@ -16,7 +16,6 @@ import com.parrot.arsdk.arcontroller.ARFrame;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -135,7 +134,7 @@ public class H264VideoView extends SurfaceView implements SurfaceHolder.Callback
         format.setByteBuffer("csd-0", mSpsBuffer);
         format.setByteBuffer("csd-1", mPpsBuffer);
 
-        mMediaCodec.configure(format, getHolder().getSurface(), null, 0);
+        mMediaCodec.configure(format, new Surface(new SurfaceTexture(0)), null, 0);
         mMediaCodec.start();
 
         if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.LOLLIPOP) {

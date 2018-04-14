@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?><!-- UI to control video playback. See the class's javadoc for more info. -->
+<com.example.trio.testproject.VideoUiView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/video_ui_view"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:background="#000">
+
+    <TextView
+        android:id="@+id/status_text"
+        android:text="whatever"
+        android:gravity="center|end"
+        android:layout_height="match_parent"
+        android:layout_width="72dp"
+        android:textSize="12dp"
+        android:textColor="#fff"
+        android:textAlignment="textEnd"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp" />
+
+</com.example.trio.testproject.VideoUiView>

@@ -11,6 +11,7 @@ import android.support.annotation.MainThread;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.util.Pair;
+import android.view.Surface;
 import android.view.ViewGroup;
 
 import java.nio.FloatBuffer;
@@ -21,7 +22,8 @@ public final class SceneRenderer {
     private static final String TAG = "SceneRenderer";
 
     // This is the primary interface between the Media Player and the GL Scene.
-    private SurfaceTexture displayTexture;
+    private Surface mSurface;
+    private SurfaceTexture mSurfaceTexture;
     private final AtomicBoolean frameAvailable = new AtomicBoolean();
     // Used to notify clients that displayTexture has a new frame. This requires synchronized access.
     @Nullable
@@ -140,12 +142,12 @@ public final class SceneRenderer {
 
         // Create the texture used to render each frame of video.
         displayTexId = GLUtils.glCreateExternalTexture();
-        displayTexture = new SurfaceTexture(displayTexId);
+        mSurfaceTexture = new SurfaceTexture(displayTexId);
         GLUtils.checkGlError();
 
 
         // When the video decodes a new frame, tell the GL thread to update the image.
-        displayTexture.setOnFrameAvailableListener(
+        mSurfaceTexture.setOnFrameAvailableListener(
                 new OnFrameAvailableListener() {
                     @Override
                     public void onFrameAvailable(SurfaceTexture surfaceTexture) {
@@ -162,18 +164,20 @@ public final class SceneRenderer {
         if (canvasQuad != null) {
             canvasQuad.glInit();
         }
+
+        mSurface = new Surface(mSurfaceTexture);
     }
 
     @AnyThread
     public synchronized @Nullable
-    SurfaceTexture createDisplay(int width, int height) {
-        if (displayTexture == null) {
+    Surface createDisplay(int width, int height) {
+        if (mSurfaceTexture == null) {
             Log.e(TAG, ".createDisplay called before GL Initialization completed.");
             return null;
         }
 
         //displayTexture.setDefaultBufferSize(width, height);
-        return displayTexture;
+        return mSurface;
     }
 
     public int getTextureId() {
@@ -181,7 +185,7 @@ public final class SceneRenderer {
     }
 
     public void updateTexture() {
-        displayTexture.updateTexImage();
+        mSurfaceTexture.updateTexImage();
         GLUtils.checkGlError();
     }
 

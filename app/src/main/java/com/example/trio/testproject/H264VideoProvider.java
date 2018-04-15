@@ -1,11 +1,10 @@
 package com.example.trio.testproject;
-import android.content.Context;
+
 import android.media.MediaCodec;
 import android.media.MediaFormat;
-import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Surface;
 import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 
 import com.parrot.arsdk.arcontroller.ARCONTROLLER_STREAM_CODEC_TYPE_ENUM;
 import com.parrot.arsdk.arcontroller.ARControllerCodec;
@@ -16,7 +15,11 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class H264VideoView extends SurfaceView implements SurfaceHolder.Callback {
+/**
+ * Created by Hp on 15.04.2018.
+ */
+
+public class H264VideoProvider implements SurfaceHolder.Callback {
 
     private static final String TAG = "H264VideoView";
     private static final String VIDEO_MIME_TYPE = "video/avc";
@@ -35,24 +38,14 @@ public class H264VideoView extends SurfaceView implements SurfaceHolder.Callback
     private static final int VIDEO_WIDTH = 640;
     private static final int VIDEO_HEIGHT = 368;
 
-    public H264VideoView(Context context) {
-        super(context);
-        customInit();
-    }
+    private Surface surface;
 
-    public H264VideoView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        customInit();
-    }
-
-    public H264VideoView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
+    public H264VideoProvider() {
         customInit();
     }
 
     private void customInit() {
         mReadyLock = new ReentrantLock();
-        getHolder().addCallback(this);
     }
 
     public void displayFrame(ARFrame frame) {
@@ -131,7 +124,7 @@ public class H264VideoView extends SurfaceView implements SurfaceHolder.Callback
         format.setByteBuffer("csd-0", mSpsBuffer);
         format.setByteBuffer("csd-1", mPpsBuffer);
 
-        mMediaCodec.configure(format, getHolder().getSurface(), null, 0);
+        mMediaCodec.configure(format, surface, null, 0);
         mMediaCodec.start();
 
         if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.LOLLIPOP) {
@@ -181,5 +174,9 @@ public class H264VideoView extends SurfaceView implements SurfaceHolder.Callback
         mReadyLock.lock();
         releaseMediaCodec();
         mReadyLock.unlock();
+    }
+
+    public void setSurface(Surface surface) {
+        this.surface = surface;
     }
 }

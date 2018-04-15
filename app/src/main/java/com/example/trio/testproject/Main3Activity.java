@@ -1,15 +1,21 @@
 package com.example.trio.testproject;
 
 import android.Manifest;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.graphics.SurfaceTexture;
-import android.hardware.Camera;
 import android.opengl.GLES20;
-import android.opengl.Matrix;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.util.Pair;
+import android.view.Surface;
 
 import com.google.vr.sdk.base.AndroidCompat;
 import com.google.vr.sdk.base.Eye;
@@ -17,23 +23,57 @@ import com.google.vr.sdk.base.GvrActivity;
 import com.google.vr.sdk.base.GvrView;
 import com.google.vr.sdk.base.HeadTransform;
 import com.google.vr.sdk.base.Viewport;
+import com.parrot.arsdk.ARSDK;
+import com.parrot.arsdk.arcontroller.ARCONTROLLER_DEVICE_STATE_ENUM;
+import com.parrot.arsdk.arcontroller.ARCONTROLLER_DICTIONARY_KEY_ENUM;
+import com.parrot.arsdk.arcontroller.ARCONTROLLER_ERROR_ENUM;
+import com.parrot.arsdk.arcontroller.ARControllerCodec;
+import com.parrot.arsdk.arcontroller.ARControllerDictionary;
+import com.parrot.arsdk.arcontroller.ARControllerException;
+import com.parrot.arsdk.arcontroller.ARDeviceController;
+import com.parrot.arsdk.arcontroller.ARDeviceControllerListener;
+import com.parrot.arsdk.arcontroller.ARDeviceControllerStreamListener;
+import com.parrot.arsdk.arcontroller.ARFrame;
+import com.parrot.arsdk.ardiscovery.ARDISCOVERY_PRODUCT_ENUM;
+import com.parrot.arsdk.ardiscovery.ARDiscoveryDevice;
+import com.parrot.arsdk.ardiscovery.ARDiscoveryDeviceService;
+import com.parrot.arsdk.ardiscovery.ARDiscoveryException;
+import com.parrot.arsdk.ardiscovery.ARDiscoveryService;
+import com.parrot.arsdk.ardiscovery.receivers.ARDiscoveryServicesDevicesListUpdatedReceiver;
+import com.parrot.arsdk.ardiscovery.receivers.ARDiscoveryServicesDevicesListUpdatedReceiverDelegate;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.microedition.khronos.egl.EGLConfig;
 
-public class Main3Activity extends GvrActivity implements GvrView.StereoRenderer, SurfaceTexture.OnFrameAvailableListener {
+public class Main3Activity extends GvrActivity
+        implements GvrView.StereoRenderer, SurfaceTexture.OnFrameAvailableListener,
+        ARDeviceControllerListener, ARDeviceControllerStreamListener {
 
     private static final String TAG = "Main3Activity";
     private VideoUiView uiView;
     private SceneRenderer scene;
     private static final int GL_TEXTURE_EXTERNAL_OES = 0x8D65;
-    private Camera camera;
     private final float[] viewProjectionMatrix = new float[16];
+    private static final int VIDEO_WIDTH = 640;
+    private static final int VIDEO_HEIGHT = 368;
+    public ArrayList<String> DeviceNames = new ArrayList<>();
+    ARDiscoveryDevice trioDrone;
+    ARDiscoveryServicesDevicesListUpdatedReceiver receiver;
+    ARDeviceController deviceController;
+
+    Context mContext;
+
+    private H264VideoProvider h264VideoProvider;
+
+    static {
+        ARSDK.loadSDKLibs();
+    }
 
     private final String vertexShaderCode =
             "attribute vec4 position;" +
@@ -110,6 +150,11 @@ public class Main3Activity extends GvrActivity implements GvrView.StereoRenderer
 
     private float[] mView;
     private float[] mCamera;
+    private boolean videoStarted = false;
+    private int displayTexId;
+    private SurfaceTexture mSurfaceTexture;
+    private Boolean updateSurface = new Boolean(false);
+    private Surface mSurface;
 
     private int loadGLShader(int type, String code) {
         int shader = GLES20.glCreateShader(type);
@@ -141,7 +186,7 @@ public class Main3Activity extends GvrActivity implements GvrView.StereoRenderer
         gvrView.setEGLConfigChooser(8, 8, 8, 8, 16, 8);
 
         gvrView.setRenderer(this);
-        gvrView.setTransitionViewEnabled(true);
+        //gvrView.setTransitionViewEnabled(true);
 
         // Enable Cardboard-trigger feedback with Daydream headsets. This is a simple way of supporting
         // Daydream controller input for basic interactions using the existing Cardboard trigger API.
@@ -173,14 +218,148 @@ public class Main3Activity extends GvrActivity implements GvrView.StereoRenderer
 
         initializeGvrView();
 
-        mView = new float[16];
+        mContext = this;
+        h264VideoProvider = new H264VideoProvider();
+
+        initDiscoveryService();
+        registerReceivers();
+
         mCamera = new float[16];
+    }
+
+    private ARDiscoveryService mArdiscoveryService;
+    private ServiceConnection mArdiscoveryServiceConnection;
+
+    private void initDiscoveryService() {
+        Log.e("initDiscoveryService", "İçerde");
+        // create the service connection
+        if (mArdiscoveryServiceConnection == null) {
+            mArdiscoveryServiceConnection = new ServiceConnection() {
+                @Override
+                public void onServiceConnected(ComponentName name, IBinder service) {
+                    mArdiscoveryService = ((ARDiscoveryService.LocalBinder) service).getService();
+
+                    startDiscovery();
+                }
+
+                @Override
+                public void onServiceDisconnected(ComponentName name) {
+                    mArdiscoveryService = null;
+                }
+            };
+        }
+
+        if (mArdiscoveryService == null) {
+            // if the discovery service doesn't exists, bind to it
+            Intent i = new Intent(getApplicationContext(), ARDiscoveryService.class);
+            getApplicationContext().bindService(i, mArdiscoveryServiceConnection, Context.BIND_AUTO_CREATE);
+        } else {
+            // if the discovery service already exists, start discovery
+            startDiscovery();
+        }
+    }
+
+    private void startDiscovery() {
+        if (mArdiscoveryService != null) {
+            mArdiscoveryService.start();
+        }
+    }
+
+    private void registerReceivers() {
+        Log.e("registerReceivers", "İçerde");
+
+        receiver = new ARDiscoveryServicesDevicesListUpdatedReceiver(mDiscoveryDelegate);
+        LocalBroadcastManager localBroadcastMgr = LocalBroadcastManager.getInstance(getApplicationContext());
+        localBroadcastMgr.registerReceiver(receiver, new IntentFilter(ARDiscoveryService.kARDiscoveryServiceNotificationServicesDevicesListUpdated));
+
+    }
+
+    private final ARDiscoveryServicesDevicesListUpdatedReceiverDelegate mDiscoveryDelegate = new ARDiscoveryServicesDevicesListUpdatedReceiverDelegate() {
+        @Override
+        public void onServicesDevicesListUpdated() {
+            Log.e("DeviceListUpdater", "İçerde");
+            if (mArdiscoveryService != null) {
+                List<ARDiscoveryDeviceService> deviceList = mArdiscoveryService.getDeviceServicesArray();
+
+                DeviceNames.clear();
+                for (int i = 0; i < deviceList.size(); i++) {
+                    DeviceNames.add(deviceList.get(i).getName());
+                }
+
+                if (deviceList.size() > 0) {
+                    Log.e("DeviceCreateCall", "Null değil create et!");
+                    trioDrone = createDiscoveryDevice(deviceList.get(0));
+                    if (trioDrone != null) {
+                        try {
+                            deviceController = new ARDeviceController(trioDrone);
+                            trioDrone.dispose();
+                            Log.e("DeviceCOntrollerYaratma", "trioDrone Null Değil");
+                            deviceController.addListener((ARDeviceControllerListener) mContext);
+                            ARCONTROLLER_ERROR_ENUM error = deviceController.start();
+                            deviceController.addStreamListener((ARDeviceControllerStreamListener) mContext);
+                        } catch (ARControllerException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } else {
+                    Log.e("DeviceCreateCall", "Null geldi!");
+                }
+            }
+        }
+    };
+
+
+    private ARDiscoveryDevice createDiscoveryDevice(ARDiscoveryDeviceService service) {
+        ARDiscoveryDevice device = null;
+        try {
+            device = new ARDiscoveryDevice(mContext, service);
+            Log.e("Device Var", device.toString());
+        } catch (ARDiscoveryException e) {
+            Log.e("ARDiscoveryException", "Exception", e);
+        }
+
+        return device;
+    }
+
+
+    private void unregisterReceivers() {
+        LocalBroadcastManager localBroadcastMgr = LocalBroadcastManager.getInstance(getApplicationContext());
+        localBroadcastMgr.unregisterReceiver(receiver);
+    }
+
+    private void closeServices() {
+        Log.d("ServiceClose", "closeServices ...");
+
+        if (mArdiscoveryService != null) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    mArdiscoveryService.stop();
+
+                    getApplicationContext().unbindService(mArdiscoveryServiceConnection);
+                    mArdiscoveryService = null;
+                }
+            }).start();
+        }
+    }
+
+    public void stopVideo() {
+        try {
+            deviceController.stopVideoStream();
+        } catch (ARControllerException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void onNewFrame(HeadTransform headTransform) {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
-        scene.updateTexture();
+        synchronized (updateSurface) {
+            if (updateSurface) {
+                mSurfaceTexture.updateTexImage(); // update surfacetexture if available
+                updateSurface = false;
+            }
+        }
     }
 
     @Override
@@ -190,7 +369,7 @@ public class Main3Activity extends GvrActivity implements GvrView.StereoRenderer
         GLES20.glUseProgram(mProgram);
 
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-        GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, scene.getTextureId());
+        GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, displayTexId);
 
 
         mPositionHandle = GLES20.glGetAttribLocation(mProgram, "position");
@@ -211,10 +390,11 @@ public class Main3Activity extends GvrActivity implements GvrView.StereoRenderer
         // Disable vertex array
         GLES20.glDisableVertexAttribArray(mPositionHandle);
         GLES20.glDisableVertexAttribArray(mTextureCoordHandle);
-
+/*
         Matrix.multiplyMM(
                 viewProjectionMatrix, 0, eye.getPerspective(Z_NEAR, Z_FAR), 0, eye.getEyeView(), 0);
         scene.glDrawFrame(viewProjectionMatrix, eye.getType());
+  */
     }
 
     @Override
@@ -231,7 +411,7 @@ public class Main3Activity extends GvrActivity implements GvrView.StereoRenderer
     public void onSurfaceCreated(EGLConfig eglConfig) {
         GLES20.glClearColor(0.1f, 0.1f, 0.1f, 0.5f); // Dark background so text shows up well
 
-        scene.glInit();
+        //scene.glInit();
         ByteBuffer bb = ByteBuffer.allocateDirect(squareVertices.length * 4);
         bb.order(ByteOrder.nativeOrder());
         vertexBuffer = bb.asFloatBuffer();
@@ -260,10 +440,32 @@ public class Main3Activity extends GvrActivity implements GvrView.StereoRenderer
         GLES20.glAttachShader(mProgram, fragmentShader); // add the fragment shader to program
         GLES20.glLinkProgram(mProgram);
 
+        displayTexId = GLUtils.glCreateExternalTexture();
+        mSurfaceTexture = new SurfaceTexture(displayTexId);
+        GLUtils.checkGlError();
+
+
+        // When the video decodes a new frame, tell the GL thread to update the image.
+        mSurfaceTexture.setOnFrameAvailableListener(new SurfaceTexture.OnFrameAvailableListener() {
+            @Override
+            public void onFrameAvailable(SurfaceTexture surfaceTexture) {
+                synchronized (updateSurface) {
+                    updateSurface = true;
+                }
+            }
+        });
+
+        mSurface = new Surface(mSurfaceTexture);
+
+
+
         startCamera();
     }
 
+
     public void startCamera() {
+        //h264VideoProvider.setSurface(scene.createDisplay(VIDEO_WIDTH, VIDEO_HEIGHT));
+        /*
         camera = Camera.open();
 
         Camera.Size cSize = camera.getParameters().getPreviewSize();
@@ -273,7 +475,7 @@ public class Main3Activity extends GvrActivity implements GvrView.StereoRenderer
             camera.startPreview();
         } catch (IOException ioe) {
             Log.w("Main3Activity", "CAM LAUNCH FAILED");
-        }
+        }*/
     }
 
     @Override
@@ -283,6 +485,39 @@ public class Main3Activity extends GvrActivity implements GvrView.StereoRenderer
 
     @Override
     public void onFrameAvailable(SurfaceTexture arg0) {
+
+    }
+
+    @Override
+    public void onStateChanged(ARDeviceController deviceController, ARCONTROLLER_DEVICE_STATE_ENUM newState, ARCONTROLLER_ERROR_ENUM error) {
+
+    }
+
+    @Override
+    public void onExtensionStateChanged(ARDeviceController deviceController, ARCONTROLLER_DEVICE_STATE_ENUM newState, ARDISCOVERY_PRODUCT_ENUM product, String name, ARCONTROLLER_ERROR_ENUM error) {
+
+    }
+
+    @Override
+    public void onCommandReceived(ARDeviceController deviceController, ARCONTROLLER_DICTIONARY_KEY_ENUM commandKey, ARControllerDictionary elementDictionary) {
+
+    }
+
+    @Override
+    public ARCONTROLLER_ERROR_ENUM configureDecoder(ARDeviceController deviceController, ARControllerCodec codec) {
+        Log.e("configureDecoder", "codec received");
+        h264VideoProvider.configureDecoder(codec);
+        return ARCONTROLLER_ERROR_ENUM.ARCONTROLLER_OK;
+    }
+
+    @Override
+    public ARCONTROLLER_ERROR_ENUM onFrameReceived(ARDeviceController deviceController, ARFrame frame) {
+        h264VideoProvider.displayFrame(frame);
+        return ARCONTROLLER_ERROR_ENUM.ARCONTROLLER_OK;
+    }
+
+    @Override
+    public void onFrameTimeout(ARDeviceController deviceController) {
 
     }
 }

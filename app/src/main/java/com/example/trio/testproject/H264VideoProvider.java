@@ -4,7 +4,6 @@ import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.util.Log;
 import android.view.Surface;
-import android.view.SurfaceHolder;
 
 import com.parrot.arsdk.arcontroller.ARCONTROLLER_STREAM_CODEC_TYPE_ENUM;
 import com.parrot.arsdk.arcontroller.ARControllerCodec;
@@ -15,11 +14,7 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-/**
- * Created by Hp on 15.04.2018.
- */
-
-public class H264VideoProvider implements SurfaceHolder.Callback {
+public class H264VideoProvider {
 
     private static final String TAG = "H264VideoView";
     private static final String VIDEO_MIME_TYPE = "video/avc";
@@ -40,11 +35,8 @@ public class H264VideoProvider implements SurfaceHolder.Callback {
 
     private Surface surface;
 
-    public H264VideoProvider() {
-        customInit();
-    }
 
-    private void customInit() {
+    public H264VideoProvider() {
         mReadyLock = new ReentrantLock();
     }
 
@@ -132,6 +124,7 @@ public class H264VideoProvider implements SurfaceHolder.Callback {
         }
 
         mIsCodecConfigured = true;
+        Log.d("media codec", "configured");
     }
 
     private void initMediaCodec(String type) {
@@ -157,26 +150,16 @@ public class H264VideoProvider implements SurfaceHolder.Callback {
         }
     }
 
-    @Override
-    public void surfaceCreated(SurfaceHolder holder) {
+    public void init(Surface surface) {
+        this.surface = surface;
         mReadyLock.lock();
         initMediaCodec(VIDEO_MIME_TYPE);
         mReadyLock.unlock();
     }
 
-    @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
+    public void destroy() {
         mReadyLock.lock();
         releaseMediaCodec();
         mReadyLock.unlock();
-    }
-
-    public void setSurface(Surface surface) {
-        this.surface = surface;
     }
 }

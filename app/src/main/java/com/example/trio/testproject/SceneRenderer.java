@@ -121,7 +121,6 @@ public final class SceneRenderer {
         drawListBuffer.put(drawOrder);
         drawListBuffer.position(0);
 
-
         ByteBuffer bb2 = ByteBuffer.allocateDirect(textureVertices.length * 4);
         bb2.order(ByteOrder.nativeOrder());
         textureVerticesBuffer = bb2.asFloatBuffer();
@@ -161,18 +160,20 @@ public final class SceneRenderer {
         }
 
         mSurface = new Surface(mSurfaceTexture);
+        Log.d("scene renderer", "initialized");
+
     }
 
     @AnyThread
     public synchronized @Nullable
-    SurfaceTexture createDisplay(int width, int height) {
+    Surface createDisplay(int width, int height) {
         if (mSurfaceTexture == null) {
             Log.e(TAG, ".createDisplay called before GL Initialization completed.");
             return null;
         }
 
         mSurfaceTexture.setDefaultBufferSize(width, height);
-        return mSurfaceTexture;
+        return mSurface;
     }
 
     public int getTextureId() {

@@ -7,11 +7,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -42,13 +44,13 @@ import com.parrot.arsdk.ardiscovery.ARDiscoveryService;
 import com.parrot.arsdk.ardiscovery.receivers.ARDiscoveryServicesDevicesListUpdatedReceiver;
 import com.parrot.arsdk.ardiscovery.receivers.ARDiscoveryServicesDevicesListUpdatedReceiverDelegate;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.microedition.khronos.egl.EGLConfig;
 
 public class Main3Activity extends GvrActivity implements GvrView.StereoRenderer,
+        SurfaceTexture.OnFrameAvailableListener,
         ARDeviceControllerListener, ARDeviceControllerStreamListener {
 
     private static final String TAG = "Main3Activity";
@@ -56,11 +58,16 @@ public class Main3Activity extends GvrActivity implements GvrView.StereoRenderer
     private SceneRenderer scene;
     public ArrayList<String> DeviceNames = new ArrayList<>();
     private Camera camera;
+    private boolean videoStarted;
     ARDiscoveryDevice trioDrone;
     ARDiscoveryServicesDevicesListUpdatedReceiver receiver;
     ARDeviceController deviceController;
+
     private static final float Z_NEAR = 0.1f;
     private static final float Z_FAR = 100.0f;
+
+    private static final int VIDEO_WIDTH = 640;
+    private static final int VIDEO_HEIGHT = 368;
 
     Context mContext;
 
@@ -113,6 +120,15 @@ public class Main3Activity extends GvrActivity implements GvrView.StereoRenderer
 
         initDiscoveryService();
         registerReceivers();
+
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                deviceController.startVideoStream();
+                Log.e("videostream", "starting video stream");
+            }
+        }, 10000);
     }
 
     private ARDiscoveryService mArdiscoveryService;
@@ -242,6 +258,11 @@ public class Main3Activity extends GvrActivity implements GvrView.StereoRenderer
     @Override
     public void onNewFrame(HeadTransform headTransform) {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
+        if ((!videoStarted) && (deviceController != null)) {
+            //deviceController.startVideoStream();
+            videoStarted = true;
+        }
+
         scene.updateTexture();
     }
 
@@ -266,8 +287,8 @@ public class Main3Activity extends GvrActivity implements GvrView.StereoRenderer
     @Override
     public void onSurfaceCreated(EGLConfig eglConfig) {
         scene.onSurfaceCreated();
-        //h264VideoProvider.setSurface(scene.createDisplay(VIDEO_WIDTH, VIDEO_HEIGHT));
-
+        h264VideoProvider.init(scene.createDisplay(VIDEO_WIDTH, VIDEO_HEIGHT));
+/*
         camera = Camera.open();
 
         Camera.Size cSize = camera.getParameters().getPreviewSize();
@@ -277,7 +298,7 @@ public class Main3Activity extends GvrActivity implements GvrView.StereoRenderer
             camera.startPreview();
         } catch (IOException ioe) {
             Log.w("Main3Activity", "CAM LAUNCH FAILED");
-        }
+        }*/
     }
 
     @Override
@@ -315,6 +336,11 @@ public class Main3Activity extends GvrActivity implements GvrView.StereoRenderer
 
     @Override
     public void onFrameTimeout(ARDeviceController deviceController) {
+
+    }
+
+    @Override
+    public void onFrameAvailable(SurfaceTexture surfaceTexture) {
 
     }
 }

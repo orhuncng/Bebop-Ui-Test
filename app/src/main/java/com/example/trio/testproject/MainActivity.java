@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
@@ -67,6 +68,15 @@ public class MainActivity extends AppCompatActivity implements ARDeviceControlle
         registerReceivers();
 
         mVideoView = (H264VideoView) findViewById(R.id.videoView);
+
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                deviceController.startVideoStream();
+                Log.e("videostream", "starting video stream");
+            }
+        }, 10000);
     }
 
     public void showDevices(View view) {

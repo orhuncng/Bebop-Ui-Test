@@ -14,9 +14,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class VideoUiView extends LinearLayout {
-    private TextView statusText;
-    private final UiUpdater uiUpdater = new UiUpdater();
 
+    private final UiUpdater uiUpdater = new UiUpdater();
     private CanvasQuad canvasQuad;
 
     VideoUiView(Context context, AttributeSet attrs) {
@@ -25,8 +24,6 @@ public class VideoUiView extends LinearLayout {
 
     @MainThread
     public static VideoUiView createForOpenGl(Context context, ViewGroup parent, CanvasQuad quad) {
-        // If a custom theme isn't specified, the Context's theme is used. For VR Activities, this is
-        // the old Android default theme rather than a modern theme. Override this with a custom theme.
         Context theme = new ContextThemeWrapper(context, R.style.AppTheme);
 
         VideoUiView view = (VideoUiView) View.inflate(theme, R.layout.video_ui, null);
@@ -68,14 +65,12 @@ public class VideoUiView extends LinearLayout {
     }
 
     private final class UiUpdater implements SurfaceTexture.OnFrameAvailableListener {
-        private int videoDurationMs = 0;
-
         // onFrameAvailable is called on an arbitrary thread, but we can only access mediaPlayer on the
         // main thread.
         private Runnable uiThreadUpdater = new Runnable() {
             @Override
             public void run() {
-                TextView tv = (TextView) findViewById(R.id.status_text);
+                TextView tv = findViewById(R.id.status_text);
                 tv.setText("asdas");
 
                 if (canvasQuad != null) {

@@ -14,6 +14,8 @@ import android.util.Pair;
 import android.view.Surface;
 import android.view.ViewGroup;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -25,7 +27,7 @@ public final class SceneRenderer {
     private Surface mSurface;
     private SurfaceTexture mSurfaceTexture;
     private final AtomicBoolean frameAvailable = new AtomicBoolean();
-    // Used to notify clients that displayTexture has a new frame. This requires synchronized access.
+
     @Nullable
     private OnFrameAvailableListener externalFrameListener;
 
@@ -43,10 +45,10 @@ public final class SceneRenderer {
     private final String fragmentShaderCode =
             "#extension GL_OES_EGL_image_external : require\n" +
                     "precision mediump float;" +
-                    "varying vec2 textureCoordinate;                            \n" +
-                    "uniform samplerExternalOES s_texture;               \n" +
+                    "varying vec2 textureCoordinate;" +
+                    "uniform samplerExternalOES s_texture;" +
                     "void main(void) {" +
-                    "  gl_FragColor = texture2D( s_texture, textureCoordinate );\n" +
+                    "  gl_FragColor = texture2D( s_texture, textureCoordinate );" +
                     "}";
 
     private static final int GL_TEXTURE_EXTERNAL_OES = 0x8D65;
@@ -75,8 +77,6 @@ public final class SceneRenderer {
     };
 
 
-    // These are only valid if createForVR() has been called. In the 2D Activity, these are null
-    // since the UI is rendered in the standard Android layout.
     @Nullable
     private final CanvasQuad canvasQuad;
     @Nullable
@@ -84,7 +84,7 @@ public final class SceneRenderer {
     @Nullable
     private final Handler uiHandler;
 
-    SceneRenderer(
+    private SceneRenderer(
             CanvasQuad canvasQuad, VideoUiView videoUiView, Handler uiHandler,
             SurfaceTexture.OnFrameAvailableListener externalFrameListener) {
         this.canvasQuad = canvasQuad;
@@ -104,26 +104,23 @@ public final class SceneRenderer {
         return Pair.create(scene, videoUiView);
     }
 
-    public void glInit() {
-        //GLUtils.checkGlError();
-
-        // Set the background frame color. This is only visible if the display mesh isn't a full sphere.
+    public void onSurfaceCreated() {
         GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         GLUtils.checkGlError();
 
-
-
-        /*ByteBuffer bb = ByteBuffer.allocateDirect(squareVertices.length * 4);
+        ByteBuffer bb = ByteBuffer.allocateDirect(squareVertices.length * 4);
         bb.order(ByteOrder.nativeOrder());
         vertexBuffer = bb.asFloatBuffer();
         vertexBuffer.put(squareVertices);
         vertexBuffer.position(0);
+
 
         ByteBuffer dlb = ByteBuffer.allocateDirect(drawOrder.length * 2);
         dlb.order(ByteOrder.nativeOrder());
         drawListBuffer = dlb.asShortBuffer();
         drawListBuffer.put(drawOrder);
         drawListBuffer.position(0);
+
 
         ByteBuffer bb2 = ByteBuffer.allocateDirect(textureVertices.length * 4);
         bb2.order(ByteOrder.nativeOrder());
@@ -137,14 +134,12 @@ public final class SceneRenderer {
         mProgram = GLES20.glCreateProgram();             // create empty OpenGL ES Program
         GLES20.glAttachShader(mProgram, vertexShader);   // add the vertex shader to program
         GLES20.glAttachShader(mProgram, fragmentShader); // add the fragment shader to program
-        GLES20.glLinkProgram(mProgram);*/
-
+        GLES20.glLinkProgram(mProgram);
 
         // Create the texture used to render each frame of video.
         displayTexId = GLUtils.glCreateExternalTexture();
         mSurfaceTexture = new SurfaceTexture(displayTexId);
         GLUtils.checkGlError();
-
 
         // When the video decodes a new frame, tell the GL thread to update the image.
         mSurfaceTexture.setOnFrameAvailableListener(
@@ -170,14 +165,14 @@ public final class SceneRenderer {
 
     @AnyThread
     public synchronized @Nullable
-    Surface createDisplay(int width, int height) {
+    SurfaceTexture createDisplay(int width, int height) {
         if (mSurfaceTexture == null) {
             Log.e(TAG, ".createDisplay called before GL Initialization completed.");
             return null;
         }
 
-        //displayTexture.setDefaultBufferSize(width, height);
-        return mSurface;
+        mSurfaceTexture.setDefaultBufferSize(width, height);
+        return mSurfaceTexture;
     }
 
     public int getTextureId() {
@@ -189,33 +184,19 @@ public final class SceneRenderer {
         GLUtils.checkGlError();
     }
 
-    public void glDrawFrame(float[] viewProjectionMatrix, int eyeType) {
-        // The uiQuad uses alpha.
-        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
-        GLES20.glEnable(GLES20.GL_BLEND);
-        canvasQuad.glDraw(viewProjectionMatrix, videoUiView.getAlpha());
-        GLES20.glDisable(GLES20.GL_BLEND);
-        // The uiQuad uses alpha.
-        //GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
-        //GLES20.glEnable(GLES20.GL_BLEND);
-
-        //if (frameAvailable.compareAndSet(true, false)) {
-        //displayTexture.updateTexImage();
-        //GLUtils.checkGlError();
-        // }
-
-        //GLES20.glEnable(GLES20.GL_DEPTH_TEST);
-        /*GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
+    public void draw(float[] viewProjectionMatrix) {
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
         GLES20.glUseProgram(mProgram);
 
-        GLES20.glActiveTexture(GL_TEXTURE_EXTERNAL_OES);
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
         GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, displayTexId);
 
         mPositionHandle = GLES20.glGetAttribLocation(mProgram, "position");
         GLES20.glEnableVertexAttribArray(mPositionHandle);
         GLES20.glVertexAttribPointer(mPositionHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT,
                 false, vertexStride, vertexBuffer);
+
 
         mTextureCoordHandle = GLES20.glGetAttribLocation(mProgram, "inputTextureCoordinate");
         GLES20.glEnableVertexAttribArray(mTextureCoordHandle);
@@ -225,18 +206,15 @@ public final class SceneRenderer {
         GLES20.glDrawElements(GLES20.GL_TRIANGLES, drawOrder.length,
                 GLES20.GL_UNSIGNED_SHORT, drawListBuffer);
 
+        // Disable vertex array
         GLES20.glDisableVertexAttribArray(mPositionHandle);
-        GLES20.glDisableVertexAttribArray(mTextureCoordHandle);*/
-        //GLES20.glEnable(GLES20.GL_TEXTURE_2D);
-        //GLES20.glEnable(GLES20.GL_BLEND);
-        //GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+        GLES20.glDisableVertexAttribArray(mTextureCoordHandle);
 
-        //GLES20.glDisable(GLES20.GL_BLEND);
-        //GLES20.glDisable(GLES20.GL_TEXTURE_2D);
+        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+        GLES20.glEnable(GLES20.GL_BLEND);
 
-        if (videoUiView != null) {
-            //        canvasQuad.glDraw(viewProjectionMatrix, videoUiView.getAlpha());
-        }
+        canvasQuad.glDraw(videoUiView.getAlpha());
+        GLES20.glDisable(GLES20.GL_BLEND);
     }
 
     public void glShutdown() {

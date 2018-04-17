@@ -14,7 +14,7 @@ public class CanvasQuad {
     // The size of the quad is hardcoded for this sample and the quad doesn't have a model matrix so
     // these dimensions are used by translateClick() for touch interaction.
     private static final float WIDTH = 1f;
-    private static final float HEIGHT = 1 / 8f;
+    private static final float HEIGHT = 1f;
     private static final float DISTANCE = 1f;
 
     private static final float[] MVP_MATRIX = {

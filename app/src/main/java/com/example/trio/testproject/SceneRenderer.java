@@ -24,14 +24,18 @@ public final class SceneRenderer {
     private static final String TAG = "SceneRenderer";
 
     // This is the primary interface between the Media Player and the GL Scene.
-    private Surface mSurface;
-    private SurfaceTexture mSurfaceTexture;
-    private final AtomicBoolean frameAvailable = new AtomicBoolean();
+    private Surface mDroneSurface;
+    private SurfaceTexture mDroneTexture;
+    private Surface mPhoneSurface;
+    private SurfaceTexture mPhoneTexture;
+    private final AtomicBoolean droneFrameAvailable = new AtomicBoolean();
+    private final AtomicBoolean phoneFrameAvailable = new AtomicBoolean();
 
     @Nullable
     private OnFrameAvailableListener externalFrameListener;
 
-    private int displayTexId;
+    private int droneTexId;
+    private int phoneTexId;
     private final String vertexShaderCode =
             "attribute vec4 position;" +
                     "attribute vec2 inputTextureCoordinate;" +
@@ -83,6 +87,12 @@ public final class SceneRenderer {
     private final VideoUiView videoUiView;
     @Nullable
     private final Handler uiHandler;
+
+    public void toggleDroneCameraEnabled() {
+        droneCameraEnabled = !droneCameraEnabled;
+    }
+
+    private boolean droneCameraEnabled;
 
     private SceneRenderer(
             CanvasQuad canvasQuad, VideoUiView videoUiView, Handler uiHandler,
@@ -136,16 +146,16 @@ public final class SceneRenderer {
         GLES20.glLinkProgram(mProgram);
 
         // Create the texture used to render each frame of video.
-        displayTexId = GLUtils.glCreateExternalTexture();
-        mSurfaceTexture = new SurfaceTexture(displayTexId);
+        droneTexId = GLUtils.glCreateExternalTexture();
+        mDroneTexture = new SurfaceTexture(droneTexId);
         GLUtils.checkGlError();
 
         // When the video decodes a new frame, tell the GL thread to update the image.
-        mSurfaceTexture.setOnFrameAvailableListener(
+        mDroneTexture.setOnFrameAvailableListener(
                 new OnFrameAvailableListener() {
                     @Override
                     public void onFrameAvailable(SurfaceTexture surfaceTexture) {
-                        frameAvailable.set(true);
+                        droneFrameAvailable.set(true);
 
                         synchronized (SceneRenderer.this) {
                             if (externalFrameListener != null) {
@@ -159,29 +169,63 @@ public final class SceneRenderer {
             canvasQuad.glInit();
         }
 
-        mSurface = new Surface(mSurfaceTexture);
+        mDroneSurface = new Surface(mDroneTexture);
+
+        // Create the texture used to render each frame of video.
+        phoneTexId = GLUtils.glCreateExternalTexture();
+        mPhoneTexture = new SurfaceTexture(phoneTexId);
+        GLUtils.checkGlError();
+
+        // When the video decodes a new frame, tell the GL thread to update the image.
+        mPhoneTexture.setOnFrameAvailableListener(
+                new OnFrameAvailableListener() {
+                    @Override
+                    public void onFrameAvailable(SurfaceTexture surfaceTexture) {
+                        phoneFrameAvailable.set(true);
+
+                        synchronized (SceneRenderer.this) {
+                            if (externalFrameListener != null) {
+                                externalFrameListener.onFrameAvailable(surfaceTexture);
+                            }
+                        }
+                    }
+                });
+
+        mPhoneSurface = new Surface(mPhoneTexture);
+
         Log.d("scene renderer", "initialized");
 
     }
 
     @AnyThread
     public synchronized @Nullable
-    Surface createDisplay(int width, int height) {
-        if (mSurfaceTexture == null) {
-            Log.e(TAG, ".createDisplay called before GL Initialization completed.");
+    Surface getDroneCamTexture(int width, int height) {
+        if (mDroneTexture == null) {
+            Log.e(TAG, ".getDroneCamTexture called before GL Initialization completed.");
             return null;
         }
 
-        mSurfaceTexture.setDefaultBufferSize(width, height);
-        return mSurface;
+        mDroneTexture.setDefaultBufferSize(width, height);
+        return mDroneSurface;
     }
 
-    public int getTextureId() {
-        return displayTexId;
+    @AnyThread
+    public synchronized @Nullable
+    SurfaceTexture getPhoneCamTexture(int width, int height) {
+        if (mPhoneTexture == null) {
+            Log.e(TAG, ".getPhoneCamTexture called before GL Initialization completed.");
+            return null;
+        }
+
+        mPhoneTexture.setDefaultBufferSize(width, height);
+        return mPhoneTexture;
     }
 
     public void updateTexture() {
-        mSurfaceTexture.updateTexImage();
+        if (droneCameraEnabled)
+            mDroneTexture.updateTexImage();
+        else
+            mPhoneTexture.updateTexImage();
         GLUtils.checkGlError();
     }
 
@@ -191,7 +235,11 @@ public final class SceneRenderer {
         GLES20.glUseProgram(mProgram);
 
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-        GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, displayTexId);
+
+        if (droneCameraEnabled)
+            GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, droneTexId);
+        else
+            GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, phoneTexId);
 
         mPositionHandle = GLES20.glGetAttribLocation(mProgram, "position");
         GLES20.glEnableVertexAttribArray(mPositionHandle);
@@ -211,10 +259,10 @@ public final class SceneRenderer {
         GLES20.glDisableVertexAttribArray(mPositionHandle);
         GLES20.glDisableVertexAttribArray(mTextureCoordHandle);
 
-        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_DST_ALPHA);
         GLES20.glEnable(GLES20.GL_BLEND);
 
-        canvasQuad.glDraw(videoUiView.getAlpha());
+        canvasQuad.glDraw(0.7f);
         GLES20.glDisable(GLES20.GL_BLEND);
     }
 

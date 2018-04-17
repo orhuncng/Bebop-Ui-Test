@@ -134,12 +134,10 @@
     <orderEntry type="library" name="Gradle: com.android.support:support-core-ui-26.1.0" level="project" />
     <orderEntry type="library" name="Gradle: com.parrot:libARController-3.13.1" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:support-core-utils-26.1.0" level="project" />
-    <orderEntry type="library" name="Gradle: com.badlogicgames.gdx:gdx-freetype:1.9.3@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.parrot:libARStream2-3.13.1" level="project" />
     <orderEntry type="library" name="Gradle: com.google.protobuf.nano:protobuf-javanano:3.1.0@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.parrot:libARNetworkAL-3.13.1" level="project" />
     <orderEntry type="library" name="Gradle: com.parrot:libARStream-3.13.1" level="project" />
-    <orderEntry type="library" name="Gradle: com.badlogicgames.gdx:gdx-backend-android:1.9.3@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.parrot:libARUpdater-3.13.1" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:design-26.1.0" level="project" />
     <orderEntry type="library" name="Gradle: com.parrot:libARUtils-3.13.1" level="project" />
@@ -165,7 +163,6 @@
     <orderEntry type="library" scope="TEST" name="Gradle: org.hamcrest:hamcrest-core:1.3@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.parrot:libARMavlink-3.13.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.android.support.test.espresso:espresso-idling-resource-3.0.1" level="project" />
-    <orderEntry type="library" name="Gradle: com.badlogicgames.gdx:gdx:1.9.3@jar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.hamcrest:hamcrest-integration:1.3@jar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.hamcrest:hamcrest-library:1.3@jar" level="project" />
     <orderEntry type="library" name="Gradle: android.arch.lifecycle:runtime-1.0.0" level="project" />

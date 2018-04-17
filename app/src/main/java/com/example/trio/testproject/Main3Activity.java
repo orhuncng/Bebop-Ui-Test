@@ -26,15 +26,20 @@ import com.google.vr.sdk.base.GvrView;
 import com.google.vr.sdk.base.HeadTransform;
 import com.google.vr.sdk.base.Viewport;
 import com.parrot.arsdk.ARSDK;
+import com.parrot.arsdk.arcommands.ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_ENUM;
+import com.parrot.arsdk.arcommands.ARCOMMANDS_COMMON_COMMONSTATE_SENSORSSTATESLISTCHANGED_SENSORNAME_ENUM;
 import com.parrot.arsdk.arcontroller.ARCONTROLLER_DEVICE_STATE_ENUM;
 import com.parrot.arsdk.arcontroller.ARCONTROLLER_DICTIONARY_KEY_ENUM;
 import com.parrot.arsdk.arcontroller.ARCONTROLLER_ERROR_ENUM;
+import com.parrot.arsdk.arcontroller.ARControllerArgumentDictionary;
 import com.parrot.arsdk.arcontroller.ARControllerCodec;
 import com.parrot.arsdk.arcontroller.ARControllerDictionary;
 import com.parrot.arsdk.arcontroller.ARControllerException;
 import com.parrot.arsdk.arcontroller.ARDeviceController;
 import com.parrot.arsdk.arcontroller.ARDeviceControllerListener;
 import com.parrot.arsdk.arcontroller.ARDeviceControllerStreamListener;
+import com.parrot.arsdk.arcontroller.ARFeatureARDrone3;
+import com.parrot.arsdk.arcontroller.ARFeatureCommon;
 import com.parrot.arsdk.arcontroller.ARFrame;
 import com.parrot.arsdk.ardiscovery.ARDISCOVERY_PRODUCT_ENUM;
 import com.parrot.arsdk.ardiscovery.ARDiscoveryDevice;
@@ -44,7 +49,9 @@ import com.parrot.arsdk.ardiscovery.ARDiscoveryService;
 import com.parrot.arsdk.ardiscovery.receivers.ARDiscoveryServicesDevicesListUpdatedReceiver;
 import com.parrot.arsdk.ardiscovery.receivers.ARDiscoveryServicesDevicesListUpdatedReceiverDelegate;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -86,6 +93,7 @@ public class Main3Activity extends GvrActivity implements GvrView.StereoRenderer
         gvrView.setEGLConfigChooser(8, 8, 8, 8, 16, 8);
 
         gvrView.setRenderer(this);
+
         //gvrView.setTransitionViewEnabled(true);
 
         gvrView.enableCardboardTriggerEmulation();
@@ -128,7 +136,7 @@ public class Main3Activity extends GvrActivity implements GvrView.StereoRenderer
                 deviceController.startVideoStream();
                 Log.e("videostream", "starting video stream");
             }
-        }, 10000);
+        }, 5000);
     }
 
     private ARDiscoveryService mArdiscoveryService;
@@ -201,6 +209,7 @@ public class Main3Activity extends GvrActivity implements GvrView.StereoRenderer
                             deviceController.addListener((ARDeviceControllerListener) mContext);
                             ARCONTROLLER_ERROR_ENUM error = deviceController.start();
                             deviceController.addStreamListener((ARDeviceControllerStreamListener) mContext);
+                            //deviceController.startVideoStream();
                         } catch (ARControllerException e) {
                             e.printStackTrace();
                         }
@@ -258,11 +267,6 @@ public class Main3Activity extends GvrActivity implements GvrView.StereoRenderer
     @Override
     public void onNewFrame(HeadTransform headTransform) {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
-        if ((!videoStarted) && (deviceController != null)) {
-            //deviceController.startVideoStream();
-            videoStarted = true;
-        }
-
         scene.updateTexture();
     }
 
@@ -279,26 +283,25 @@ public class Main3Activity extends GvrActivity implements GvrView.StereoRenderer
 
     }
 
-    @Override
-    public void onSurfaceChanged(int i, int i1) {
 
-    }
+    @Override
+    public void onSurfaceChanged(int i, int i1) { }
 
     @Override
     public void onSurfaceCreated(EGLConfig eglConfig) {
-        scene.onSurfaceCreated();
-        h264VideoProvider.init(scene.createDisplay(VIDEO_WIDTH, VIDEO_HEIGHT));
-/*
-        camera = Camera.open();
+            scene.onSurfaceCreated();
+            h264VideoProvider.init(scene.getDroneCamTexture(VIDEO_WIDTH, VIDEO_HEIGHT));
 
-        Camera.Size cSize = camera.getParameters().getPreviewSize();
+            camera = Camera.open();
 
-        try {
-            camera.setPreviewTexture(scene.createDisplay(cSize.width, cSize.height));
-            camera.startPreview();
-        } catch (IOException ioe) {
-            Log.w("Main3Activity", "CAM LAUNCH FAILED");
-        }*/
+            Camera.Size cSize = camera.getParameters().getPreviewSize();
+
+            try {
+                camera.setPreviewTexture(scene.getPhoneCamTexture(cSize.width, cSize.height));
+                camera.startPreview();
+            } catch (IOException ioe) {
+                Log.w("Main3Activity", "CAM LAUNCH FAILED");
+            }
     }
 
     @Override
@@ -318,7 +321,80 @@ public class Main3Activity extends GvrActivity implements GvrView.StereoRenderer
 
     @Override
     public void onCommandReceived(ARDeviceController deviceController, ARCONTROLLER_DICTIONARY_KEY_ENUM commandKey, ARControllerDictionary elementDictionary) {
+        if (elementDictionary != null) {
+            // if the command received is a battery state changed
+            if (commandKey == ARCONTROLLER_DICTIONARY_KEY_ENUM.ARCONTROLLER_DICTIONARY_KEY_COMMON_COMMONSTATE_BATTERYSTATECHANGED) {
+                ARControllerArgumentDictionary<Object> args = elementDictionary.get(ARControllerDictionary.ARCONTROLLER_DICTIONARY_SINGLE_KEY);
 
+                if (args != null) {
+                    Integer batValue = (Integer) args.get(ARFeatureCommon.ARCONTROLLER_DICTIONARY_KEY_COMMON_COMMONSTATE_BATTERYSTATECHANGED_PERCENT);
+                    uiView.setBatteryLevel(batValue);
+                }
+            }
+            else if ((commandKey == ARCONTROLLER_DICTIONARY_KEY_ENUM.ARCONTROLLER_DICTIONARY_KEY_COMMON_COMMONSTATE_WIFISIGNALCHANGED) && (elementDictionary != null)){
+                ARControllerArgumentDictionary<Object> args = elementDictionary.get(ARControllerDictionary.ARCONTROLLER_DICTIONARY_SINGLE_KEY);
+                if (args != null) {
+                    short rssi = (short)((Integer)args.get(ARFeatureCommon.ARCONTROLLER_DICTIONARY_KEY_COMMON_COMMONSTATE_WIFISIGNALCHANGED_RSSI)).intValue();
+                    uiView.setWifiSignal(rssi);
+                }
+            }
+            else if ((commandKey == ARCONTROLLER_DICTIONARY_KEY_ENUM.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED) && (elementDictionary != null)){
+                ARControllerArgumentDictionary<Object> args = elementDictionary.get(ARControllerDictionary.ARCONTROLLER_DICTIONARY_SINGLE_KEY);
+                if (args != null) {
+                    ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_ENUM state = ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_ENUM.getFromValue((Integer)args.get(ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE));
+                    uiView.setPilotingState(state);
+                }
+            }
+            else if ((commandKey == ARCONTROLLER_DICTIONARY_KEY_ENUM.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_POSITIONCHANGED) && (elementDictionary != null)){
+                ARControllerArgumentDictionary<Object> args = elementDictionary.get(ARControllerDictionary.ARCONTROLLER_DICTIONARY_SINGLE_KEY);
+                if (args != null) {
+                    double latitude = (double)args.get(ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_POSITIONCHANGED_LATITUDE);
+                    double longitude = (double)args.get(ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_POSITIONCHANGED_LONGITUDE);
+                    double altitude = (double)args.get(ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_POSITIONCHANGED_ALTITUDE);
+                    uiView.setLatitude(latitude);
+                    uiView.setLongitude(longitude);
+                    uiView.setPosAlt(altitude);
+                }
+            }
+            else if ((commandKey == ARCONTROLLER_DICTIONARY_KEY_ENUM.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_SPEEDCHANGED) && (elementDictionary != null)){
+                ARControllerArgumentDictionary<Object> args = elementDictionary.get(ARControllerDictionary.ARCONTROLLER_DICTIONARY_SINGLE_KEY);
+                if (args != null) {
+                    float speedX = (float)((Double)args.get(ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_SPEEDCHANGED_SPEEDX)).doubleValue();
+                    float speedY = (float)((Double)args.get(ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_SPEEDCHANGED_SPEEDY)).doubleValue();
+                    float speedZ = (float)((Double)args.get(ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_SPEEDCHANGED_SPEEDZ)).doubleValue();
+                    uiView.setSpeedX(speedX);
+                    uiView.setSpeedY(speedY);
+                    uiView.setSpeedZ(speedZ);
+                }
+            }
+            else if ((commandKey == ARCONTROLLER_DICTIONARY_KEY_ENUM.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_ATTITUDECHANGED) && (elementDictionary != null)){
+                ARControllerArgumentDictionary<Object> args = elementDictionary.get(ARControllerDictionary.ARCONTROLLER_DICTIONARY_SINGLE_KEY);
+                if (args != null) {
+                    float roll = (float)((Double)args.get(ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_ATTITUDECHANGED_ROLL)).doubleValue();
+                    float pitch = (float)((Double)args.get(ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_ATTITUDECHANGED_PITCH)).doubleValue();
+                    float yaw = (float)((Double)args.get(ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_ATTITUDECHANGED_YAW)).doubleValue();
+                    uiView.setRoll(roll);
+                    uiView.setPitch(pitch);
+                    uiView.setYaw(yaw);
+                }
+            }
+            else if ((commandKey == ARCONTROLLER_DICTIONARY_KEY_ENUM.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_ALTITUDECHANGED) && (elementDictionary != null)){
+                ARControllerArgumentDictionary<Object> args = elementDictionary.get(ARControllerDictionary.ARCONTROLLER_DICTIONARY_SINGLE_KEY);
+                if (args != null) {
+                    double altitude = (double)args.get(ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_ALTITUDECHANGED_ALTITUDE);
+                    uiView.setAltitude(altitude);
+                }
+            }
+            else if ((commandKey == ARCONTROLLER_DICTIONARY_KEY_ENUM.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_CAMERASTATE_ORIENTATION) && (elementDictionary != null)){
+                ARControllerArgumentDictionary<Object> args = elementDictionary.get(ARControllerDictionary.ARCONTROLLER_DICTIONARY_SINGLE_KEY);
+                if (args != null) {
+                    byte tilt = (byte)((Integer)args.get(ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_CAMERASTATE_ORIENTATION_TILT)).intValue();
+                    byte pan = (byte)((Integer)args.get(ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_CAMERASTATE_ORIENTATION_PAN)).intValue();
+                    uiView.setCameraTilt(tilt);
+                    uiView.setCameraPan(pan);
+                }
+            }
+        }
     }
 
     @Override
@@ -343,4 +419,11 @@ public class Main3Activity extends GvrActivity implements GvrView.StereoRenderer
     public void onFrameAvailable(SurfaceTexture surfaceTexture) {
 
     }
+
+    @Override
+    public void onCardboardTrigger() {
+        scene.toggleDroneCameraEnabled();
+    }
+
+
 }

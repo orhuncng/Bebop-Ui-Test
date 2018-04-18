@@ -25,6 +25,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".MainActivity" />
         <activity
             android:name=".Main2Activity"
             android:label="@string/title_activity_main2"
@@ -33,6 +34,7 @@
         <activity
             android:name=".Main3Activity"
             android:label="@string/title_activity_main3"
+            android:screenOrientation="landscape"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
     </application>

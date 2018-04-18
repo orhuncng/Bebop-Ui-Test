@@ -1,6 +1,11 @@
 package com.example.trio.testproject;
 
 import android.Manifest;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
@@ -8,6 +13,9 @@ import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.util.Pair;
 
@@ -17,140 +25,80 @@ import com.google.vr.sdk.base.GvrActivity;
 import com.google.vr.sdk.base.GvrView;
 import com.google.vr.sdk.base.HeadTransform;
 import com.google.vr.sdk.base.Viewport;
+import com.parrot.arsdk.ARSDK;
+import com.parrot.arsdk.arcommands.ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_ENUM;
+import com.parrot.arsdk.arcommands.ARCOMMANDS_COMMON_COMMONSTATE_SENSORSSTATESLISTCHANGED_SENSORNAME_ENUM;
+import com.parrot.arsdk.arcontroller.ARCONTROLLER_DEVICE_STATE_ENUM;
+import com.parrot.arsdk.arcontroller.ARCONTROLLER_DICTIONARY_KEY_ENUM;
+import com.parrot.arsdk.arcontroller.ARCONTROLLER_ERROR_ENUM;
+import com.parrot.arsdk.arcontroller.ARControllerArgumentDictionary;
+import com.parrot.arsdk.arcontroller.ARControllerCodec;
+import com.parrot.arsdk.arcontroller.ARControllerDictionary;
+import com.parrot.arsdk.arcontroller.ARControllerException;
+import com.parrot.arsdk.arcontroller.ARDeviceController;
+import com.parrot.arsdk.arcontroller.ARDeviceControllerListener;
+import com.parrot.arsdk.arcontroller.ARDeviceControllerStreamListener;
+import com.parrot.arsdk.arcontroller.ARFeatureARDrone3;
+import com.parrot.arsdk.arcontroller.ARFeatureCommon;
+import com.parrot.arsdk.arcontroller.ARFrame;
+import com.parrot.arsdk.ardiscovery.ARDISCOVERY_PRODUCT_ENUM;
+import com.parrot.arsdk.ardiscovery.ARDiscoveryDevice;
+import com.parrot.arsdk.ardiscovery.ARDiscoveryDeviceService;
+import com.parrot.arsdk.ardiscovery.ARDiscoveryException;
+import com.parrot.arsdk.ardiscovery.ARDiscoveryService;
+import com.parrot.arsdk.ardiscovery.receivers.ARDiscoveryServicesDevicesListUpdatedReceiver;
+import com.parrot.arsdk.ardiscovery.receivers.ARDiscoveryServicesDevicesListUpdatedReceiverDelegate;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
-import java.nio.ShortBuffer;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.microedition.khronos.egl.EGLConfig;
 
-public class Main3Activity extends GvrActivity implements GvrView.StereoRenderer, SurfaceTexture.OnFrameAvailableListener {
+public class Main3Activity extends GvrActivity implements GvrView.StereoRenderer,
+        SurfaceTexture.OnFrameAvailableListener,
+        ARDeviceControllerListener, ARDeviceControllerStreamListener {
 
     private static final String TAG = "Main3Activity";
     private VideoUiView uiView;
     private SceneRenderer scene;
-    private static final int GL_TEXTURE_EXTERNAL_OES = 0x8D65;
+    public ArrayList<String> DeviceNames = new ArrayList<>();
     private Camera camera;
-    private final float[] viewProjectionMatrix = new float[16];
+    private boolean videoStarted;
+    ARDiscoveryDevice trioDrone;
+    ARDiscoveryServicesDevicesListUpdatedReceiver receiver;
+    ARDeviceController deviceController;
 
-    private final String vertexShaderCode =
-            "attribute vec4 position;" +
-                    "attribute vec2 inputTextureCoordinate;" +
-                    "varying vec2 textureCoordinate;" +
-                    "void main()" +
-                    "{" +
-                    "gl_Position = position;" +
-                    "textureCoordinate = inputTextureCoordinate;" +
-                    "}";
+    private static final float Z_NEAR = 0.1f;
+    private static final float Z_FAR = 100.0f;
 
-    private final String fragmentShaderCode =
-            "#extension GL_OES_EGL_image_external : require\n" +
-                    "precision mediump float;" +
-                    "varying vec2 textureCoordinate;                            \n" +
-                    "uniform samplerExternalOES s_texture;               \n" +
-                    "void main(void) {" +
-                    "  gl_FragColor = texture2D( s_texture, textureCoordinate );\n" +
-                    //"  gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n" +
-                    "}";
+    private static final int VIDEO_WIDTH = 640;
+    private static final int VIDEO_HEIGHT = 368;
 
-    private FloatBuffer vertexBuffer, textureVerticesBuffer, vertexBuffer2;
-    private ShortBuffer drawListBuffer, buf2;
-    private int mProgram;
-    private int mPositionHandle, mPositionHandle2;
-    private int mColorHandle;
-    private int mTextureCoordHandle;
-    private static final float Z_NEAR = .1f;
-    private static final float Z_FAR = 100;
+    Context mContext;
 
-    // number of coordinates per vertex in this array
-    static final int COORDS_PER_VERTEX = 2;
-    static float squareVertices[] = { // in counterclockwise order:
-            -1.0f, -1.0f,   // 0.left - mid
-            1.0f, -1.0f,   // 1. right - mid
-            -1.0f, 1.0f,   // 2. left - top
-            1.0f, 1.0f,   // 3. right - top
-//
-//    	 -1.0f, -1.0f, //4. left - bottom
-//    	 1.0f , -1.0f, //5. right - bottom
+    private H264VideoProvider h264VideoProvider;
 
-
-//       -1.0f, -1.0f,  // 0. left-bottom
-//        0.0f, -1.0f,   // 1. mid-bottom
-//       -1.0f,  1.0f,   // 2. left-top
-//        0.0f,  1.0f,   // 3. mid-top
-
-            //1.0f, -1.0f,  // 4. right-bottom
-            //1.0f, 1.0f,   // 5. right-top
-
-    };
-
-
-    //, 1, 4, 3, 4, 5, 3
-//    private short drawOrder[] =  {0, 1, 2, 1, 3, 2 };//, 4, 5, 0, 5, 0, 1 }; // order to draw vertices
-    private short drawOrder[] = {0, 2, 1, 1, 2, 3}; // order to draw vertices
-    private short drawOrder2[] = {2, 0, 3, 3, 0, 1}; // order to draw vertices
-
-    static float textureVertices[] = {
-            0.0f, 1.0f,  // A. left-bottom
-            1.0f, 1.0f,  // B. right-bottom
-            0.0f, 0.0f,  // C. left-top
-            1.0f, 0.0f   // D. right-top
-
-//        1.0f,  1.0f,
-//        1.0f,  0.0f,
-//        0.0f,  1.0f,
-//        0.0f,  0.0f
-    };
-
-    private final int vertexStride = COORDS_PER_VERTEX * 4; // 4 bytes per vertex
-
-    private ByteBuffer indexBuffer;    // Buffer for index-array
-
-    private float[] mView;
-    private float[] mCamera;
-
-    private int loadGLShader(int type, String code) {
-        int shader = GLES20.glCreateShader(type);
-        GLES20.glShaderSource(shader, code);
-        GLES20.glCompileShader(shader);
-
-        // Get the compilation status.
-        int[] compileStatus = new int[1];
-        GLES20.glGetShaderiv(shader, GLES20.GL_COMPILE_STATUS, compileStatus, 0);
-
-        // If the compilation failed, delete the shader.
-        if (compileStatus[0] == 0) {
-            Log.e(TAG, "Error compiling shader: " + GLES20.glGetShaderInfoLog(shader));
-            GLES20.glDeleteShader(shader);
-            shader = 0;
-        }
-
-        if (shader == 0) {
-            throw new RuntimeException("Error creating shader.");
-        }
-
-        return shader;
+    static {
+        ARSDK.loadSDKLibs();
     }
+
+    private float[] viewProjectionMatrix;
 
     public void initializeGvrView() {
         setContentView(R.layout.activity_main3);
 
-        GvrView gvrView = (GvrView) findViewById(R.id.hudView2);
+        GvrView gvrView = findViewById(R.id.hudView2);
         gvrView.setEGLConfigChooser(8, 8, 8, 8, 16, 8);
 
         gvrView.setRenderer(this);
-        gvrView.setTransitionViewEnabled(true);
 
-        // Enable Cardboard-trigger feedback with Daydream headsets. This is a simple way of supporting
-        // Daydream controller input for basic interactions using the existing Cardboard trigger API.
+        //gvrView.setTransitionViewEnabled(true);
+
         gvrView.enableCardboardTriggerEmulation();
 
         if (gvrView.setAsyncReprojectionEnabled(true)) {
-            // Async reprojection decouples the app framerate from the display framerate,
-            // allowing immersive interaction even at the throttled clockrates set by
-            // sustained performance mode.
             AndroidCompat.setSustainedPerformanceMode(this, true);
         }
 
@@ -159,6 +107,8 @@ public class Main3Activity extends GvrActivity implements GvrView.StereoRenderer
         Pair<SceneRenderer, VideoUiView> pair = SceneRenderer.createForVR(this, gvrView);
         scene = pair.first;
         uiView = pair.second;
+
+        viewProjectionMatrix = new float[16];
     }
 
     @Override
@@ -173,8 +123,145 @@ public class Main3Activity extends GvrActivity implements GvrView.StereoRenderer
 
         initializeGvrView();
 
-        mView = new float[16];
-        mCamera = new float[16];
+        mContext = this;
+        h264VideoProvider = new H264VideoProvider();
+
+        initDiscoveryService();
+        registerReceivers();
+
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                deviceController.startVideoStream();
+                Log.e("videostream", "starting video stream");
+            }
+        }, 5000);
+    }
+
+    private ARDiscoveryService mArdiscoveryService;
+    private ServiceConnection mArdiscoveryServiceConnection;
+
+    private void initDiscoveryService() {
+        Log.e("initDiscoveryService", "İçerde");
+        // create the service connection
+        if (mArdiscoveryServiceConnection == null) {
+            mArdiscoveryServiceConnection = new ServiceConnection() {
+                @Override
+                public void onServiceConnected(ComponentName name, IBinder service) {
+                    mArdiscoveryService = ((ARDiscoveryService.LocalBinder) service).getService();
+
+                    startDiscovery();
+                }
+
+                @Override
+                public void onServiceDisconnected(ComponentName name) {
+                    mArdiscoveryService = null;
+                }
+            };
+        }
+
+        if (mArdiscoveryService == null) {
+            // if the discovery service doesn't exists, bind to it
+            Intent i = new Intent(getApplicationContext(), ARDiscoveryService.class);
+            getApplicationContext().bindService(i, mArdiscoveryServiceConnection, Context.BIND_AUTO_CREATE);
+        } else {
+            // if the discovery service already exists, start discovery
+            startDiscovery();
+        }
+    }
+
+    private void startDiscovery() {
+        if (mArdiscoveryService != null) {
+            mArdiscoveryService.start();
+        }
+    }
+
+    private void registerReceivers() {
+        Log.e("registerReceivers", "İçerde");
+
+        receiver = new ARDiscoveryServicesDevicesListUpdatedReceiver(mDiscoveryDelegate);
+        LocalBroadcastManager localBroadcastMgr = LocalBroadcastManager.getInstance(getApplicationContext());
+        localBroadcastMgr.registerReceiver(receiver, new IntentFilter(ARDiscoveryService.kARDiscoveryServiceNotificationServicesDevicesListUpdated));
+
+    }
+
+    private final ARDiscoveryServicesDevicesListUpdatedReceiverDelegate mDiscoveryDelegate = new ARDiscoveryServicesDevicesListUpdatedReceiverDelegate() {
+        @Override
+        public void onServicesDevicesListUpdated() {
+            Log.e("DeviceListUpdater", "İçerde");
+            if (mArdiscoveryService != null) {
+                List<ARDiscoveryDeviceService> deviceList = mArdiscoveryService.getDeviceServicesArray();
+
+                DeviceNames.clear();
+                for (int i = 0; i < deviceList.size(); i++) {
+                    DeviceNames.add(deviceList.get(i).getName());
+                }
+
+                if (deviceList.size() > 0) {
+                    Log.e("DeviceCreateCall", "Null değil create et!");
+                    trioDrone = createDiscoveryDevice(deviceList.get(0));
+                    if (trioDrone != null) {
+                        try {
+                            deviceController = new ARDeviceController(trioDrone);
+                            trioDrone.dispose();
+                            Log.e("DeviceCOntrollerYaratma", "trioDrone Null Değil");
+                            deviceController.addListener((ARDeviceControllerListener) mContext);
+                            ARCONTROLLER_ERROR_ENUM error = deviceController.start();
+                            deviceController.addStreamListener((ARDeviceControllerStreamListener) mContext);
+                            //deviceController.startVideoStream();
+                        } catch (ARControllerException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } else {
+                    Log.e("DeviceCreateCall", "Null geldi!");
+                }
+            }
+        }
+    };
+
+
+    private ARDiscoveryDevice createDiscoveryDevice(ARDiscoveryDeviceService service) {
+        ARDiscoveryDevice device = null;
+        try {
+            device = new ARDiscoveryDevice(mContext, service);
+            Log.e("Device Var", device.toString());
+        } catch (ARDiscoveryException e) {
+            Log.e("ARDiscoveryException", "Exception", e);
+        }
+
+        return device;
+    }
+
+
+    private void unregisterReceivers() {
+        LocalBroadcastManager localBroadcastMgr = LocalBroadcastManager.getInstance(getApplicationContext());
+        localBroadcastMgr.unregisterReceiver(receiver);
+    }
+
+    private void closeServices() {
+        Log.d("ServiceClose", "closeServices ...");
+
+        if (mArdiscoveryService != null) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    mArdiscoveryService.stop();
+
+                    getApplicationContext().unbindService(mArdiscoveryServiceConnection);
+                    mArdiscoveryService = null;
+                }
+            }).start();
+        }
+    }
+
+    public void stopVideo() {
+        try {
+            deviceController.stopVideoStream();
+        } catch (ARControllerException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -186,35 +273,9 @@ public class Main3Activity extends GvrActivity implements GvrView.StereoRenderer
     @Override
     public void onDrawEye(Eye eye) {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
-
-        GLES20.glUseProgram(mProgram);
-
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-        GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, scene.getTextureId());
-
-
-        mPositionHandle = GLES20.glGetAttribLocation(mProgram, "position");
-        GLES20.glEnableVertexAttribArray(mPositionHandle);
-        GLES20.glVertexAttribPointer(mPositionHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT,
-                false, vertexStride, vertexBuffer);
-
-
-        mTextureCoordHandle = GLES20.glGetAttribLocation(mProgram, "inputTextureCoordinate");
-        GLES20.glEnableVertexAttribArray(mTextureCoordHandle);
-        GLES20.glVertexAttribPointer(mTextureCoordHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT,
-                false, vertexStride, textureVerticesBuffer);
-
-        GLES20.glDrawElements(GLES20.GL_TRIANGLES, drawOrder.length,
-                GLES20.GL_UNSIGNED_SHORT, drawListBuffer);
-
-
-        // Disable vertex array
-        GLES20.glDisableVertexAttribArray(mPositionHandle);
-        GLES20.glDisableVertexAttribArray(mTextureCoordHandle);
-
         Matrix.multiplyMM(
                 viewProjectionMatrix, 0, eye.getPerspective(Z_NEAR, Z_FAR), 0, eye.getEyeView(), 0);
-        scene.glDrawFrame(viewProjectionMatrix, eye.getType());
+        scene.draw(viewProjectionMatrix);
     }
 
     @Override
@@ -222,58 +283,25 @@ public class Main3Activity extends GvrActivity implements GvrView.StereoRenderer
 
     }
 
-    @Override
-    public void onSurfaceChanged(int i, int i1) {
 
-    }
+    @Override
+    public void onSurfaceChanged(int i, int i1) { }
 
     @Override
     public void onSurfaceCreated(EGLConfig eglConfig) {
-        GLES20.glClearColor(0.1f, 0.1f, 0.1f, 0.5f); // Dark background so text shows up well
+            scene.onSurfaceCreated();
+            h264VideoProvider.init(scene.getDroneCamTexture(VIDEO_WIDTH, VIDEO_HEIGHT));
 
-        scene.glInit();
-        ByteBuffer bb = ByteBuffer.allocateDirect(squareVertices.length * 4);
-        bb.order(ByteOrder.nativeOrder());
-        vertexBuffer = bb.asFloatBuffer();
-        vertexBuffer.put(squareVertices);
-        vertexBuffer.position(0);
+            camera = Camera.open();
 
+            Camera.Size cSize = camera.getParameters().getPreviewSize();
 
-        ByteBuffer dlb = ByteBuffer.allocateDirect(drawOrder.length * 2);
-        dlb.order(ByteOrder.nativeOrder());
-        drawListBuffer = dlb.asShortBuffer();
-        drawListBuffer.put(drawOrder);
-        drawListBuffer.position(0);
-
-
-        ByteBuffer bb2 = ByteBuffer.allocateDirect(textureVertices.length * 4);
-        bb2.order(ByteOrder.nativeOrder());
-        textureVerticesBuffer = bb2.asFloatBuffer();
-        textureVerticesBuffer.put(textureVertices);
-        textureVerticesBuffer.position(0);
-
-        int vertexShader = loadGLShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode);
-        int fragmentShader = loadGLShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode);
-
-        mProgram = GLES20.glCreateProgram();             // create empty OpenGL ES Program
-        GLES20.glAttachShader(mProgram, vertexShader);   // add the vertex shader to program
-        GLES20.glAttachShader(mProgram, fragmentShader); // add the fragment shader to program
-        GLES20.glLinkProgram(mProgram);
-
-        startCamera();
-    }
-
-    public void startCamera() {
-        camera = Camera.open();
-
-        Camera.Size cSize = camera.getParameters().getPreviewSize();
-
-        try {
-            camera.setPreviewTexture(scene.createDisplay(cSize.width, cSize.height));
-            camera.startPreview();
-        } catch (IOException ioe) {
-            Log.w("Main3Activity", "CAM LAUNCH FAILED");
-        }
+            try {
+                camera.setPreviewTexture(scene.getPhoneCamTexture(cSize.width, cSize.height));
+                camera.startPreview();
+            } catch (IOException ioe) {
+                Log.w("Main3Activity", "CAM LAUNCH FAILED");
+            }
     }
 
     @Override
@@ -282,7 +310,120 @@ public class Main3Activity extends GvrActivity implements GvrView.StereoRenderer
     }
 
     @Override
-    public void onFrameAvailable(SurfaceTexture arg0) {
+    public void onStateChanged(ARDeviceController deviceController, ARCONTROLLER_DEVICE_STATE_ENUM newState, ARCONTROLLER_ERROR_ENUM error) {
 
     }
+
+    @Override
+    public void onExtensionStateChanged(ARDeviceController deviceController, ARCONTROLLER_DEVICE_STATE_ENUM newState, ARDISCOVERY_PRODUCT_ENUM product, String name, ARCONTROLLER_ERROR_ENUM error) {
+
+    }
+
+    @Override
+    public void onCommandReceived(ARDeviceController deviceController, ARCONTROLLER_DICTIONARY_KEY_ENUM commandKey, ARControllerDictionary elementDictionary) {
+        if (elementDictionary != null) {
+            // if the command received is a battery state changed
+            if (commandKey == ARCONTROLLER_DICTIONARY_KEY_ENUM.ARCONTROLLER_DICTIONARY_KEY_COMMON_COMMONSTATE_BATTERYSTATECHANGED) {
+                ARControllerArgumentDictionary<Object> args = elementDictionary.get(ARControllerDictionary.ARCONTROLLER_DICTIONARY_SINGLE_KEY);
+
+                if (args != null) {
+                    Integer batValue = (Integer) args.get(ARFeatureCommon.ARCONTROLLER_DICTIONARY_KEY_COMMON_COMMONSTATE_BATTERYSTATECHANGED_PERCENT);
+                    uiView.setBatteryLevel(batValue);
+                }
+            }
+            else if ((commandKey == ARCONTROLLER_DICTIONARY_KEY_ENUM.ARCONTROLLER_DICTIONARY_KEY_COMMON_COMMONSTATE_WIFISIGNALCHANGED) && (elementDictionary != null)){
+                ARControllerArgumentDictionary<Object> args = elementDictionary.get(ARControllerDictionary.ARCONTROLLER_DICTIONARY_SINGLE_KEY);
+                if (args != null) {
+                    short rssi = (short)((Integer)args.get(ARFeatureCommon.ARCONTROLLER_DICTIONARY_KEY_COMMON_COMMONSTATE_WIFISIGNALCHANGED_RSSI)).intValue();
+                    uiView.setWifiSignal(rssi);
+                }
+            }
+            else if ((commandKey == ARCONTROLLER_DICTIONARY_KEY_ENUM.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED) && (elementDictionary != null)){
+                ARControllerArgumentDictionary<Object> args = elementDictionary.get(ARControllerDictionary.ARCONTROLLER_DICTIONARY_SINGLE_KEY);
+                if (args != null) {
+                    ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_ENUM state = ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_ENUM.getFromValue((Integer)args.get(ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE));
+                    uiView.setPilotingState(state);
+                }
+            }
+            else if ((commandKey == ARCONTROLLER_DICTIONARY_KEY_ENUM.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_POSITIONCHANGED) && (elementDictionary != null)){
+                ARControllerArgumentDictionary<Object> args = elementDictionary.get(ARControllerDictionary.ARCONTROLLER_DICTIONARY_SINGLE_KEY);
+                if (args != null) {
+                    double latitude = (double)args.get(ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_POSITIONCHANGED_LATITUDE);
+                    double longitude = (double)args.get(ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_POSITIONCHANGED_LONGITUDE);
+                    double altitude = (double)args.get(ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_POSITIONCHANGED_ALTITUDE);
+                    uiView.setLatitude(latitude);
+                    uiView.setLongitude(longitude);
+                    uiView.setPosAlt(altitude);
+                }
+            }
+            else if ((commandKey == ARCONTROLLER_DICTIONARY_KEY_ENUM.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_SPEEDCHANGED) && (elementDictionary != null)){
+                ARControllerArgumentDictionary<Object> args = elementDictionary.get(ARControllerDictionary.ARCONTROLLER_DICTIONARY_SINGLE_KEY);
+                if (args != null) {
+                    float speedX = (float)((Double)args.get(ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_SPEEDCHANGED_SPEEDX)).doubleValue();
+                    float speedY = (float)((Double)args.get(ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_SPEEDCHANGED_SPEEDY)).doubleValue();
+                    float speedZ = (float)((Double)args.get(ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_SPEEDCHANGED_SPEEDZ)).doubleValue();
+                    uiView.setSpeedX(speedX);
+                    uiView.setSpeedY(speedY);
+                    uiView.setSpeedZ(speedZ);
+                }
+            }
+            else if ((commandKey == ARCONTROLLER_DICTIONARY_KEY_ENUM.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_ATTITUDECHANGED) && (elementDictionary != null)){
+                ARControllerArgumentDictionary<Object> args = elementDictionary.get(ARControllerDictionary.ARCONTROLLER_DICTIONARY_SINGLE_KEY);
+                if (args != null) {
+                    float roll = (float)((Double)args.get(ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_ATTITUDECHANGED_ROLL)).doubleValue();
+                    float pitch = (float)((Double)args.get(ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_ATTITUDECHANGED_PITCH)).doubleValue();
+                    float yaw = (float)((Double)args.get(ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_ATTITUDECHANGED_YAW)).doubleValue();
+                    uiView.setRoll(roll);
+                    uiView.setPitch(pitch);
+                    uiView.setYaw(yaw);
+                }
+            }
+            else if ((commandKey == ARCONTROLLER_DICTIONARY_KEY_ENUM.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_ALTITUDECHANGED) && (elementDictionary != null)){
+                ARControllerArgumentDictionary<Object> args = elementDictionary.get(ARControllerDictionary.ARCONTROLLER_DICTIONARY_SINGLE_KEY);
+                if (args != null) {
+                    double altitude = (double)args.get(ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_ALTITUDECHANGED_ALTITUDE);
+                    uiView.setAltitude(altitude);
+                }
+            }
+            else if ((commandKey == ARCONTROLLER_DICTIONARY_KEY_ENUM.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_CAMERASTATE_ORIENTATION) && (elementDictionary != null)){
+                ARControllerArgumentDictionary<Object> args = elementDictionary.get(ARControllerDictionary.ARCONTROLLER_DICTIONARY_SINGLE_KEY);
+                if (args != null) {
+                    byte tilt = (byte)((Integer)args.get(ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_CAMERASTATE_ORIENTATION_TILT)).intValue();
+                    byte pan = (byte)((Integer)args.get(ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_CAMERASTATE_ORIENTATION_PAN)).intValue();
+                    uiView.setCameraTilt(tilt);
+                    uiView.setCameraPan(pan);
+                }
+            }
+        }
+    }
+
+    @Override
+    public ARCONTROLLER_ERROR_ENUM configureDecoder(ARDeviceController deviceController, ARControllerCodec codec) {
+        Log.e("configureDecoder", "codec received");
+        h264VideoProvider.configureDecoder(codec);
+        return ARCONTROLLER_ERROR_ENUM.ARCONTROLLER_OK;
+    }
+
+    @Override
+    public ARCONTROLLER_ERROR_ENUM onFrameReceived(ARDeviceController deviceController, ARFrame frame) {
+        h264VideoProvider.displayFrame(frame);
+        return ARCONTROLLER_ERROR_ENUM.ARCONTROLLER_OK;
+    }
+
+    @Override
+    public void onFrameTimeout(ARDeviceController deviceController) {
+
+    }
+
+    @Override
+    public void onFrameAvailable(SurfaceTexture surfaceTexture) {
+
+    }
+
+    @Override
+    public void onCardboardTrigger() {
+        scene.toggleDroneCameraEnabled();
+    }
+
+
 }

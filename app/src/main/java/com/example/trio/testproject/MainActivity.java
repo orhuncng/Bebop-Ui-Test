@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
@@ -40,7 +41,6 @@ import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity implements ARDeviceControllerListener, ARDeviceControllerStreamListener {
-
     public static final String TESTMSG = "com.example.trio.testproject";
     public ArrayList<String> DeviceNames = new ArrayList<>();
     ARDiscoveryDevice trioDrone;
@@ -66,6 +66,17 @@ public class MainActivity extends AppCompatActivity implements ARDeviceControlle
 
         initDiscoveryService();
         registerReceivers();
+
+        mVideoView = (H264VideoView) findViewById(R.id.videoView);
+
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                deviceController.startVideoStream();
+                Log.e("videostream", "starting video stream");
+            }
+        }, 10000);
     }
 
     public void showDevices(View view) {
@@ -123,13 +134,18 @@ public class MainActivity extends AppCompatActivity implements ARDeviceControlle
         deviceController.startVideoStream();
     }
 
+
     public void stopVideo(View view) {
         try {
             deviceController.stopVideoStream();
         } catch (ARControllerException e) {
             e.printStackTrace();
         }
+    }
 
+    public void openVR(View view) {
+        Intent intent = new Intent(this, Main3Activity.class);
+        startActivity(intent);
     }
 
     private ARDiscoveryService mArdiscoveryService;
@@ -358,7 +374,6 @@ public class MainActivity extends AppCompatActivity implements ARDeviceControlle
 
     @Override
     public ARCONTROLLER_ERROR_ENUM onFrameReceived(ARDeviceController deviceController, ARFrame frame) {
-        Log.e("onFrameReceived", "Frame Received");
         mVideoView.displayFrame(frame);
         return ARCONTROLLER_ERROR_ENUM.ARCONTROLLER_OK;
     }

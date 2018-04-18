@@ -40,7 +40,7 @@ public final class SceneRenderer {
     private OnFrameAvailableListener externalFrameListener;
 
     private int droneTexId;
-   // private int phoneTexId;
+    // private int phoneTexId;
     private final String vertexShaderCode =
             "attribute vec4 position;" +
                     "attribute vec2 inputTextureCoordinate;" +
@@ -160,7 +160,7 @@ public final class SceneRenderer {
 
         // When the video decodes a new frame, tell the GL thread to update the image.
 
-       // mDroneTexture.setOnFrameAvailableListener(this);
+        // mDroneTexture.setOnFrameAvailableListener(this);
 
         mDroneTexture.setOnFrameAvailableListener(
                 new OnFrameAvailableListener() {
@@ -234,51 +234,52 @@ public final class SceneRenderer {
 
     public void updateTexture() {
         //if (droneCameraEnabled)
-        if(droneFrameAvailable.get())
+        if (droneFrameAvailable.get())
             mDroneTexture.updateTexImage();
-       // else
-         //   mPhoneTexture.updateTexImage();
+        // else
+        //   mPhoneTexture.updateTexImage();
         GLUtils.checkGlError();
     }
 
     public void draw(float[] viewProjectionMatrix) {
-        if (droneFrameAvailable.get()){
-        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
+        if (droneFrameAvailable.get()) {
+            GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
-        GLES20.glUseProgram(mProgram);
+            GLES20.glUseProgram(mProgram);
 
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
 
-       // if (droneCameraEnabled)
+            // if (droneCameraEnabled)
             GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, droneTexId);
-        //else
-          //  GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, phoneTexId);
+            //else
+            //  GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, phoneTexId);
 
-        mPositionHandle = GLES20.glGetAttribLocation(mProgram, "position");
-        GLES20.glEnableVertexAttribArray(mPositionHandle);
-        GLES20.glVertexAttribPointer(mPositionHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT,
-                false, vertexStride, vertexBuffer);
+            mPositionHandle = GLES20.glGetAttribLocation(mProgram, "position");
+            GLES20.glEnableVertexAttribArray(mPositionHandle);
+            GLES20.glVertexAttribPointer(mPositionHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT,
+                    false, vertexStride, vertexBuffer);
 
 
-        mTextureCoordHandle = GLES20.glGetAttribLocation(mProgram, "inputTextureCoordinate");
-        GLES20.glEnableVertexAttribArray(mTextureCoordHandle);
-        GLES20.glVertexAttribPointer(mTextureCoordHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT,
-                false, vertexStride, textureVerticesBuffer);
+            mTextureCoordHandle = GLES20.glGetAttribLocation(mProgram, "inputTextureCoordinate");
+            GLES20.glEnableVertexAttribArray(mTextureCoordHandle);
+            GLES20.glVertexAttribPointer(mTextureCoordHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT,
+                    false, vertexStride, textureVerticesBuffer);
 
-        GLES20.glDrawElements(GLES20.GL_TRIANGLES, drawOrder.length,
-                GLES20.GL_UNSIGNED_SHORT, drawListBuffer);
+            GLES20.glDrawElements(GLES20.GL_TRIANGLES, drawOrder.length,
+                    GLES20.GL_UNSIGNED_SHORT, drawListBuffer);
 
-        // Disable vertex array
-        GLES20.glDisableVertexAttribArray(mPositionHandle);
-        GLES20.glDisableVertexAttribArray(mTextureCoordHandle);
-if(droneCameraEnabled) {
-    GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_DST_ALPHA);
-      GLES20.glEnable(GLES20.GL_BLEND);
+            // Disable vertex array
+            GLES20.glDisableVertexAttribArray(mPositionHandle);
+            GLES20.glDisableVertexAttribArray(mTextureCoordHandle);
+            if (droneCameraEnabled) {
+                GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_DST_ALPHA);
+                GLES20.glEnable(GLES20.GL_BLEND);
 
-    canvasQuad.glDraw(0.7f);
-    GLES20.glDisable(GLES20.GL_BLEND);
-}
-    }}
+                canvasQuad.glDraw(0.7f);
+                GLES20.glDisable(GLES20.GL_BLEND);
+            }
+        }
+    }
 
     public void glShutdown() {
         if (canvasQuad != null) {

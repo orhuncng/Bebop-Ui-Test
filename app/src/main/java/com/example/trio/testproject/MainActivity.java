@@ -120,6 +120,13 @@ public class MainActivity extends AppCompatActivity implements ARDeviceControlle
         startActivity(intent);
     }
 
+    public void openGearSensor(View view) {
+        Log.e("openGearSensor", "OpenGearSensore basıldı");
+
+        Intent intent = new Intent(this, GearSensorActivity.class);
+        startActivity(intent);
+    }
+
     public void startVideo(View view) {
         deviceController.startVideoStream();
     }

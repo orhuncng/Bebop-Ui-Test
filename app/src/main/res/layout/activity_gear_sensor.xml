@@ -1,0 +1,308 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".GearSensorActivity">
+
+    <TextView
+        android:id="@+id/tvStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:gravity="center"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <!-- <TableLayout
+        android:layout_width="wrap_content"
+        android:layout_height="100dp"
+        android:shrinkColumns="*"
+        android:stretchColumns="1">
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <TextView
+                android:id="@+id/GyroText"
+                android:layout_height="wrap_content"
+                android:text="Gyroscope"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+        </TableRow>
+
+
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <TextView
+                android:id="@+id/GyroXText"
+                android:layout_height="wrap_content"
+                android:layout_width="0dip"
+                android:layout_weight="0.5"
+                android:layout_column="0"
+                android:text="X:"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/GyroX"
+                android:layout_height="wrap_content"
+                android:layout_width="0dip"
+                android:layout_weight="1.5"
+                android:layout_column="1"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/GyroYText"
+                android:layout_height="wrap_content"
+                android:layout_width="0dip"
+                android:layout_weight="0.5"
+                android:layout_column="2"
+                android:text="Y:"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/GyroY"
+                android:layout_height="wrap_content"
+                android:layout_width="0dip"
+                android:layout_weight="1.5"
+                android:layout_column="3"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/GyroZText"
+                android:layout_height="wrap_content"
+                android:layout_width="0dip"
+                android:layout_weight="0.5"
+                android:layout_column="4"
+                android:text="Z:"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/GyroZ"
+                android:layout_height="wrap_content"
+                android:layout_width="0dip"
+                android:layout_weight="1.5"
+                android:layout_column="5"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+        </TableRow>
+
+    </TableLayout>
+
+    <TableLayout
+        android:layout_width="wrap_content"
+        android:layout_height="100dp"
+        android:shrinkColumns="*"
+        android:stretchColumns="1">
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <TextView
+                android:id="@+id/AccelText"
+                android:layout_height="wrap_content"
+                android:text="Accelerometer"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+        </TableRow>
+
+
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <TextView
+                android:id="@+id/AccelXText"
+                android:layout_height="wrap_content"
+                android:layout_width="0dip"
+                android:layout_weight="0.5"
+                android:layout_column="0"
+                android:text="X:"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/AccelX"
+                android:layout_height="wrap_content"
+                android:layout_width="0dip"
+                android:layout_weight="1.5"
+                android:layout_column="1"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/AccelYText"
+                android:layout_height="wrap_content"
+                android:layout_width="0dip"
+                android:layout_weight="0.5"
+                android:layout_column="2"
+                android:text="Y:"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/AccelY"
+                android:layout_height="wrap_content"
+                android:layout_width="0dip"
+                android:layout_weight="1.5"
+                android:layout_column="3"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/AccelZText"
+                android:layout_height="wrap_content"
+                android:layout_width="0dip"
+                android:layout_weight="0.5"
+                android:layout_column="4"
+                android:text="Z:"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/AccelZ"
+                android:layout_height="wrap_content"
+                android:layout_width="0dip"
+                android:layout_weight="1.5"
+                android:layout_column="5"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+        </TableRow>
+
+    </TableLayout>
+
+    <TableLayout
+        android:layout_width="wrap_content"
+        android:layout_height="100dp"
+        android:shrinkColumns="*"
+        android:stretchColumns="1">
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <TextView
+                android:id="@+id/GravityText"
+                android:layout_height="wrap_content"
+                android:text="Gravity"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+        </TableRow>
+
+
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <TextView
+                android:id="@+id/GravityXText"
+                android:layout_height="wrap_content"
+                android:layout_width="0dip"
+                android:layout_weight="0.5"
+                android:layout_column="0"
+                android:text="X:"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/GravityX"
+                android:layout_height="wrap_content"
+                android:layout_width="0dip"
+                android:layout_weight="1.5"
+                android:layout_column="1"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/GravityYText"
+                android:layout_height="wrap_content"
+                android:layout_width="0dip"
+                android:layout_weight="0.5"
+                android:layout_column="2"
+                android:text="Y:"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/GravityY"
+                android:layout_height="wrap_content"
+                android:layout_width="0dip"
+                android:layout_weight="1.5"
+                android:layout_column="3"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/GravityZText"
+                android:layout_height="wrap_content"
+                android:layout_width="0dip"
+                android:layout_weight="0.5"
+                android:layout_column="4"
+                android:text="Z:"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/GravityZ"
+                android:layout_height="wrap_content"
+                android:layout_width="0dip"
+                android:layout_weight="1.5"
+                android:layout_column="5"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+        </TableRow>
+
+    </TableLayout> -->
+
+
+    <ListView
+        android:id="@+id/lvMessage"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="0.9"></ListView>
+
+    <Button
+        android:id="@+id/buttonConnect"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:onClick="mOnClick"
+        android:text="@string/buttonConnect"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/buttonDisconnect"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:onClick="mOnClick"
+        android:text="@string/buttonDisconnect"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/buttonSend"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:onClick="mOnClick"
+        android:text="@string/buttonSend"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+</LinearLayout>

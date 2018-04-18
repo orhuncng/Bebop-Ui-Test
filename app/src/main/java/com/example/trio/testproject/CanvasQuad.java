@@ -14,8 +14,16 @@ public class CanvasQuad {
     // The size of the quad is hardcoded for this sample and the quad doesn't have a model matrix so
     // these dimensions are used by translateClick() for touch interaction.
     private static final float WIDTH = 1f;
-    private static final float HEIGHT = 1 / 8f;
+    private static final float HEIGHT = 1f;
     private static final float DISTANCE = 1f;
+
+    private static final float[] MVP_MATRIX = {
+            1.0f, 0.0f, 0.0f, 0.0f,
+            0.0f, 1.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f, 0.0f,
+            0.0f, 0.0f, 0.0f, 1.0f
+    };
+
     // The number of pixels in this quad affect how Android positions Views in it. VideoUiView in VR
     // will be 1024 x 128 px in size which is similar to its 2D size. For Views that only have VR
     // layouts, using a number that results in ~10-15 px / degree is good.
@@ -137,7 +145,7 @@ public class CanvasQuad {
     }
 
 
-    void glDraw(float[] viewProjectionMatrix, float alpha) {
+    void glDraw(float alpha) {
         // Configure shader.
         GLES20.glUseProgram(program);
         GLUtils.checkGlError();
@@ -146,7 +154,7 @@ public class CanvasQuad {
         GLES20.glEnableVertexAttribArray(textureCoordsHandle);
         GLUtils.checkGlError();
 
-        GLES20.glUniformMatrix4fv(mvpMatrixHandle, 1, false, viewProjectionMatrix, 0);
+        GLES20.glUniformMatrix4fv(mvpMatrixHandle, 1, false, MVP_MATRIX, 0);
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
         GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, textureId);
         GLES20.glUniform1i(textureHandle, 0);

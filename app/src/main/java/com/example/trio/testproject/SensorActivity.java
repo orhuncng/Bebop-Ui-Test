@@ -1,18 +1,22 @@
 package com.example.trio.testproject;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
+
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class SensorActivity extends AppCompatActivity implements SensorEventListener {
@@ -58,12 +62,21 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
     TextView averageLast;
 
     // Acceleration with lowPassFilter Text Views
-    TextView lowPassAcclXTextView;
+    TextView velocityZ;
     TextView lowPassAcclYTextView;
     TextView lowPassAcclZTextView;
 
-    float[] gravity = new float[3];
     float[] linear_acceleration = new float[3];
+    float[] gravity = new float[3];
+
+    float[] acceleration = new float[2];
+    float[] accelerationFilter = new float[3];
+    float[] gyroscope = new float[2];
+
+    private DeviceSensorProvider<HashMap<String, float[]>> liveData;
+
+    float deltaX = 0;
+    private int count = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +85,56 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
 
         // Set sensorLayout to related layout
         sensorLayout = (LinearLayout) findViewById(R.id.sensorLayout);
+        addLinearAcclViews(true);
+        addAcclViews(true);
 
+        DeviceSensorViewModel model = ViewModelProviders.of(this).get(DeviceSensorViewModel.class);
+        liveData = model.getDeviceSensorListener();
+
+        liveData.observe(this, new Observer<HashMap<String, float[]>>() {
+            @Override
+            public void onChanged(@Nullable HashMap<String, float[]> sensorData) {
+                acceleration = sensorData.get("acceleration");
+                accelerationFilter = sensorData.get("accelerationFilter");
+                gyroscope = sensorData.get("gyroscope");
+
+                count++;
+
+                if(acceleration != null && acceleration.length == 3)
+                {
+                    linearAcclXTextView.setText(Float.toString(acceleration[0]));
+                    linearAcclYTextView.setText(Float.toString(acceleration[1]));
+                    linearAcclZTextView.setText(Float.toString(acceleration[2]));
+
+                    Log.e("raw", Float.toString(acceleration[0]));
+                }
+
+
+                if(accelerationFilter != null && accelerationFilter.length == 3)
+                {
+                    acclXTextView.setText(Float.toString(accelerationFilter[0]));
+                    acclYTextView.setText(Float.toString(accelerationFilter[1]));
+                    acclZTextView.setText(Float.toString(accelerationFilter[2]));
+
+                    Log.e("filtered", Float.toString(accelerationFilter[0]));
+                }
+
+                if(count >= 100){
+                    Log.e("count", "Ayar yapıldı");
+
+                    deltaX = deltaX + accelerationFilter[2];
+
+                    velocityZ.setText("Gidilen Yol: " + Float.toString(deltaX));
+
+
+                }
+
+
+            }
+        });
+
+
+/*
         // Set Sensor Manager
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
@@ -97,6 +159,7 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
         addMagnetoViews(mMagnet != null);
 
         //listSensorData();
+        */
     }
 
     private void addLinearAcclViews(boolean hasLinAcc) {
@@ -124,6 +187,7 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
 
     private void addAcclViews(boolean hasAccl) {
         if (hasAccl) {
+
             acclXTextView = new TextView(this);
             acclYTextView = new TextView(this);
             acclZTextView = new TextView(this);
@@ -135,18 +199,19 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
             seperateGroups.setText("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
             sensorLayout.addView(seperateGroups);
 
-            lowPassAcclXTextView = new TextView(this);
+            velocityZ = new TextView(this);
+            sensorLayout.addView(velocityZ);
+/*
             lowPassAcclYTextView = new TextView(this);
             lowPassAcclZTextView = new TextView(this);
-            sensorLayout.addView(lowPassAcclXTextView);
             sensorLayout.addView(lowPassAcclYTextView);
             sensorLayout.addView(lowPassAcclZTextView);
-
+*/
             seperateGroups = new TextView(this);
             seperateGroups.setText("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
             sensorLayout.addView(seperateGroups);
 
-            Log.e("Accl", "Added");
+            Log.e("Velocity", "Added");
 
         } else {
             TextView noAccleration = new TextView(this);
@@ -266,7 +331,7 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
             String lowPassacclY = "LowPassAcclY:" + Float.toString(linear_acceleration[1]);
             String lowPassacclZ = "LowPassAcclZ:" + Float.toString(linear_acceleration[2]);
 
-            lowPassAcclXTextView.setText(lowPassacclX);
+            velocityZ.setText(lowPassacclX);
             lowPassAcclYTextView.setText(lowPassacclY);
             lowPassAcclZTextView.setText(lowPassacclZ);
 
@@ -316,15 +381,19 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
     protected void onResume() {
         super.onResume();
         Log.e("OnResume", "Resume Etti");
+        /*
         mSensorManager.registerListener(this, mGyro, SensorManager.SENSOR_DELAY_NORMAL);
         mSensorManager.registerListener(this, mAccl, SensorManager.SENSOR_DELAY_NORMAL);
         mSensorManager.registerListener(this, mLinearAccl, SensorManager.SENSOR_DELAY_NORMAL);
         mSensorManager.registerListener(this, mMagnet, SensorManager.SENSOR_DELAY_NORMAL);
+        */
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        /*
         mSensorManager.unregisterListener(this);
+        */
     }
 }

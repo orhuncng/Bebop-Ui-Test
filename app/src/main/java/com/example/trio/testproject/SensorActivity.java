@@ -2,19 +2,17 @@ package com.example.trio.testproject;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 
 import java.util.HashMap;
 import java.util.List;
@@ -100,8 +98,7 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
 
                 count++;
 
-                if(acceleration != null && acceleration.length == 3)
-                {
+                if (acceleration != null && acceleration.length == 3) {
                     linearAcclXTextView.setText(Float.toString(acceleration[0]));
                     linearAcclYTextView.setText(Float.toString(acceleration[1]));
                     linearAcclZTextView.setText(Float.toString(acceleration[2]));
@@ -110,8 +107,7 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
                 }
 
 
-                if(accelerationFilter != null && accelerationFilter.length == 3)
-                {
+                if (accelerationFilter != null && accelerationFilter.length == 3) {
                     acclXTextView.setText(Float.toString(accelerationFilter[0]));
                     acclYTextView.setText(Float.toString(accelerationFilter[1]));
                     acclZTextView.setText(Float.toString(accelerationFilter[2]));
@@ -119,7 +115,7 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
                     Log.e("filtered", Float.toString(accelerationFilter[0]));
                 }
 
-                if(count >= 100){
+                if (count >= 100) {
                     Log.e("count", "Ayar yapıldı");
 
                     deltaX = deltaX + accelerationFilter[2];

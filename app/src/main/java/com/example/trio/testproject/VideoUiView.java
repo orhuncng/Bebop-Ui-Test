@@ -80,8 +80,8 @@ public class VideoUiView extends LinearLayout {
         glCanvas.drawARGB(255, 0, 0, 0);
         // Have Android render the child views.
 
-        glCanvas.drawLine(10, 10, 500, 500, paintWhite);
-        glCanvas.drawLine(500, 20, 90, 500, paintCyan);
+       // glCanvas.drawLine(10, 10, 500, 500, paintWhite);
+      //  glCanvas.drawLine(500, 20, 90, 500, paintCyan);
 
         super.dispatchDraw(glCanvas);
         // Commit the changes.

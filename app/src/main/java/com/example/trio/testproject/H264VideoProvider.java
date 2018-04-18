@@ -30,8 +30,8 @@ public class H264VideoProvider {
 
     private ByteBuffer[] mBuffers;
 
-    private static final int VIDEO_WIDTH = 640;
-    private static final int VIDEO_HEIGHT = 368;
+    private static final int VIDEO_WIDTH = 480;
+    private static final int VIDEO_HEIGHT = 480;
 
     private Surface surface;
 

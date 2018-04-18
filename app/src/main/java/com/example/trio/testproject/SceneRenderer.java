@@ -26,16 +26,21 @@ public final class SceneRenderer {
     // This is the primary interface between the Media Player and the GL Scene.
     private Surface mDroneSurface;
     private SurfaceTexture mDroneTexture;
-    private Surface mPhoneSurface;
-    private SurfaceTexture mPhoneTexture;
+    private Surface uiSurface;
+    private SurfaceTexture uiTexture;
+    private int uiTexId;
+    //private Surface mPhoneSurface;
+    //private SurfaceTexture mPhoneTexture;
     private final AtomicBoolean droneFrameAvailable = new AtomicBoolean();
-    private final AtomicBoolean phoneFrameAvailable = new AtomicBoolean();
+
+    private final AtomicBoolean uiFrameAvailable = new AtomicBoolean();
+    //private final AtomicBoolean phoneFrameAvailable = new AtomicBoolean();
 
     @Nullable
     private OnFrameAvailableListener externalFrameListener;
 
     private int droneTexId;
-    private int phoneTexId;
+   // private int phoneTexId;
     private final String vertexShaderCode =
             "attribute vec4 position;" +
                     "attribute vec2 inputTextureCoordinate;" +
@@ -148,9 +153,15 @@ public final class SceneRenderer {
         // Create the texture used to render each frame of video.
         droneTexId = GLUtils.glCreateExternalTexture();
         mDroneTexture = new SurfaceTexture(droneTexId);
+
+        uiTexId = GLUtils.glCreateExternalTexture();
+        uiTexture = new SurfaceTexture(uiTexId);
         GLUtils.checkGlError();
 
         // When the video decodes a new frame, tell the GL thread to update the image.
+
+       // mDroneTexture.setOnFrameAvailableListener(this);
+
         mDroneTexture.setOnFrameAvailableListener(
                 new OnFrameAvailableListener() {
                     @Override
@@ -172,12 +183,12 @@ public final class SceneRenderer {
         mDroneSurface = new Surface(mDroneTexture);
 
         // Create the texture used to render each frame of video.
-        phoneTexId = GLUtils.glCreateExternalTexture();
-        mPhoneTexture = new SurfaceTexture(phoneTexId);
+        //phoneTexId = GLUtils.glCreateExternalTexture();
+        //mPhoneTexture = new SurfaceTexture(phoneTexId);
         GLUtils.checkGlError();
 
         // When the video decodes a new frame, tell the GL thread to update the image.
-        mPhoneTexture.setOnFrameAvailableListener(
+        /*mPhoneTexture.setOnFrameAvailableListener(
                 new OnFrameAvailableListener() {
                     @Override
                     public void onFrameAvailable(SurfaceTexture surfaceTexture) {
@@ -192,7 +203,7 @@ public final class SceneRenderer {
                 });
 
         mPhoneSurface = new Surface(mPhoneTexture);
-
+*/
         Log.d("scene renderer", "initialized");
 
     }
@@ -209,7 +220,7 @@ public final class SceneRenderer {
         return mDroneSurface;
     }
 
-    @AnyThread
+    /*@AnyThread
     public synchronized @Nullable
     SurfaceTexture getPhoneCamTexture(int width, int height) {
         if (mPhoneTexture == null) {
@@ -219,27 +230,29 @@ public final class SceneRenderer {
 
         mPhoneTexture.setDefaultBufferSize(width, height);
         return mPhoneTexture;
-    }
+    }*/
 
     public void updateTexture() {
-        if (droneCameraEnabled)
+        //if (droneCameraEnabled)
+        if(droneFrameAvailable.get())
             mDroneTexture.updateTexImage();
-        else
-            mPhoneTexture.updateTexImage();
+       // else
+         //   mPhoneTexture.updateTexImage();
         GLUtils.checkGlError();
     }
 
     public void draw(float[] viewProjectionMatrix) {
+        if (droneFrameAvailable.get()){
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
         GLES20.glUseProgram(mProgram);
 
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
 
-        if (droneCameraEnabled)
+       // if (droneCameraEnabled)
             GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, droneTexId);
-        else
-            GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, phoneTexId);
+        //else
+          //  GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, phoneTexId);
 
         mPositionHandle = GLES20.glGetAttribLocation(mProgram, "position");
         GLES20.glEnableVertexAttribArray(mPositionHandle);
@@ -258,13 +271,14 @@ public final class SceneRenderer {
         // Disable vertex array
         GLES20.glDisableVertexAttribArray(mPositionHandle);
         GLES20.glDisableVertexAttribArray(mTextureCoordHandle);
+if(droneCameraEnabled) {
+    GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_DST_ALPHA);
+      GLES20.glEnable(GLES20.GL_BLEND);
 
-        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_DST_ALPHA);
-        GLES20.glEnable(GLES20.GL_BLEND);
-
-        canvasQuad.glDraw(0.7f);
-        GLES20.glDisable(GLES20.GL_BLEND);
-    }
+    canvasQuad.glDraw(0.7f);
+    GLES20.glDisable(GLES20.GL_BLEND);
+}
+    }}
 
     public void glShutdown() {
         if (canvasQuad != null) {

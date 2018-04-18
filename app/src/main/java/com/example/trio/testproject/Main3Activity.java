@@ -64,7 +64,7 @@ public class Main3Activity extends GvrActivity implements GvrView.StereoRenderer
     private VideoUiView uiView;
     private SceneRenderer scene;
     public ArrayList<String> DeviceNames = new ArrayList<>();
-    private Camera camera;
+    //private Camera camera;
     private boolean videoStarted;
     ARDiscoveryDevice trioDrone;
     ARDiscoveryServicesDevicesListUpdatedReceiver receiver;
@@ -73,8 +73,8 @@ public class Main3Activity extends GvrActivity implements GvrView.StereoRenderer
     private static final float Z_NEAR = 0.1f;
     private static final float Z_FAR = 100.0f;
 
-    private static final int VIDEO_WIDTH = 640;
-    private static final int VIDEO_HEIGHT = 368;
+    private static final int VIDEO_WIDTH = 480;
+    private static final int VIDEO_HEIGHT = 480;
 
     Context mContext;
 
@@ -134,7 +134,7 @@ public class Main3Activity extends GvrActivity implements GvrView.StereoRenderer
             @Override
             public void run() {
                 deviceController.startVideoStream();
-                Log.e("videostream", "starting video stream");
+                Log.e("_______videostream", "starting video stream");
             }
         }, 5000);
     }
@@ -292,7 +292,7 @@ public class Main3Activity extends GvrActivity implements GvrView.StereoRenderer
             scene.onSurfaceCreated();
             h264VideoProvider.init(scene.getDroneCamTexture(VIDEO_WIDTH, VIDEO_HEIGHT));
 
-            camera = Camera.open();
+            /*camera = Camera.open();
 
             Camera.Size cSize = camera.getParameters().getPreviewSize();
 
@@ -301,7 +301,7 @@ public class Main3Activity extends GvrActivity implements GvrView.StereoRenderer
                 camera.startPreview();
             } catch (IOException ioe) {
                 Log.w("Main3Activity", "CAM LAUNCH FAILED");
-            }
+            }*/
     }
 
     @Override

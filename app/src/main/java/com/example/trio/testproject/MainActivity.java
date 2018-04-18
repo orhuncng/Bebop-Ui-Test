@@ -68,15 +68,6 @@ public class MainActivity extends AppCompatActivity implements ARDeviceControlle
         registerReceivers();
 
         mVideoView = (H264VideoView) findViewById(R.id.videoView);
-
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                deviceController.startVideoStream();
-                Log.e("videostream", "starting video stream");
-            }
-        }, 10000);
     }
 
     public void showDevices(View view) {
@@ -144,6 +135,8 @@ public class MainActivity extends AppCompatActivity implements ARDeviceControlle
     }
 
     public void openVR(View view) {
+        unregisterReceivers();
+        closeServices();
         Intent intent = new Intent(this, Main3Activity.class);
         startActivity(intent);
     }

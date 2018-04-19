@@ -16,8 +16,6 @@ import android.widget.TextView;
 
 import com.parrot.arsdk.arcommands.ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_ENUM;
 
-import java.nio.channels.FileLock;
-
 public class VideoUiView extends LinearLayout {
 
     private final UiUpdater uiUpdater = new UiUpdater();
@@ -88,19 +86,20 @@ public class VideoUiView extends LinearLayout {
         glCanvas.drawARGB(255, 0, 0, 0);
         // Have Android render the child views.
 
-        if (pitch != null && roll != null & yaw != null){
-        glCanvas.save();
-        glCanvas.translate(500, 500);
-        glCanvas.rotate((Float.valueOf(roll) / (float)Math.PI) * 180.0f);
-        glCanvas.drawRoundRect(500.0f, 500.0f, -500.0f, -500.0f, 20.0f, 20.0f, paintWhite);
-        float cPitch = Float.valueOf(pitch)*500;
-        glCanvas.drawLine(-500, cPitch, 500, cPitch, paintRed);
-        for (int i = 0; i < 30; i++) {
-            float cRelPitch = cPitch + (75.0f * (i - 15));
-            glCanvas.drawLine(-100, cRelPitch, 100, cRelPitch, paintOrange);
+        if (pitch != null && roll != null & yaw != null) {
+            glCanvas.save();
+            glCanvas.translate(500, 500);
+            glCanvas.rotate((Float.valueOf(roll) / (float) Math.PI) * 180.0f);
+            glCanvas.drawRoundRect(500.0f, 500.0f, -500.0f, -500.0f, 20.0f, 20.0f, paintWhite);
+            float cPitch = Float.valueOf(pitch) * 500;
+            glCanvas.drawLine(-500, cPitch, 500, cPitch, paintRed);
+            for (int i = 0; i < 30; i++) {
+                float cRelPitch = cPitch + (75.0f * (i - 15));
+                glCanvas.drawLine(-100, cRelPitch, 100, cRelPitch, paintOrange);
+            }
+            glCanvas.drawLine(-Float.valueOf(yaw) * 500, -500, -Float.valueOf(yaw) * 500, 500, paintCyan);
+            glCanvas.restore();
         }
-        glCanvas.drawLine(-Float.valueOf(yaw)*500, -500, -Float.valueOf(yaw)*500, 500, paintCyan);
-        glCanvas.restore();}
 
         super.dispatchDraw(glCanvas);
         // Commit the changes.

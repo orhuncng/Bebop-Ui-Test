@@ -34,7 +34,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,12 +56,9 @@ public class GearSensorActivity extends Activity {
     private static TextView mTextGravityY;
     private static TextView mTextGravityZ;
 
-    private boolean gyroTurn = false;
-    private int index = 0;
+    private MainActivity droneCtrlObj = new MainActivity();
 
-    private static MessageAdapter mMessageAdapter;
     private boolean mIsBound = false;
-    private ListView mMessageListView;
     private ConsumerService mConsumerService = null;
 
     @Override
@@ -70,16 +66,13 @@ public class GearSensorActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gear_sensor);
         mTextView = (TextView) findViewById(R.id.tvStatus);
-        mMessageListView = (ListView) findViewById(R.id.lvMessage);
-        mMessageAdapter = new MessageAdapter();
-        mMessageListView.setAdapter(mMessageAdapter);
         // Bind service
 
-        /*mTextGyroX = (TextView) findViewById(R.id.GyroX);
+        mTextGyroX = (TextView) findViewById(R.id.GyroX);
         mTextGyroY = (TextView) findViewById(R.id.GyroY);
         mTextGyroZ = (TextView) findViewById(R.id.GyroZ);
 
-        mTextAccelX = (TextView) findViewById(R.id.AccelX);
+        /*mTextAccelX = (TextView) findViewById(R.id.AccelX);
         mTextAccelY = (TextView) findViewById(R.id.AccelY);
         mTextAccelZ = (TextView) findViewById(R.id.AccelZ);
 
@@ -96,7 +89,7 @@ public class GearSensorActivity extends Activity {
         if (mIsBound == true && mConsumerService != null) {
             if (mConsumerService.closeConnection() == false) {
                 updateTextView("Disconnected");
-                mMessageAdapter.clear();
+                //mMessageAdapter.clear();
             }
         }
         // Un-bind service
@@ -120,7 +113,7 @@ public class GearSensorActivity extends Activity {
                     if (mConsumerService.closeConnection() == false) {
                         updateTextView("Disconnected");
                         Toast.makeText(getApplicationContext(), R.string.ConnectionAlreadyDisconnected, Toast.LENGTH_LONG).show();
-                        mMessageAdapter.clear();
+                        //mMessageAdapter.clear();
                     }
                 }
                 break;
@@ -153,10 +146,28 @@ public class GearSensorActivity extends Activity {
         }
     };
 
-    public static void addGyroMessage(ArrayList<String> gyroData) {
-        mTextGyroX.setText(gyroData.get(0));
-        mTextGyroY.setText(gyroData.get(1));
-        mTextGyroZ.setText(gyroData.get(2));
+    public void rotateDrone(final String str) {
+        int dir = 10;
+        if (str.equals("CCW")) {
+            dir *= -1;
+        }
+
+        droneCtrlObj.setYawFromBezelRotate(dir);
+
+    }
+
+    public static void addGyroXMessage(final String str) {
+        mTextGyroX.setText(str);
+
+    }
+
+    public static void addGyroYMessage(final String str) {
+        mTextGyroY.setText(str);
+
+    }
+
+    public static void addGyroZMessage(final String str) {
+        mTextGyroZ.setText(str);
 
     }
 
@@ -174,9 +185,9 @@ public class GearSensorActivity extends Activity {
 
     }
 
-    public static void addMessage(String data) {
+    /*public static void addMessage(String data) {
         mMessageAdapter.addMessage(new Message(data));
-    }
+    }*/
 
     public static void updateTextView(final String str) {
         mTextView.setText(str);
@@ -201,7 +212,7 @@ public class GearSensorActivity extends Activity {
                         mMessages.add(msg);
                     }
                     notifyDataSetChanged();
-                    mMessageListView.setSelection(getCount() - 1);
+                    //mMessageListView.setSelection(getCount() - 1);
                     //Log.e("gear", msg.data);
                    /* if (msg.data.equals("gyro"))
                     {

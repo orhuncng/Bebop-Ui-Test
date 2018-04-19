@@ -45,7 +45,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
@@ -95,14 +94,15 @@ public class ConsumerService extends SAAgent {
     private final IBinder mBinder = new LocalBinder();
     private ServiceConnection mConnectionHandler = null;
     Handler mHandler = new Handler();
-    private ArrayList<String> gyroData = new ArrayList<String>();
-    private ArrayList<String> accelData = new ArrayList<String>();
-    private ArrayList<String> gravityData = new ArrayList<String>();
-
+    private MainActivity droneCtrlObj;
+    private WatchServiceCallbacks serviceCallbacks;
     public ConsumerService() {
         super(TAG, SASOCKET_CLASS);
     }
 
+    public void setCallbacks(WatchServiceCallbacks callbacks) {
+        serviceCallbacks = callbacks;
+    }
     @Override
     public void onCreate() {
         super.onCreate();
@@ -239,28 +239,30 @@ public class ConsumerService extends SAAgent {
         @Override
         public void onReceive(int channelId, byte[] data) {
             final String message = new String(data);
-
+            Log.e("X", message);
+            rotateDrone(message);
             try {
                 JSONObject obj = new JSONObject(message);
 
                 Iterator<String> it = obj.keys();
 
-                while (it.hasNext()) {
-                    try {
+                if (it.hasNext()) {
+                    /*try {
                         addMessage("Received: ", obj.getString(it.next()));
                     } catch (JSONException e) {
                         e.printStackTrace();
-                    }
+                    }*/
 
-                   /* String key = it.next();
+                    Log.e("X", obj.get(obj.names().getString(1)).toString());
+                    //  Log.e("Y",obj.get(obj.names().getString(2)).toString());
+                    //Log.e("Z",obj.get(obj.names().getString(3)).toString());
+                    /*String key = it.next();
                     if ( obj.getString(key).equals("gyro")) {
-                        gyroData.add(obj.get(obj.names().getString(1)).toString());
-                        gyroData.add(obj.get(obj.names().getString(2)).toString());
-                        gyroData.add(obj.get(obj.names().getString(3)).toString());
-                        addGyroMessage(gyroData);
-                        gyroData.clear();
+                        addGyroXMessage(obj.get(obj.names().getString(1)).toString());
+                        addGyroYMessage(obj.get(obj.names().getString(2)).toString());
+                        addGyroZMessage(obj.get(obj.names().getString(3)).toString());
                     }
-                    else if (obj.getString(it.next()).equals("accelero"))
+                    /*else if (obj.getString(it.next()).equals("accelero"))
                     {
                         accelData.add(obj.get(obj.names().getString(1)).toString());
                         accelData.add(obj.get(obj.names().getString(2)).toString());
@@ -311,7 +313,7 @@ public class ConsumerService extends SAAgent {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            addMessage("Sent: ", data);
+            //addMessage("Sent: ", data);
         }
         return retvalue;
     }
@@ -352,12 +354,51 @@ public class ConsumerService extends SAAgent {
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                GearSensorActivity.updateTextView(str);
+                //GearSensorActivity.updateTextView(str);
             }
         });
     }
 
-    private void addMessage(final String prefix, final String data) {
+    private void addGyroXMessage(final String str) {
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                GearSensorActivity.addGyroXMessage(str);
+            }
+        }, 500);
+    }
+
+    private void addGyroYMessage(final String str) {
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                GearSensorActivity.addGyroYMessage(str);
+            }
+        }, 500);
+    }
+
+    private void rotateDrone(final String str) {
+        Log.e("ServiceRotateDrone", str);
+        int dir = 10;
+        if (str.equals("CCW")) {
+            dir *= -1;
+        }
+
+        if (serviceCallbacks != null) {
+            serviceCallbacks.doSomething(dir);
+        }
+    }
+
+    private void addGyroZMessage(final String str) {
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                GearSensorActivity.addGyroZMessage(str);
+            }
+        }, 500);
+    }
+
+    /*private void addMessage(final String prefix, final String data) {
         //final String strToUI = prefix.concat(data);
         mHandler.post(new Runnable() {
             @Override
@@ -365,5 +406,5 @@ public class ConsumerService extends SAAgent {
                 GearSensorActivity.addMessage(data);
             }
         });
-    }
+    }*/
 }

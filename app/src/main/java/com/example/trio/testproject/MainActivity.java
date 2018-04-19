@@ -39,7 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainActivity extends AppCompatActivity implements ARDeviceControllerListener, ARDeviceControllerStreamListener {
+public class MainActivity extends AppCompatActivity implements ARDeviceControllerListener, ARDeviceControllerStreamListener, WatchServiceCallbacks {
     public static final String TESTMSG = "com.example.trio.testproject";
     public ArrayList<String> DeviceNames = new ArrayList<>();
     ARDiscoveryDevice trioDrone;
@@ -47,7 +47,10 @@ public class MainActivity extends AppCompatActivity implements ARDeviceControlle
     ARDiscoveryServicesDevicesListUpdatedReceiver receiver;
     ARDeviceController deviceController;
     private H264VideoView mVideoView;
+    private ARCONTROLLER_DEVICE_STATE_ENUM deviceState = ARCONTROLLER_DEVICE_STATE_ENUM.eARCONTROLLER_DEVICE_STATE_UNKNOWN_ENUM_VALUE;
 
+    private boolean mIsBound = false;
+    private ConsumerService mConsumerService = null;
 
     static {
         ARSDK.loadSDKLibs();
@@ -67,6 +70,9 @@ public class MainActivity extends AppCompatActivity implements ARDeviceControlle
         registerReceivers();
 
         mVideoView = (H264VideoView) findViewById(R.id.videoView);
+        mIsBound = bindService(new Intent(MainActivity.this, ConsumerService.class), mConnection, Context.BIND_AUTO_CREATE);
+
+
     }
 
     public void showDevices(View view) {
@@ -110,6 +116,24 @@ public class MainActivity extends AppCompatActivity implements ARDeviceControlle
             ARCONTROLLER_ERROR_ENUM error = deviceController.stop();
             // only when the deviceController is stopped
             deviceController.dispose();
+        }
+    }
+
+    public void setYawFromBezelRotate(int dir) {
+        Log.e("MainActRotateDrone", "" + dir);
+
+        if (deviceController != null) {
+
+            deviceController.getFeatureARDrone3().setPilotingPCMDFlag((byte) 0);
+
+            Log.e("SetYawpilotingState", getDeviceState().toString());
+            if ((getPilotingState().toString().equals(ARCONTROLLER_DEVICE_STATE_ENUM.ARCONTROLLER_DEVICE_STATE_RUNNING))) {
+                deviceController.getFeatureARDrone3().setPilotingPCMDYaw((byte) dir);
+                Log.e("MainActRotateDrone", "dirSent");
+            } else {
+                Log.e("MainActRotateDrone", "else ye girdi");
+
+            }
         }
     }
 
@@ -265,7 +289,7 @@ public class MainActivity extends AppCompatActivity implements ARDeviceControlle
 
     @Override
     public void onStateChanged(ARDeviceController deviceController, ARCONTROLLER_DEVICE_STATE_ENUM newState, ARCONTROLLER_ERROR_ENUM error) {
-
+        deviceState = newState;
         switch (newState) {
             case ARCONTROLLER_DEVICE_STATE_RUNNING:
                 Log.e("onStateChanged", "ARCONTROLLER_DEVICE_STATE_RUNNING: ");
@@ -338,6 +362,10 @@ public class MainActivity extends AppCompatActivity implements ARDeviceControlle
         return flyingState;
     }
 
+    public ARCONTROLLER_DEVICE_STATE_ENUM getDeviceState() {
+        return deviceState;
+    }
+
     private void takeoff() {
         Log.e("TAKE OFF state", getPilotingState().toString());
         if (ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_ENUM.ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_LANDED.equals(getPilotingState())) {
@@ -380,5 +408,32 @@ public class MainActivity extends AppCompatActivity implements ARDeviceControlle
     @Override
     public void onFrameTimeout(ARDeviceController deviceController) {
 
+    }
+
+    private final ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            mConsumerService = ((ConsumerService.LocalBinder) service).getService();
+            //updateTextView("onServiceConnected");
+            Log.e("MainAct", "onServiceConnected");
+            if (mIsBound == true && mConsumerService != null) {
+                Log.e("MainAct", "oncreate bind and consumer");
+                mConsumerService.findPeers();
+                mConsumerService.setCallbacks(MainActivity.this); // register
+            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName className) {
+            mConsumerService = null;
+            mIsBound = false;
+            //updateTextView("onServiceDisconnected");
+            Log.e("MainAct", "onServicedisonnected");
+        }
+    };
+
+    @Override
+    public void doSomething(int dir) {
+        setYawFromBezelRotate(dir);
     }
 }

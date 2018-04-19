@@ -14,7 +14,7 @@
         android:textSize="24sp"
         android:textStyle="bold" />
 
-    <!-- <TableLayout
+    <TableLayout
         android:layout_width="wrap_content"
         android:layout_height="100dp"
         android:shrinkColumns="*"
@@ -100,7 +100,7 @@
 
     </TableLayout>
 
-    <TableLayout
+    <!--<TableLayout
         android:layout_width="wrap_content"
         android:layout_height="100dp"
         android:shrinkColumns="*"
@@ -273,11 +273,11 @@
     </TableLayout> -->
 
 
-    <ListView
+    <!--<ListView
         android:id="@+id/lvMessage"
         android:layout_width="match_parent"
         android:layout_height="0dip"
-        android:layout_weight="0.9"></ListView>
+        android:layout_weight="0.9"></ListView>-->
 
     <Button
         android:id="@+id/buttonConnect"

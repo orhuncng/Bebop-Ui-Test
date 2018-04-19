@@ -132,7 +132,7 @@ public class Main3Activity extends GvrActivity implements GvrView.StereoRenderer
                 deviceController.startVideoStream();
                 Log.e("_______videostream", "starting video stream");
             }
-        }, 3000);
+        }, 5000);
     }
 
     private ARDiscoveryService mArdiscoveryService;

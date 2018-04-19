@@ -379,7 +379,7 @@ public class ConsumerService extends SAAgent {
 
     private void rotateDrone(final String str) {
         Log.e("ServiceRotateDrone", str);
-        int dir = 10;
+        int dir = 100;
         if (str.equals("CCW")) {
             dir *= -1;
         }

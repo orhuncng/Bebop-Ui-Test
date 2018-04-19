@@ -16,12 +16,16 @@ import android.widget.TextView;
 
 import com.parrot.arsdk.arcommands.ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_ENUM;
 
+import java.nio.channels.FileLock;
+
 public class VideoUiView extends LinearLayout {
 
     private final UiUpdater uiUpdater = new UiUpdater();
     private CanvasQuad canvasQuad;
     private static Paint paintWhite = new Paint();
     private static Paint paintCyan = new Paint();
+    private static Paint paintOrange = new Paint();
+    private static Paint paintRed = new Paint();
     private static String batteryLevel;
     private static String wifiSignal;
     private static String pilotingState;
@@ -52,9 +56,13 @@ public class VideoUiView extends LinearLayout {
         view.setVisibility(View.VISIBLE);
         parent.addView(view, 0);
         paintWhite.setColor(Color.WHITE);
-        paintWhite.setStrokeWidth(4.0f);
+        paintWhite.setStrokeWidth(12.0f);
         paintCyan.setColor(Color.CYAN);
-        paintCyan.setStrokeWidth(4.0f);
+        paintCyan.setStrokeWidth(12.0f);
+        paintOrange.setColor(Color.argb(255, 250, 160, 0));
+        paintOrange.setStrokeWidth(6.0f);
+        paintRed.setColor(Color.RED);
+        paintRed.setStrokeWidth(12.0f);
 
         return view;
     }
@@ -80,8 +88,19 @@ public class VideoUiView extends LinearLayout {
         glCanvas.drawARGB(255, 0, 0, 0);
         // Have Android render the child views.
 
-        // glCanvas.drawLine(10, 10, 500, 500, paintWhite);
-        //  glCanvas.drawLine(500, 20, 90, 500, paintCyan);
+        if (pitch != null && roll != null & yaw != null){
+        glCanvas.save();
+        glCanvas.translate(500, 500);
+        glCanvas.rotate((Float.valueOf(roll) / (float)Math.PI) * 180.0f);
+        glCanvas.drawRoundRect(500.0f, 500.0f, -500.0f, -500.0f, 20.0f, 20.0f, paintWhite);
+        float cPitch = Float.valueOf(pitch)*500;
+        glCanvas.drawLine(-500, cPitch, 500, cPitch, paintRed);
+        for (int i = 0; i < 30; i++) {
+            float cRelPitch = cPitch + (75.0f * (i - 15));
+            glCanvas.drawLine(-100, cRelPitch, 100, cRelPitch, paintOrange);
+        }
+        glCanvas.drawLine(-Float.valueOf(yaw)*500, -500, -Float.valueOf(yaw)*500, 500, paintCyan);
+        glCanvas.restore();}
 
         super.dispatchDraw(glCanvas);
         // Commit the changes.

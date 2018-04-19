@@ -1,5 +1,7 @@
 package com.example.trio.testproject;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -7,6 +9,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -36,6 +39,7 @@ import com.parrot.arsdk.ardiscovery.receivers.ARDiscoveryServicesDevicesListUpda
 import com.parrot.arsdk.ardiscovery.receivers.ARDiscoveryServicesDevicesListUpdatedReceiverDelegate;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -48,6 +52,15 @@ public class MainActivity extends AppCompatActivity implements ARDeviceControlle
     ARDeviceController deviceController;
     private H264VideoView mVideoView;
     private ARCONTROLLER_DEVICE_STATE_ENUM deviceState = ARCONTROLLER_DEVICE_STATE_ENUM.eARCONTROLLER_DEVICE_STATE_UNKNOWN_ENUM_VALUE;
+
+    float[] acceleration = new float[2];
+    float[] accelerationFilter = new float[3];
+    float[] gyroscope = new float[2];
+
+    private DeviceSensorProvider<HashMap<String, float[]>> liveData;
+
+    float deltaX = 0;
+    private int count = 0;
 
     private boolean mIsBound = false;
     private ConsumerService mConsumerService = null;
@@ -71,6 +84,41 @@ public class MainActivity extends AppCompatActivity implements ARDeviceControlle
 
         mVideoView = (H264VideoView) findViewById(R.id.videoView);
         mIsBound = bindService(new Intent(MainActivity.this, ConsumerService.class), mConnection, Context.BIND_AUTO_CREATE);
+
+
+        DeviceSensorViewModel model = ViewModelProviders.of(this).get(DeviceSensorViewModel.class);
+        liveData = model.getDeviceSensorListener();
+
+        liveData.observe(this, new Observer<HashMap<String, float[]>>() {
+            @Override
+            public void onChanged(@Nullable HashMap<String, float[]> sensorData) {
+                acceleration = sensorData.get("acceleration");
+                accelerationFilter = sensorData.get("accelerationFilter");
+                gyroscope = sensorData.get("gyroscope");
+
+                count++;
+
+                if (acceleration != null && acceleration.length == 3) {
+                    Log.e("raw", Float.toString(acceleration[0]));
+                }
+
+                if (accelerationFilter != null && accelerationFilter.length == 3) {
+                    Log.e("filtered", Float.toString(accelerationFilter[0]));
+                }
+
+                if (count >= 100) {
+                    Log.e("count", "Ayar yapıldı");
+                    deltaX = deltaX + accelerationFilter[2];
+                    Log.e("Gidilen Yol", Float.toString(deltaX));
+
+                    int yaw = Math.round(accelerationFilter[2] * 10);
+
+                    setYawFromAcclSensor(yaw);
+
+                }
+
+            }
+        });
 
 
     }
@@ -136,6 +184,26 @@ public class MainActivity extends AppCompatActivity implements ARDeviceControlle
             }
         }
     }
+
+    public void setYawFromAcclSensor(int dir) {
+        Log.e("MainActRotateDrone", "" + dir);
+
+        if (deviceController != null) {
+
+            deviceController.getFeatureARDrone3().setPilotingPCMDFlag((byte) 0);
+
+            Log.e("SetYawpilotingState", getDeviceState().toString());
+            if ((getPilotingState().toString().equals(ARCONTROLLER_DEVICE_STATE_ENUM.ARCONTROLLER_DEVICE_STATE_RUNNING))) {
+                deviceController.getFeatureARDrone3().setPilotingPCMDYaw((byte) dir);
+                Log.e("MainActRotateDrone", "dirSent");
+            } else {
+                Log.e("MainActRotateDrone", "else ye girdi");
+
+            }
+        }
+    }
+
+
 
     public void openSensor(View view) {
         Log.e("openSensor", "OpenSensore basıldı");

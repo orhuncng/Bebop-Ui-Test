@@ -175,7 +175,7 @@ public class MainActivity extends AppCompatActivity implements ARDeviceControlle
             deviceController.getFeatureARDrone3().setPilotingPCMDFlag((byte) 0);
 
             Log.e("SetYawpilotingState", getDeviceState().toString());
-            if ((getPilotingState().toString().equals(ARCONTROLLER_DEVICE_STATE_ENUM.ARCONTROLLER_DEVICE_STATE_RUNNING))) {
+            if ((getDeviceState() == ARCONTROLLER_DEVICE_STATE_ENUM.ARCONTROLLER_DEVICE_STATE_RUNNING)) {
                 deviceController.getFeatureARDrone3().setPilotingPCMDYaw((byte) dir);
                 Log.e("MainActRotateDrone", "dirSent");
             } else {

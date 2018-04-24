@@ -1,4 +1,4 @@
-package com.example.trio.testproject;
+package com.trio.dronetest;
 
 import android.arch.lifecycle.LiveData;
 import android.content.Context;
@@ -13,7 +13,9 @@ import java.util.HashMap;
  * Created by orhun on 4/15/2018.
  */
 
-public class DeviceSensorProvider<T> extends LiveData<HashMap<String, float[]>> implements SensorEventListener {
+public class DeviceSensorProvider<T> extends LiveData<HashMap<String, float[]>>
+        implements SensorEventListener
+{
 
     private HashMap<String, float[]> sensorMap = new HashMap();
 
@@ -25,29 +27,33 @@ public class DeviceSensorProvider<T> extends LiveData<HashMap<String, float[]>> 
     private float[] acceleration = new float[]{0.0F, 0.0F, 0.0F};
 
     //Config
-    private int sensorFrequency = mSensorManager.SENSOR_DELAY_NORMAL;
+    private int sensorFrequency = SensorManager.SENSOR_DELAY_NORMAL;
     private boolean filterActive = true;
     private boolean axisInverted = false;
 
 
-    public DeviceSensorProvider(Context context) {
+    public DeviceSensorProvider(Context context)
+    {
         mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
     }
 
 
     @Override
-    protected void onActive() {
+    protected void onActive()
+    {
         registerSensors(sensorFrequency);
     }
 
     @Override
-    protected void onInactive() {
+    protected void onInactive()
+    {
 
         unregisterSensors();
     }
 
     @Override
-    public void onSensorChanged(SensorEvent event) {
+    public void onSensorChanged(SensorEvent event)
+    {
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             if (filterActive) {
                 acceleration = dataFilterer.lowPassFilter(history, event.values);
@@ -71,22 +77,30 @@ public class DeviceSensorProvider<T> extends LiveData<HashMap<String, float[]>> 
     }
 
     @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    public void onAccuracyChanged(Sensor sensor, int accuracy)
+    {
 
     }
 
-    private void registerSensors(int sensorDelay) {
+    private void registerSensors(int sensorDelay)
+    {
         // Register for sensor updates.
-        mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), sensorFrequency);
-        mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE), sensorFrequency);
+        mSensorManager
+                .registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+                        sensorFrequency);
+        mSensorManager
+                .registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE),
+                        sensorFrequency);
     }
 
-    private void unregisterSensors() {
+    private void unregisterSensors()
+    {
         // Unregister for sensor updates.
         mSensorManager.unregisterListener(this);
     }
 
-    private float[] invert(float[] values) {
+    private float[] invert(float[] values)
+    {
         for (int i = 0; i < 3; i++) {
             values[i] = -values[i];
         }

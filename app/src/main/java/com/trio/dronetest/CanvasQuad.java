@@ -1,4 +1,4 @@
-package com.example.trio.testproject;
+package com.trio.dronetest;
 
 import android.graphics.Canvas;
 import android.graphics.SurfaceTexture;
@@ -10,7 +10,8 @@ import android.widget.FrameLayout;
 import java.nio.FloatBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class CanvasQuad {
+public class CanvasQuad
+{
     // The size of the quad is hardcoded for this sample and the quad doesn't have a model matrix so
     // these dimensions are used by translateClick() for touch interaction.
     private static final float WIDTH = 1f;
@@ -101,18 +102,23 @@ public class CanvasQuad {
     private static final FloatBuffer vertexBuffer = GLUtils.createBuffer(vertexData);
 
 
-    CanvasQuad() {
+    CanvasQuad()
+    {
     }
 
-    public static FrameLayout.LayoutParams getLayoutParams() {
-        return new FrameLayout.LayoutParams((int) (WIDTH * PX_PER_UNIT), (int) (HEIGHT * PX_PER_UNIT));
+    public static FrameLayout.LayoutParams getLayoutParams()
+    {
+        return new FrameLayout.LayoutParams((int) (WIDTH * PX_PER_UNIT),
+                (int) (HEIGHT * PX_PER_UNIT));
     }
 
-    public Canvas lockCanvas() {
+    public Canvas lockCanvas()
+    {
         return displaySurface == null ? null : displaySurface.lockCanvas(null /* dirty Rect */);
     }
 
-    public void unlockCanvasAndPost(Canvas canvas) {
+    public void unlockCanvasAndPost(Canvas canvas)
+    {
         if (canvas == null || displaySurface == null) {
             // glInit() hasn't run yet.
             return;
@@ -122,7 +128,8 @@ public class CanvasQuad {
     }
 
 
-    void glInit() {
+    void glInit()
+    {
         if (program != 0) {
             return;
         }
@@ -145,7 +152,8 @@ public class CanvasQuad {
     }
 
 
-    void glDraw(float alpha) {
+    void glDraw(float alpha)
+    {
         // Configure shader.
         GLES20.glUseProgram(program);
         GLUtils.checkGlError();
@@ -169,7 +177,8 @@ public class CanvasQuad {
 
         // Load texture data.
         vertexBuffer.position(POSITION_COORDS_PER_VERTEX);
-        GLES20.glVertexAttribPointer(textureCoordsHandle, TEXTURE_COORDS_PER_VERTEX, GLES20.GL_FLOAT,
+        GLES20.glVertexAttribPointer(textureCoordsHandle, TEXTURE_COORDS_PER_VERTEX,
+                GLES20.GL_FLOAT,
                 false, VERTEX_STRIDE_BYTES, vertexBuffer);
         GLUtils.checkGlError();
 
@@ -187,7 +196,8 @@ public class CanvasQuad {
     }
 
 
-    void glShutdown() {
+    void glShutdown()
+    {
         if (program != 0) {
             GLES20.glDeleteProgram(program);
             GLES20.glDeleteTextures(1, new int[]{textureId}, 0);

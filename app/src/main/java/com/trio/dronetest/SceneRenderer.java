@@ -1,4 +1,4 @@
-package com.example.trio.testproject;
+package com.trio.dronetest;
 
 import android.content.Context;
 import android.graphics.SurfaceTexture;
@@ -20,10 +20,12 @@ import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public final class SceneRenderer {
+public final class SceneRenderer
+{
     private static final String TAG = "SceneRenderer";
 
-    // This is the primary interface between the Media Player and the GL Scene.
+    // This is the primary interface between the Media Player and the GL Scene. asdasdasdasdas a
+    // sd as dasda ssa
     private Surface mDroneSurface;
     private SurfaceTexture mDroneTexture;
     private Surface uiSurface;
@@ -92,16 +94,11 @@ public final class SceneRenderer {
     private final VideoUiView videoUiView;
     @Nullable
     private final Handler uiHandler;
-
-    public void toggleDroneCameraEnabled() {
-        droneCameraEnabled = !droneCameraEnabled;
-    }
-
     private boolean droneCameraEnabled;
 
-    private SceneRenderer(
-            CanvasQuad canvasQuad, VideoUiView videoUiView, Handler uiHandler,
-            SurfaceTexture.OnFrameAvailableListener externalFrameListener) {
+    private SceneRenderer(CanvasQuad canvasQuad, VideoUiView videoUiView, Handler uiHandler,
+            SurfaceTexture.OnFrameAvailableListener externalFrameListener)
+    {
         this.canvasQuad = canvasQuad;
         this.videoUiView = videoUiView;
         this.uiHandler = uiHandler;
@@ -109,17 +106,25 @@ public final class SceneRenderer {
     }
 
     @MainThread
-    public static Pair<SceneRenderer, VideoUiView> createForVR(Context context, ViewGroup parent) {
+    public static Pair<SceneRenderer, VideoUiView> createForVR(Context context, ViewGroup parent)
+    {
         CanvasQuad canvasQuad = new CanvasQuad();
         VideoUiView videoUiView = VideoUiView.createForOpenGl(context, parent, canvasQuad);
         OnFrameAvailableListener externalFrameListener = videoUiView.getFrameListener();
 
         SceneRenderer scene = new SceneRenderer(
-                canvasQuad, videoUiView, new Handler(Looper.getMainLooper()), externalFrameListener);
+                canvasQuad, videoUiView, new Handler(Looper.getMainLooper()),
+                externalFrameListener);
         return Pair.create(scene, videoUiView);
     }
 
-    public void onSurfaceCreated() {
+    public void toggleDroneCameraEnabled()
+    {
+        droneCameraEnabled = !droneCameraEnabled;
+    }
+
+    public void onSurfaceCreated()
+    {
         GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         GLUtils.checkGlError();
 
@@ -163,9 +168,11 @@ public final class SceneRenderer {
         // mDroneTexture.setOnFrameAvailableListener(this);
 
         mDroneTexture.setOnFrameAvailableListener(
-                new OnFrameAvailableListener() {
+                new OnFrameAvailableListener()
+                {
                     @Override
-                    public void onFrameAvailable(SurfaceTexture surfaceTexture) {
+                    public void onFrameAvailable(SurfaceTexture surfaceTexture)
+                    {
                         droneFrameAvailable.set(true);
 
                         synchronized (SceneRenderer.this) {
@@ -210,7 +217,8 @@ public final class SceneRenderer {
 
     @AnyThread
     public synchronized @Nullable
-    Surface getDroneCamTexture(int width, int height) {
+    Surface getDroneCamTexture(int width, int height)
+    {
         if (mDroneTexture == null) {
             Log.e(TAG, ".getDroneCamTexture called before GL Initialization completed.");
             return null;
@@ -232,7 +240,8 @@ public final class SceneRenderer {
         return mPhoneTexture;
     }*/
 
-    public void updateTexture() {
+    public void updateTexture()
+    {
         //if (droneCameraEnabled)
         if (droneFrameAvailable.get())
             mDroneTexture.updateTexImage();
@@ -241,7 +250,8 @@ public final class SceneRenderer {
         GLUtils.checkGlError();
     }
 
-    public void draw(float[] viewProjectionMatrix) {
+    public void draw(float[] viewProjectionMatrix)
+    {
         if (droneFrameAvailable.get()) {
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
@@ -260,7 +270,8 @@ public final class SceneRenderer {
                     false, vertexStride, vertexBuffer);
 
 
-            mTextureCoordHandle = GLES20.glGetAttribLocation(mProgram, "inputTextureCoordinate");
+            mTextureCoordHandle =
+                    GLES20.glGetAttribLocation(mProgram, "inputTextureCoordinate");
             GLES20.glEnableVertexAttribArray(mTextureCoordHandle);
             GLES20.glVertexAttribPointer(mTextureCoordHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT,
                     false, vertexStride, textureVerticesBuffer);
@@ -281,9 +292,8 @@ public final class SceneRenderer {
         }
     }
 
-    public void glShutdown() {
-        if (canvasQuad != null) {
-            canvasQuad.glShutdown();
-        }
+    public void glShutdown()
+    {
+        if (canvasQuad != null) { canvasQuad.glShutdown(); }
     }
 }

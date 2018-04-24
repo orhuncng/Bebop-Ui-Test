@@ -1,4 +1,4 @@
-package com.example.trio.testproject;
+package com.trio.dronetest;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -13,10 +13,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
+import com.example.trio.testproject.R;
 import com.parrot.arsdk.arcommands.ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_ENUM;
 
-public class VideoUiView extends LinearLayout {
+public class VideoUiView extends LinearLayout
+{
 
     private final UiUpdater uiUpdater = new UiUpdater();
     private CanvasQuad canvasQuad;
@@ -40,12 +41,14 @@ public class VideoUiView extends LinearLayout {
     private static String cameraTilt;
     private static String cameraPan;
 
-    VideoUiView(Context context, AttributeSet attrs) {
+    VideoUiView(Context context, AttributeSet attrs)
+    {
         super(context, attrs);
     }
 
     @MainThread
-    public static VideoUiView createForOpenGl(Context context, ViewGroup parent, CanvasQuad quad) {
+    public static VideoUiView createForOpenGl(Context context, ViewGroup parent, CanvasQuad quad)
+    {
         Context theme = new ContextThemeWrapper(context, R.style.AppTheme);
 
         VideoUiView view = (VideoUiView) View.inflate(theme, R.layout.video_ui, null);
@@ -66,7 +69,8 @@ public class VideoUiView extends LinearLayout {
     }
 
     @Override
-    public void dispatchDraw(Canvas androidUiCanvas) {
+    public void dispatchDraw(Canvas androidUiCanvas)
+    {
         if (canvasQuad == null) {
             // Handle non-VR rendering.
             super.dispatchDraw(androidUiCanvas);
@@ -76,7 +80,8 @@ public class VideoUiView extends LinearLayout {
         // Handle VR rendering.
         Canvas glCanvas = canvasQuad.lockCanvas();
         if (glCanvas == null) {
-            // This happens if Android tries to draw this View before GL initialization completes. We need
+            // This happens if Android tries to draw this View before GL initialization completes
+            // . We need
             // to retry until the draw call happens after GL invalidation.
             postInvalidate();
             return;
@@ -97,7 +102,8 @@ public class VideoUiView extends LinearLayout {
                 float cRelPitch = cPitch + (75.0f * (i - 15));
                 glCanvas.drawLine(-100, cRelPitch, 100, cRelPitch, paintOrange);
             }
-            glCanvas.drawLine(-Float.valueOf(yaw) * 500, -500, -Float.valueOf(yaw) * 500, 500, paintCyan);
+            glCanvas.drawLine(-Float.valueOf(yaw) * 500, -500, -Float.valueOf(yaw) * 500, 500,
+                    paintCyan);
             glCanvas.restore();
         }
 
@@ -106,113 +112,134 @@ public class VideoUiView extends LinearLayout {
         canvasQuad.unlockCanvasAndPost(glCanvas);
     }
 
-    public SurfaceTexture.OnFrameAvailableListener getFrameListener() {
+    public SurfaceTexture.OnFrameAvailableListener getFrameListener()
+    {
         return uiUpdater;
     }
 
-    public void setBatteryLevel(Integer batteryLevel) {
-        this.batteryLevel = String.valueOf(batteryLevel);
+    public void setBatteryLevel(Integer batteryLevel)
+    {
+        VideoUiView.batteryLevel = String.valueOf(batteryLevel);
     }
 
-    public void setWifiSignal(short wifiSignal) {
-        this.wifiSignal = String.valueOf(wifiSignal) + " dbm";
+    public void setWifiSignal(short wifiSignal)
+    {
+        VideoUiView.wifiSignal = String.valueOf(wifiSignal) + " dbm";
     }
 
-    public void setPilotingState(ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_ENUM pilotingState) {
+    public void setPilotingState(
+            ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_ENUM pilotingState)
+    {
         switch (pilotingState) {
             case ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_EMERGENCY: {
-                this.pilotingState = ("Emergency");
+                VideoUiView.pilotingState = ("Emergency");
                 break;
             }
             case ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_EMERGENCY_LANDING: {
-                this.pilotingState = ("Emergency Landing");
+                VideoUiView.pilotingState = ("Emergency Landing");
                 break;
             }
             case ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_FLYING: {
-                this.pilotingState = ("Flying");
+                VideoUiView.pilotingState = ("Flying");
                 break;
             }
             case ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_HOVERING: {
-                this.pilotingState = ("Hovering");
+                VideoUiView.pilotingState = ("Hovering");
                 break;
             }
             case ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_LANDED: {
-                this.pilotingState = ("Landed");
+                VideoUiView.pilotingState = ("Landed");
                 break;
             }
             case ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_LANDING: {
-                this.pilotingState = ("Landing");
+                VideoUiView.pilotingState = ("Landing");
                 break;
             }
             case ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_MOTOR_RAMPING: {
-                this.pilotingState = ("Motor Ramping");
+                VideoUiView.pilotingState = ("Motor Ramping");
                 break;
             }
             case ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_TAKINGOFF: {
-                this.pilotingState = ("Taking Off");
+                VideoUiView.pilotingState = ("Taking Off");
                 break;
             }
             case ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_USERTAKEOFF: {
-                this.pilotingState = ("User Take Off");
+                VideoUiView.pilotingState = ("User Take Off");
                 break;
             }
         }
     }
 
-    public void setLatitude(double latitude) {
-        this.latitude = (String.valueOf(latitude));
+    public void setLatitude(double latitude)
+    {
+        VideoUiView.latitude = (String.valueOf(latitude));
     }
 
-    public void setLongitude(double longitude) {
-        this.longitude = (String.valueOf(longitude));
+    public void setLongitude(double longitude)
+    {
+        VideoUiView.longitude = (String.valueOf(longitude));
     }
 
-    public void setPosAlt(double posAlt) {
-        this.posAlt = (String.valueOf(posAlt));
+    public void setPosAlt(double posAlt)
+    {
+        VideoUiView.posAlt = (String.valueOf(posAlt));
     }
 
-    public void setSpeedX(float speedX) {
-        this.speedX = (String.valueOf(speedX));
+    public void setSpeedX(float speedX)
+    {
+        VideoUiView.speedX = (String.valueOf(speedX));
     }
 
-    public void setSpeedY(float speedY) {
-        this.speedY = (String.valueOf(speedY));
+    public void setSpeedY(float speedY)
+    {
+        VideoUiView.speedY = (String.valueOf(speedY));
     }
 
-    public void setSpeedZ(float speedZ) {
-        this.speedZ = (String.valueOf(speedZ));
+    public void setSpeedZ(float speedZ)
+    {
+        VideoUiView.speedZ = (String.valueOf(speedZ));
     }
 
-    public void setRoll(float roll) {
-        this.roll = (String.valueOf(roll));
+    public void setRoll(float roll)
+    {
+        VideoUiView.roll = (String.valueOf(roll));
     }
 
-    public void setPitch(float pitch) {
-        this.pitch = (String.valueOf(pitch));
+    public void setPitch(float pitch)
+    {
+        VideoUiView.pitch = (String.valueOf(pitch));
     }
 
-    public void setYaw(float yaw) {
-        this.yaw = (String.valueOf(yaw));
+    public void setYaw(float yaw)
+    {
+        VideoUiView.yaw = (String.valueOf(yaw));
     }
 
-    public void setAltitude(double altitude) {
-        this.altitude = (String.valueOf(altitude));
+    public void setAltitude(double altitude)
+    {
+        VideoUiView.altitude = (String.valueOf(altitude));
     }
 
-    public void setCameraTilt(byte cameraTilt) {
-        this.cameraTilt = (String.valueOf(cameraTilt));
+    public void setCameraTilt(byte cameraTilt)
+    {
+        VideoUiView.cameraTilt = (String.valueOf(cameraTilt));
     }
 
-    public void setCameraPan(byte cameraPan) {
-        this.cameraPan = (String.valueOf(cameraPan));
+    public void setCameraPan(byte cameraPan)
+    {
+        VideoUiView.cameraPan = (String.valueOf(cameraPan));
     }
 
-    private final class UiUpdater implements SurfaceTexture.OnFrameAvailableListener {
-        // onFrameAvailable is called on an arbitrary thread, but we can only access mediaPlayer on the
+    private final class UiUpdater implements SurfaceTexture.OnFrameAvailableListener
+    {
+        // onFrameAvailable is called on an arbitrary thread, but we can only access mediaPlayer
+        // on the
         // main thread.
-        private Runnable uiThreadUpdater = new Runnable() {
+        private Runnable uiThreadUpdater = new Runnable()
+        {
             @Override
-            public void run() {
+            public void run()
+            {
                 if (canvasQuad != null) {
 
                     ((TextView) findViewById(R.id.twBattery)).setText(batteryLevel);
@@ -240,7 +267,8 @@ public class VideoUiView extends LinearLayout {
 
         @AnyThread
         @Override
-        public void onFrameAvailable(SurfaceTexture surfaceTexture) {
+        public void onFrameAvailable(SurfaceTexture surfaceTexture)
+        {
             post(uiThreadUpdater);
         }
     }

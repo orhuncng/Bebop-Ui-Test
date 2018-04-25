@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import com.example.trio.testproject.R;
+import com.trio.drone.R;
 
 import java.util.ArrayList;
 
@@ -22,8 +22,8 @@ public class Main2Activity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
 
-        ArrayAdapter<String> adapter =
-                new ArrayAdapter<>(this, R.layout.activity_listview, listMobile);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.activity_listview,
+                listMobile);
 
         ListView listView = findViewById(R.id.mobile_list);
         listView.setAdapter(adapter);

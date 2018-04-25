@@ -471,7 +471,8 @@ public class MainActivity extends AppCompatActivity
                         ARControllerDictionary.ARCONTROLLER_DICTIONARY_SINGLE_KEY);
 
                 if (args != null) {
-                    Integer batValue = (Integer) args.get(ARFeatureCommon
+                    Integer batValue = (Integer) args.get(
+                            ARFeatureCommon
                                     .ARCONTROLLER_DICTIONARY_KEY_COMMON_COMMONSTATE_BATTERYSTATECHANGED_PERCENT);
                     Log.e("Battery", String.valueOf(batValue));
                     // do what you want with the battery level

@@ -1,4 +1,4 @@
-package com.example.trio.testproject;
+package com.trio.dronetest;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
@@ -13,11 +13,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import com.example.trio.testproject.R;
 
 import java.util.HashMap;
 import java.util.List;
 
-public class SensorActivity extends AppCompatActivity implements SensorEventListener {
+public class SensorActivity extends AppCompatActivity implements SensorEventListener
+{
 
     float DEFAULT_TIME_CONSTANT = 0.18f;
 
@@ -77,21 +79,24 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
     private int count = 0;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sensor);
 
         // Set sensorLayout to related layout
-        sensorLayout = (LinearLayout) findViewById(R.id.sensorLayout);
+        sensorLayout = findViewById(R.id.sensorLayout);
         addLinearAcclViews(true);
         addAcclViews(true);
 
         DeviceSensorViewModel model = ViewModelProviders.of(this).get(DeviceSensorViewModel.class);
         liveData = model.getDeviceSensorListener();
 
-        liveData.observe(this, new Observer<HashMap<String, float[]>>() {
+        liveData.observe(this, new Observer<HashMap<String, float[]>>()
+        {
             @Override
-            public void onChanged(@Nullable HashMap<String, float[]> sensorData) {
+            public void onChanged(@Nullable HashMap<String, float[]> sensorData)
+            {
                 acceleration = sensorData.get("acceleration");
                 accelerationFilter = sensorData.get("accelerationFilter");
                 gyroscope = sensorData.get("gyroscope");
@@ -158,7 +163,8 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
         */
     }
 
-    private void addLinearAcclViews(boolean hasLinAcc) {
+    private void addLinearAcclViews(boolean hasLinAcc)
+    {
         if (hasLinAcc) {
             linearAcclXTextView = new TextView(this);
             linearAcclYTextView = new TextView(this);
@@ -181,7 +187,8 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
         }
     }
 
-    private void addAcclViews(boolean hasAccl) {
+    private void addAcclViews(boolean hasAccl)
+    {
         if (hasAccl) {
 
             acclXTextView = new TextView(this);
@@ -218,7 +225,8 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
         }
     }
 
-    private void addGyroViews(Boolean hasGyro) {
+    private void addGyroViews(Boolean hasGyro)
+    {
         if (hasGyro) {
             gyroXTextView = new TextView(this);
             gyroYTextView = new TextView(this);
@@ -241,7 +249,8 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
         }
     }
 
-    private void addMagnetoViews(boolean hasMagnet) {
+    private void addMagnetoViews(boolean hasMagnet)
+    {
         if (hasMagnet) {
             magnetometerXTextView = new TextView(this);
             magnetometerYTextView = new TextView(this);
@@ -264,24 +273,28 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
         }
     }
 
-    private List<Sensor> getSensorList() {
+    private List<Sensor> getSensorList()
+    {
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
         List<Sensor> deviceSensors = mSensorManager.getSensorList(Sensor.TYPE_ALL);
 
         for (int i = 0; i < deviceSensors.size(); i++) {
-            Log.e("Sensor", deviceSensors.get(i).getName() + "Vendor: " + deviceSensors.get(i).getVendor() + "Power: " + deviceSensors.get(i).getPower());
+            Log.e("Sensor",
+                    deviceSensors.get(i).getName() + "Vendor: " + deviceSensors.get(i).getVendor() +
+                            "Power: " + deviceSensors.get(i).getPower());
         }
         return deviceSensors;
     }
 
-    private void listSensorData() {
+    private void listSensorData()
+    {
         List<Sensor> deviceSensors = getSensorList();
 
         final int N = deviceSensors.size(); // total number of textviews to add
 
-        sensorLayout = (LinearLayout) findViewById(R.id.sensorLayout);
+        sensorLayout = findViewById(R.id.sensorLayout);
         for (int i = 0; i < N; i++) {
             // create a new textview
             gyroXTextView = new TextView(this);
@@ -297,7 +310,8 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
     }
 
     @Override
-    public void onSensorChanged(SensorEvent event) {
+    public void onSensorChanged(SensorEvent event)
+    {
 
         // Gyro sensor to detect turn movements
         if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
@@ -369,12 +383,23 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
     }
 
     @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    public void onAccuracyChanged(Sensor sensor, int accuracy)
+    {
 
     }
 
     @Override
-    protected void onResume() {
+    protected void onPause()
+    {
+        super.onPause();
+        /*
+        mSensorManager.unregisterListener(this);
+        */
+    }
+
+    @Override
+    protected void onResume()
+    {
         super.onResume();
         Log.e("OnResume", "Resume Etti");
         /*
@@ -382,14 +407,6 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
         mSensorManager.registerListener(this, mAccl, SensorManager.SENSOR_DELAY_NORMAL);
         mSensorManager.registerListener(this, mLinearAccl, SensorManager.SENSOR_DELAY_NORMAL);
         mSensorManager.registerListener(this, mMagnet, SensorManager.SENSOR_DELAY_NORMAL);
-        */
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        /*
-        mSensorManager.unregisterListener(this);
         */
     }
 }

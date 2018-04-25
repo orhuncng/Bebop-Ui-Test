@@ -1,4 +1,4 @@
-package com.example.trio.testproject;
+package com.trio.dronetest;
 
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
@@ -15,7 +15,8 @@ import static android.opengl.GLU.gluErrorString;
 /**
  * GL utility methods.
  */
-public class GLUtils {
+public class GLUtils
+{
     private static final String TAG = "Video360.Utils";
 
     public static final int BYTES_PER_FLOAT = 4;
@@ -28,13 +29,15 @@ public class GLUtils {
     /**
      * Class only contains static methods.
      */
-    private GLUtils() {
+    private GLUtils()
+    {
     }
 
     /**
      * Checks GLES20.glGetError and fails quickly if the state isn't GL_NO_ERROR.
      */
-    public static void checkGlError() {
+    public static void checkGlError()
+    {
         int error = GLES20.glGetError();
         int lastError;
         if (error != GLES20.GL_NO_ERROR) {
@@ -52,7 +55,8 @@ public class GLUtils {
         }
     }
 
-    public static int loadGLShader(int type, String code) {
+    public static int loadGLShader(int type, String code)
+    {
         int shader = GLES20.glCreateShader(type);
         GLES20.glShaderSource(shader, code);
         GLES20.glCompileShader(shader);
@@ -75,14 +79,16 @@ public class GLUtils {
     }
 
     /**
-     * Builds a GL shader program from vertex & fragment shader code. The vertex and fragment shaders
+     * Builds a GL shader program from vertex & fragment shader code. The vertex and fragment
+     * shaders
      * are passed as arrays of strings in order to make debugging compilation issues easier.
      *
      * @param vertexCode   GLES20 vertex shader program.
      * @param fragmentCode GLES20 fragment shader program.
      * @return GLES20 program id.
      */
-    public static int compileProgram(String[] vertexCode, String[] fragmentCode) {
+    public static int compileProgram(String[] vertexCode, String[] fragmentCode)
+    {
         checkGlError();
         // prepare shaders and OpenGL program
         int vertexShader = GLES20.glCreateShader(GLES20.GL_VERTEX_SHADER);
@@ -104,7 +110,8 @@ public class GLUtils {
         int[] linkStatus = new int[1];
         GLES20.glGetProgramiv(program, GLES20.GL_LINK_STATUS, linkStatus, 0);
         if (linkStatus[0] != GLES20.GL_TRUE) {
-            String errorMsg = "Unable to link shader program: \n" + GLES20.glGetProgramInfoLog(program);
+            String errorMsg =
+                    "Unable to link shader program: \n" + GLES20.glGetProgramInfoLog(program);
             Log.e(TAG, errorMsg);
             if (HALT_ON_GL_ERROR) {
                 throw new RuntimeException(errorMsg);
@@ -118,7 +125,8 @@ public class GLUtils {
     /**
      * Allocates a FloatBuffer with the given data.
      */
-    public static FloatBuffer createBuffer(float[] data) {
+    public static FloatBuffer createBuffer(float[] data)
+    {
         ByteBuffer bb = ByteBuffer.allocateDirect(data.length * BYTES_PER_FLOAT);
         bb.order(ByteOrder.nativeOrder());
         FloatBuffer buffer = bb.asFloatBuffer();
@@ -132,7 +140,8 @@ public class GLUtils {
      * Creates a GL_TEXTURE_EXTERNAL_OES with default configuration of GL_LINEAR filtering and
      * GL_CLAMP_TO_EDGE wrapping.
      */
-    public static int glCreateExternalTexture() {
+    public static int glCreateExternalTexture()
+    {
         int[] texId = new int[1];
         GLES20.glGenTextures(1, IntBuffer.wrap(texId));
         GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, texId[0]);
@@ -141,9 +150,11 @@ public class GLUtils {
         GLES20.glTexParameteri(
                 GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
         GLES20.glTexParameteri(
-                GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+                GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_WRAP_S,
+                GLES20.GL_CLAMP_TO_EDGE);
         GLES20.glTexParameteri(
-                GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+                GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_WRAP_T,
+                GLES20.GL_CLAMP_TO_EDGE);
         checkGlError();
         return texId[0];
     }

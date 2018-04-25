@@ -1,7 +1,8 @@
-package com.example.trio.testproject;
+package com.trio.dronetest;
 /*
  * Copyright (c) 2015 Samsung Electronics Co., Ltd. All rights reserved.
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+ * Redistribution and use in source and binary forms, with or without modification, are permitted
+ * provided that
  * the following conditions are met:
  *
  *     * Redistributions of source code must retain the above copyright notice,
@@ -9,16 +10,24 @@ package com.example.trio.testproject;
  *     * Redistributions in binary form must reproduce the above copyright notice,
  *       this list of conditions and the following disclaimer in the documentation and/or
  *       other materials provided with the distribution.
- *     * Neither the name of Samsung Electronics Co., Ltd. nor the names of its contributors may be used to endorse or
+ *     * Neither the name of Samsung Electronics Co., Ltd. nor the names of its contributors may
+ *     be used to endorse or
  *       promote products derived from this software without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+ * IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ * FITNESS FOR A
+ * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
@@ -36,12 +45,14 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.example.trio.testproject.R;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class GearSensorActivity extends Activity {
+public class GearSensorActivity extends Activity
+{
     private static TextView mTextView;
 
     private static TextView mTextGyroX;
@@ -61,16 +72,74 @@ public class GearSensorActivity extends Activity {
     private boolean mIsBound = false;
     private ConsumerService mConsumerService = null;
 
+    private final ServiceConnection mConnection = new ServiceConnection()
+    {
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service)
+        {
+            mConsumerService = ((ConsumerService.LocalBinder) service).getService();
+            updateTextView("onServiceConnected");
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName className)
+        {
+            mConsumerService = null;
+            mIsBound = false;
+            updateTextView("onServiceDisconnected");
+        }
+    };
+
+    public static void addGyroXMessage(final String str)
+    {
+        mTextGyroX.setText(str);
+
+    }
+
+    public static void addGyroYMessage(final String str)
+    {
+        mTextGyroY.setText(str);
+
+    }
+
+    public static void addGyroZMessage(final String str)
+    {
+        mTextGyroZ.setText(str);
+
+    }
+
+    public static void addGravityMessage(ArrayList<String> gravityData)
+    {
+        mTextGravityX.setText(gravityData.get(0));
+        mTextGravityY.setText(gravityData.get(1));
+        mTextGravityZ.setText(gravityData.get(2));
+
+    }
+
+    public static void addAcceleroMessage(ArrayList<String> accelData)
+    {
+        mTextAccelX.setText(accelData.get(0));
+        mTextAccelY.setText(accelData.get(1));
+        mTextAccelZ.setText(accelData.get(2));
+
+    }
+
+    public static void updateTextView(final String str)
+    {
+        mTextView.setText(str);
+    }
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gear_sensor);
-        mTextView = (TextView) findViewById(R.id.tvStatus);
+        mTextView = findViewById(R.id.tvStatus);
         // Bind service
 
-        mTextGyroX = (TextView) findViewById(R.id.GyroX);
-        mTextGyroY = (TextView) findViewById(R.id.GyroY);
-        mTextGyroZ = (TextView) findViewById(R.id.GyroZ);
+        mTextGyroX = findViewById(R.id.GyroX);
+        mTextGyroY = findViewById(R.id.GyroY);
+        mTextGyroZ = findViewById(R.id.GyroZ);
 
         /*mTextAccelX = (TextView) findViewById(R.id.AccelX);
         mTextAccelY = (TextView) findViewById(R.id.AccelY);
@@ -80,11 +149,14 @@ public class GearSensorActivity extends Activity {
         mTextGravityY = (TextView) findViewById(R.id.GravityY);
         mTextGravityZ = (TextView) findViewById(R.id.GravityZ);*/
 
-        mIsBound = bindService(new Intent(GearSensorActivity.this, ConsumerService.class), mConnection, Context.BIND_AUTO_CREATE);
+        mIsBound =
+                bindService(new Intent(GearSensorActivity.this, ConsumerService.class),
+                        mConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
-    protected void onDestroy() {
+    protected void onDestroy()
+    {
         // Clean up connections
         if (mIsBound == true && mConsumerService != null) {
             if (mConsumerService.closeConnection() == false) {
@@ -100,7 +172,8 @@ public class GearSensorActivity extends Activity {
         super.onDestroy();
     }
 
-    public void mOnClick(View v) {
+    public void mOnClick(View v)
+    {
         switch (v.getId()) {
             case R.id.buttonConnect: {
                 if (mIsBound == true && mConsumerService != null) {
@@ -112,7 +185,10 @@ public class GearSensorActivity extends Activity {
                 if (mIsBound == true && mConsumerService != null) {
                     if (mConsumerService.closeConnection() == false) {
                         updateTextView("Disconnected");
-                        Toast.makeText(getApplicationContext(), R.string.ConnectionAlreadyDisconnected, Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(),
+                                R.string.ConnectionAlreadyDisconnected,
+                                Toast.LENGTH_LONG)
+                                .show();
                         //mMessageAdapter.clear();
                     }
                 }
@@ -122,7 +198,9 @@ public class GearSensorActivity extends Activity {
                 if (mIsBound == true && mConsumerService != null) {
                     if (mConsumerService.sendData("Hello Accessory!")) {
                     } else {
-                        Toast.makeText(getApplicationContext(), R.string.ConnectionAlreadyDisconnected, Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(),
+                                R.string.ConnectionAlreadyDisconnected, Toast.LENGTH_LONG)
+                                .show();
                     }
                 }
                 break;
@@ -131,22 +209,12 @@ public class GearSensorActivity extends Activity {
         }
     }
 
-    private final ServiceConnection mConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            mConsumerService = ((ConsumerService.LocalBinder) service).getService();
-            updateTextView("onServiceConnected");
-        }
+    /*public static void addMessage(String data) {
+        mMessageAdapter.addMessage(new Message(data));
+    }*/
 
-        @Override
-        public void onServiceDisconnected(ComponentName className) {
-            mConsumerService = null;
-            mIsBound = false;
-            updateTextView("onServiceDisconnected");
-        }
-    };
-
-    public void rotateDrone(final String str) {
+    public void rotateDrone(final String str)
+    {
         int dir = 10;
         if (str.equals("CCW")) {
             dir *= -1;
@@ -156,55 +224,34 @@ public class GearSensorActivity extends Activity {
 
     }
 
-    public static void addGyroXMessage(final String str) {
-        mTextGyroX.setText(str);
+    private static final class Message
+    {
+        String data;
 
+        public Message(String data)
+        {
+            super();
+            this.data = data;
+        }
     }
 
-    public static void addGyroYMessage(final String str) {
-        mTextGyroY.setText(str);
-
-    }
-
-    public static void addGyroZMessage(final String str) {
-        mTextGyroZ.setText(str);
-
-    }
-
-    public static void addGravityMessage(ArrayList<String> gravityData) {
-        mTextGravityX.setText(gravityData.get(0));
-        mTextGravityY.setText(gravityData.get(1));
-        mTextGravityZ.setText(gravityData.get(2));
-
-    }
-
-    public static void addAcceleroMessage(ArrayList<String> accelData) {
-        mTextAccelX.setText(accelData.get(0));
-        mTextAccelY.setText(accelData.get(1));
-        mTextAccelZ.setText(accelData.get(2));
-
-    }
-
-    /*public static void addMessage(String data) {
-        mMessageAdapter.addMessage(new Message(data));
-    }*/
-
-    public static void updateTextView(final String str) {
-        mTextView.setText(str);
-    }
-
-    private class MessageAdapter extends BaseAdapter {
+    private class MessageAdapter extends BaseAdapter
+    {
         private static final int MAX_MESSAGES_TO_DISPLAY = 20;
         private List<Message> mMessages;
 
-        public MessageAdapter() {
+        public MessageAdapter()
+        {
             mMessages = Collections.synchronizedList(new ArrayList<Message>());
         }
 
-        void addMessage(final Message msg) {
-            runOnUiThread(new Runnable() {
+        void addMessage(final Message msg)
+        {
+            runOnUiThread(new Runnable()
+            {
                 @Override
-                public void run() {
+                public void run()
+                {
                     if (mMessages.size() == MAX_MESSAGES_TO_DISPLAY) {
                         mMessages.remove(0);
                         mMessages.add(msg);
@@ -274,10 +321,13 @@ public class GearSensorActivity extends Activity {
             });
         }
 
-        void clear() {
-            runOnUiThread(new Runnable() {
+        void clear()
+        {
+            runOnUiThread(new Runnable()
+            {
                 @Override
-                public void run() {
+                public void run()
+                {
                     mMessages.clear();
                     notifyDataSetChanged();
                 }
@@ -285,40 +335,36 @@ public class GearSensorActivity extends Activity {
         }
 
         @Override
-        public int getCount() {
+        public int getCount()
+        {
             return mMessages.size();
         }
 
         @Override
-        public Object getItem(int position) {
+        public Object getItem(int position)
+        {
             return mMessages.get(position);
         }
 
         @Override
-        public long getItemId(int position) {
+        public long getItemId(int position)
+        {
             return 0;
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            LayoutInflater inflator = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        public View getView(int position, View convertView, ViewGroup parent)
+        {
+            LayoutInflater inflator =
+                    (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View messageRecordView = null;
             if (inflator != null) {
                 messageRecordView = inflator.inflate(R.layout.message, null);
-                TextView tvData = (TextView) messageRecordView.findViewById(R.id.tvData);
+                TextView tvData = messageRecordView.findViewById(R.id.tvData);
                 Message message = (Message) getItem(position);
                 tvData.setText(message.data);
             }
             return messageRecordView;
-        }
-    }
-
-    private static final class Message {
-        String data;
-
-        public Message(String data) {
-            super();
-            this.data = data;
         }
     }
 }

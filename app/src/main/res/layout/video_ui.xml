@@ -1,274 +1,274 @@
 <?xml version="1.0" encoding="utf-8"?><!-- UI to control video playback. See the class's javadoc for more info. -->
-<com.example.trio.testproject.VideoUiView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/video_ui_view"
-    android:orientation="horizontal"
-    android:layout_width="match_parent"
-    android:layout_height="480dp">
+<com.trio.dronetest.VideoUiView xmlns:android="http://schemas.android.com/apk/res/android"
+                                android:id="@+id/video_ui_view"
+                                android:orientation="horizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="480dp">
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:orientation="horizontal"
-        android:padding="0dp"
-        android:paddingBottom="80dp"
-        android:paddingEnd="80dp"
-        android:paddingLeft="80dp"
-        android:paddingRight="80dp"
-        android:paddingStart="80dp">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:padding="0dp"
+            android:paddingBottom="80dp"
+            android:paddingEnd="80dp"
+            android:paddingLeft="80dp"
+            android:paddingRight="80dp"
+            android:paddingStart="80dp">
 
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
             <TextView
-                android:id="@+id/textView16"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Battery:"
-                android:textColor="@android:color/white"
-                android:textSize="10sp" />
+                    android:id="@+id/textView16"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Battery:"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp"/>
 
             <TextView
-                android:id="@+id/textView17"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Wifi Signal:"
-                android:textColor="@android:color/white"
-                android:textSize="10sp" />
+                    android:id="@+id/textView17"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Wifi Signal:"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp"/>
 
             <TextView
-                android:id="@+id/textView18"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Piloting State:"
-                android:textColor="@android:color/white"
-                android:textSize="10sp" />
+                    android:id="@+id/textView18"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Piloting State:"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp"/>
 
             <TextView
-                android:id="@+id/textView19"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Latitude:"
-                android:textColor="@android:color/white"
-                android:textSize="10sp" />
+                    android:id="@+id/textView19"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Latitude:"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp"/>
 
             <TextView
-                android:id="@+id/textView20"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Longitude:"
-                android:textColor="@android:color/white"
-                android:textSize="10sp" />
+                    android:id="@+id/textView20"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Longitude:"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp"/>
 
             <TextView
-                android:id="@+id/textView21"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Altitude (pos):"
-                android:textColor="@android:color/white"
-                android:textSize="10sp" />
+                    android:id="@+id/textView21"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Altitude (pos):"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp"/>
 
             <TextView
-                android:id="@+id/textView22"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="SpeedX: "
-                android:textColor="@android:color/white"
-                android:textSize="10sp" />
+                    android:id="@+id/textView22"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="SpeedX: "
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp"/>
 
             <TextView
-                android:id="@+id/textView23"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="SpeedY:"
-                android:textColor="@android:color/white"
-                android:textSize="10sp" />
+                    android:id="@+id/textView23"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="SpeedY:"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp"/>
 
             <TextView
-                android:id="@+id/textView24"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="SpeedZ:"
-                android:textColor="@android:color/white"
-                android:textSize="10sp" />
+                    android:id="@+id/textView24"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="SpeedZ:"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp"/>
 
             <TextView
-                android:id="@+id/textView25"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Roll:"
-                android:textColor="@android:color/white"
-                android:textSize="10sp" />
+                    android:id="@+id/textView25"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Roll:"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp"/>
 
             <TextView
-                android:id="@+id/textView26"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Pitch:"
-                android:textColor="@android:color/white"
-                android:textSize="10sp" />
+                    android:id="@+id/textView26"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Pitch:"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp"/>
 
             <TextView
-                android:id="@+id/textView27"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Yaw:"
-                android:textColor="@android:color/white"
-                android:textSize="10sp" />
+                    android:id="@+id/textView27"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Yaw:"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp"/>
 
             <TextView
-                android:id="@+id/textView28"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Altitude:"
-                android:textColor="@android:color/white"
-                android:textSize="10sp" />
+                    android:id="@+id/textView28"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Altitude:"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp"/>
 
             <TextView
-                android:id="@+id/textView29"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Camera Tilt:"
-                android:textColor="@android:color/white"
-                android:textSize="10sp" />
+                    android:id="@+id/textView29"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Camera Tilt:"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp"/>
 
             <TextView
-                android:id="@+id/textView30"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Camera Pan:"
-                android:textColor="@android:color/white"
-                android:textSize="10sp" />
+                    android:id="@+id/textView30"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Camera Pan:"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp"/>
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
             <TextView
-                android:id="@+id/twBattery"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Battery:"
-                android:textColor="@android:color/white"
-                android:textSize="10sp" />
+                    android:id="@+id/twBattery"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Battery:"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp"/>
 
             <TextView
-                android:id="@+id/twWifi"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Wifi Signal:"
-                android:textColor="@android:color/white"
-                android:textSize="10sp" />
+                    android:id="@+id/twWifi"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Wifi Signal:"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp"/>
 
             <TextView
-                android:id="@+id/twPilotingState"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Piloting State:"
-                android:textColor="@android:color/white"
-                android:textSize="10sp" />
+                    android:id="@+id/twPilotingState"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Piloting State:"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp"/>
 
             <TextView
-                android:id="@+id/twLat"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Latitude:"
-                android:textColor="@android:color/white"
-                android:textSize="10sp" />
+                    android:id="@+id/twLat"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Latitude:"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp"/>
 
             <TextView
-                android:id="@+id/twLong"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Longitude:"
-                android:textColor="@android:color/white"
-                android:textSize="10sp" />
+                    android:id="@+id/twLong"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Longitude:"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp"/>
 
             <TextView
-                android:id="@+id/twPosAlt"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Altitude (pos):"
-                android:textColor="@android:color/white"
-                android:textSize="10sp" />
+                    android:id="@+id/twPosAlt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Altitude (pos):"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp"/>
 
             <TextView
-                android:id="@+id/twSpeedX"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="SpeedX: "
-                android:textColor="@android:color/white"
-                android:textSize="10sp" />
+                    android:id="@+id/twSpeedX"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="SpeedX: "
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp"/>
 
             <TextView
-                android:id="@+id/twSpeedY"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="SpeedY:"
-                android:textColor="@android:color/white"
-                android:textSize="10sp" />
+                    android:id="@+id/twSpeedY"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="SpeedY:"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp"/>
 
             <TextView
-                android:id="@+id/twSpeedZ"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="SpeedZ:"
-                android:textColor="@android:color/white"
-                android:textSize="10sp" />
+                    android:id="@+id/twSpeedZ"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="SpeedZ:"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp"/>
 
             <TextView
-                android:id="@+id/twRoll"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Roll:"
-                android:textColor="@android:color/white"
-                android:textSize="10sp" />
+                    android:id="@+id/twRoll"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Roll:"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp"/>
 
             <TextView
-                android:id="@+id/twPitch"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Pitch:"
-                android:textColor="@android:color/white"
-                android:textSize="10sp" />
+                    android:id="@+id/twPitch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Pitch:"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp"/>
 
             <TextView
-                android:id="@+id/twYaw"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Yaw:"
-                android:textColor="@android:color/white"
-                android:textSize="10sp" />
+                    android:id="@+id/twYaw"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Yaw:"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp"/>
 
             <TextView
-                android:id="@+id/twAltitude"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Altitude:"
-                android:textColor="@android:color/white"
-                android:textSize="10sp" />
+                    android:id="@+id/twAltitude"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Altitude:"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp"/>
 
             <TextView
-                android:id="@+id/twTilt"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Camera Tilt:"
-                android:textColor="@android:color/white"
-                android:textSize="10sp" />
+                    android:id="@+id/twTilt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Camera Tilt:"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp"/>
 
             <TextView
-                android:id="@+id/twPan"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Camera Pan:"
-                android:textColor="@android:color/white"
-                android:textSize="10sp" />
+                    android:id="@+id/twPan"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Camera Pan:"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp"/>
         </LinearLayout>
 
     </LinearLayout>
 
-</com.example.trio.testproject.VideoUiView>
+</com.trio.dronetest.VideoUiView>

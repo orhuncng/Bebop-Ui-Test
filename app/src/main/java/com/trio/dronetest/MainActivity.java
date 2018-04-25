@@ -13,13 +13,13 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import com.example.trio.testproject.R;
 import com.parrot.arsdk.ARSDK;
 import com.parrot.arsdk.arcommands.ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_ENUM;
 import com.parrot.arsdk.arcontroller.*;
 import com.parrot.arsdk.ardiscovery.*;
 import com.parrot.arsdk.ardiscovery.receivers.ARDiscoveryServicesDevicesListUpdatedReceiver;
 import com.parrot.arsdk.ardiscovery.receivers.ARDiscoveryServicesDevicesListUpdatedReceiverDelegate;
+import com.trio.drone.R;
 import com.trio.drone.core.SettingsActivity;
 
 import java.util.ArrayList;
@@ -134,8 +134,7 @@ public class MainActivity extends AppCompatActivity
         mContext = this;
         setContentView(R.layout.activity_main);
         System.out.println("ON CREATE");
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
         initDiscoveryService();
         registerReceivers();
 

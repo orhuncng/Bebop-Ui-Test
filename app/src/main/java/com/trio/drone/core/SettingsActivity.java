@@ -3,7 +3,7 @@ package com.trio.drone.core;
 import android.os.Bundle;
 import android.preference.*;
 import android.view.MenuItem;
-import com.example.trio.testproject.R;
+import com.trio.drone.R;
 
 public class SettingsActivity extends PreferenceActivity
 {

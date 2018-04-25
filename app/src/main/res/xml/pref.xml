@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <ListPreference
+            android:defaultValue="1"
+            android:title="Camera Stabilization"
+            android:entries="@array/pref_camera_stab_titles"
+            android:entryValues="@array/pref_camera_stab_values"
+            android:key="@string/pref_key_camera_stab_mode"/>
+    <ListPreference
+            android:defaultValue="1"
+            android:title="Returning point"
+            android:entries="@array/pref_home_type_titles"
+            android:entryValues="@array/pref_home_type_values"
+            android:key="@string/pref_key_home_type"/>
+    <PreferenceCategory android:title="Smoothing">
+        <ListPreference
+                android:defaultValue="1"
+                android:title="User interface animations"
+                android:entries="@array/pref_smoothing_titles"
+                android:entryValues="@array/pref_smoothing_values"
+                android:key="@string/pref_key_smoothing_ui"/>
+        <ListPreference
+                android:defaultValue="1"
+                android:title="Smartwatch sensors"
+                android:entries="@array/pref_smoothing_titles"
+                android:entryValues="@array/pref_smoothing_values"
+                android:key="@string/pref_key_smoothing_watch_sensors"/>
+        <ListPreference
+                android:defaultValue="1"
+                android:title="Phone sensors"
+                android:entries="@array/pref_smoothing_titles"
+                android:entryValues="@array/pref_smoothing_values"
+                android:key="@string/pref_key_smoothing_phone_sensors"/>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Flight limits">
+        <EditTextPreference
+                android:defaultValue="@integer/defaultMaxAltitude"
+                android:selectAllOnFocus="true"
+                android:singleLine="true"
+                android:title="Max altitude in meters"
+                android:key="@string/pref_key_max_altitude"
+                android:numeric="integer"/>
+        <EditTextPreference
+                android:defaultValue="@integer/defaultMaxVerticalSpeed"
+                android:selectAllOnFocus="true"
+                android:singleLine="true"
+                android:title="Max vertical speed in m/s"
+                android:key="@string/pref_key_max_vert_speed"
+                android:numeric="integer"/>
+        <EditTextPreference
+                android:defaultValue="@integer/defaultMaxPitchRoll"
+                android:selectAllOnFocus="true"
+                android:singleLine="true"
+                android:title="Max pitch and roll in degree/s"
+                android:key="@string/pref_key_max_pitch_roll"
+                android:numeric="integer"/>
+        <EditTextPreference
+                android:defaultValue="@integer/defaultMaxRotationSpeed"
+                android:selectAllOnFocus="true"
+                android:singleLine="true"
+                android:title="Max rotation speed in degree/s"
+                android:key="@string/pref_key_max_rot_speed"
+                android:numeric="integer"/>
+        <EditTextPreference
+                android:defaultValue="@integer/defaultMaxTilt"
+                android:selectAllOnFocus="true"
+                android:singleLine="true"
+                android:title="Max tilt in degree/s"
+                android:key="@string/pref_key_max_tilt"
+                android:numeric="integer"/>
+    </PreferenceCategory>
+</PreferenceScreen>

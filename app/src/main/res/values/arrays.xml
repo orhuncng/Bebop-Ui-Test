@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="pref_camera_stab_titles">
+        <item>On roll and Pitch</item>
+        <item>On pitch</item>
+        <item>On roll</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="pref_camera_stab_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+    <string-array name="pref_smoothing_titles">
+        <item>High</item>
+        <item>Normal</item>
+        <item>Low</item>
+        <item>None</item>
+    </string-array>
+    <string-array name="pref_smoothing_values">
+        <item>25</item>
+        <item>50</item>
+        <item>75</item>
+        <item>100</item>
+    </string-array>
+    <string-array name="pref_home_type_titles">
+        <item>Takeoff point</item>
+        <item>User location</item>
+    </string-array>
+    <string-array name="pref_home_type_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+</resources>

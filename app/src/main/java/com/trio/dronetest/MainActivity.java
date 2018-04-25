@@ -8,7 +8,10 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import com.example.trio.testproject.R;
 import com.parrot.arsdk.ARSDK;
@@ -17,14 +20,16 @@ import com.parrot.arsdk.arcontroller.*;
 import com.parrot.arsdk.ardiscovery.*;
 import com.parrot.arsdk.ardiscovery.receivers.ARDiscoveryServicesDevicesListUpdatedReceiver;
 import com.parrot.arsdk.ardiscovery.receivers.ARDiscoveryServicesDevicesListUpdatedReceiverDelegate;
+import com.trio.drone.core.SettingsActivity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 
-public class MainActivity extends AppCompatActivity implements ARDeviceControllerListener,
-        ARDeviceControllerStreamListener, WatchServiceCallbacks
+public class MainActivity extends AppCompatActivity
+        implements ARDeviceControllerListener, ARDeviceControllerStreamListener,
+        WatchServiceCallbacks
 {
     public static final String TESTMSG = "com.example.trio.testproject";
     public ArrayList<String> DeviceNames = new ArrayList<>();
@@ -74,11 +79,6 @@ public class MainActivity extends AppCompatActivity implements ARDeviceControlle
         ARSDK.loadSDKLibs();
     }
 
-    String[] mobileArray = {"Android", "IPhone", "WindowsMobile", "Blackberry",
-            "WebOS", "Ubuntu", "Windows7", "Max OS X"};
-    private ARCONTROLLER_DEVICE_STATE_ENUM deviceState =
-            ARCONTROLLER_DEVICE_STATE_ENUM.eARCONTROLLER_DEVICE_STATE_UNKNOWN_ENUM_VALUE;
-    private ARDiscoveryService mArdiscoveryService;
     private final ARDiscoveryServicesDevicesListUpdatedReceiverDelegate mDiscoveryDelegate =
             new ARDiscoveryServicesDevicesListUpdatedReceiverDelegate()
             {
@@ -103,8 +103,8 @@ public class MainActivity extends AppCompatActivity implements ARDeviceControlle
                                     deviceController = new ARDeviceController(trioDrone);
                                     trioDrone.dispose();
                                     Log.e("DeviceCOntrollerYaratma", "trioDrone Null Değil");
-                                    deviceController
-                                            .addListener((ARDeviceControllerListener) mContext);
+                                    deviceController.addListener(
+                                            (ARDeviceControllerListener) mContext);
                                     ARCONTROLLER_ERROR_ENUM error = deviceController.start();
                                     deviceController.addStreamListener(
                                             (ARDeviceControllerStreamListener) mContext);
@@ -112,12 +112,19 @@ public class MainActivity extends AppCompatActivity implements ARDeviceControlle
                                     e.printStackTrace();
                                 }
                             }
-                        } else {
+                        }
+                        else {
                             Log.e("DeviceCreateCall", "Null geldi!");
                         }
                     }
                 }
             };
+    private ARCONTROLLER_DEVICE_STATE_ENUM deviceState =
+            ARCONTROLLER_DEVICE_STATE_ENUM.eARCONTROLLER_DEVICE_STATE_UNKNOWN_ENUM_VALUE;
+    private ARDiscoveryService mArdiscoveryService;
+    String[] mobileArray =
+            {"Android", "IPhone", "WindowsMobile", "Blackberry", "WebOS", "Ubuntu", "Windows7",
+                    "Max OS X"};
     private ServiceConnection mArdiscoveryServiceConnection;
 
     @Override
@@ -127,13 +134,14 @@ public class MainActivity extends AppCompatActivity implements ARDeviceControlle
         mContext = this;
         setContentView(R.layout.activity_main);
         System.out.println("ON CREATE");
-
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         initDiscoveryService();
         registerReceivers();
 
         mVideoView = findViewById(R.id.videoView);
-        mIsBound = bindService(new Intent(MainActivity.this, ConsumerService.class),
-                mConnection, Context.BIND_AUTO_CREATE);
+        mIsBound = bindService(new Intent(MainActivity.this, ConsumerService.class), mConnection,
+                Context.BIND_AUTO_CREATE);
 
         DeviceSensorViewModel model = ViewModelProviders.of(this).get(DeviceSensorViewModel.class);
         liveData = model.getDeviceSensorListener();
@@ -172,6 +180,27 @@ public class MainActivity extends AppCompatActivity implements ARDeviceControlle
         });
 
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        int id = item.getItemId();
+
+        if (id == R.id.action_settings) {
+            // launch settings activity
+            startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     public void showDevices(View view)
@@ -236,7 +265,8 @@ public class MainActivity extends AppCompatActivity implements ARDeviceControlle
                     ARCONTROLLER_DEVICE_STATE_ENUM.ARCONTROLLER_DEVICE_STATE_RUNNING)) {
                 deviceController.getFeatureARDrone3().setPilotingPCMDYaw((byte) dir);
                 Log.e("MainActRotateDrone", "dirSent");
-            } else {
+            }
+            else {
                 Log.e("MainActRotateDrone", "else ye girdi");
 
             }
@@ -256,7 +286,8 @@ public class MainActivity extends AppCompatActivity implements ARDeviceControlle
                     (ARCONTROLLER_DEVICE_STATE_ENUM.ARCONTROLLER_DEVICE_STATE_RUNNING))) {
                 deviceController.getFeatureARDrone3().setPilotingPCMDYaw((byte) dir);
                 Log.e("MainActRotateDrone", "dirSent");
-            } else {
+            }
+            else {
                 Log.e("MainActRotateDrone", "else ye girdi");
 
             }
@@ -327,9 +358,10 @@ public class MainActivity extends AppCompatActivity implements ARDeviceControlle
         if (mArdiscoveryService == null) {
             // if the discovery service doesn't exists, bind to it
             Intent i = new Intent(getApplicationContext(), ARDiscoveryService.class);
-            getApplicationContext()
-                    .bindService(i, mArdiscoveryServiceConnection, Context.BIND_AUTO_CREATE);
-        } else {
+            getApplicationContext().bindService(i, mArdiscoveryServiceConnection,
+                    Context.BIND_AUTO_CREATE);
+        }
+        else {
             // if the discovery service already exists, start discovery
             startDiscovery();
         }
@@ -347,8 +379,8 @@ public class MainActivity extends AppCompatActivity implements ARDeviceControlle
         Log.e("registerReceivers", "İçerde");
 
         receiver = new ARDiscoveryServicesDevicesListUpdatedReceiver(mDiscoveryDelegate);
-        LocalBroadcastManager localBroadcastMgr =
-                LocalBroadcastManager.getInstance(getApplicationContext());
+        LocalBroadcastManager localBroadcastMgr = LocalBroadcastManager.getInstance(
+                getApplicationContext());
         localBroadcastMgr.registerReceiver(receiver, new IntentFilter(
                 ARDiscoveryService.kARDiscoveryServiceNotificationServicesDevicesListUpdated));
 
@@ -370,8 +402,8 @@ public class MainActivity extends AppCompatActivity implements ARDeviceControlle
 
     private void unregisterReceivers()
     {
-        LocalBroadcastManager localBroadcastMgr =
-                LocalBroadcastManager.getInstance(getApplicationContext());
+        LocalBroadcastManager localBroadcastMgr = LocalBroadcastManager.getInstance(
+                getApplicationContext());
         localBroadcastMgr.unregisterReceiver(receiver);
     }
 
@@ -396,8 +428,7 @@ public class MainActivity extends AppCompatActivity implements ARDeviceControlle
 
     @Override
     public void onStateChanged(ARDeviceController deviceController,
-            ARCONTROLLER_DEVICE_STATE_ENUM newState,
-            ARCONTROLLER_ERROR_ENUM error)
+            ARCONTROLLER_DEVICE_STATE_ENUM newState, ARCONTROLLER_ERROR_ENUM error)
     {
         deviceState = newState;
         switch (newState) {
@@ -422,8 +453,7 @@ public class MainActivity extends AppCompatActivity implements ARDeviceControlle
 
     @Override
     public void onExtensionStateChanged(ARDeviceController deviceController,
-            ARCONTROLLER_DEVICE_STATE_ENUM newState,
-            ARDISCOVERY_PRODUCT_ENUM product, String name,
+            ARCONTROLLER_DEVICE_STATE_ENUM newState, ARDISCOVERY_PRODUCT_ENUM product, String name,
             ARCONTROLLER_ERROR_ENUM error)
     {
 
@@ -431,20 +461,18 @@ public class MainActivity extends AppCompatActivity implements ARDeviceControlle
 
     @Override
     public void onCommandReceived(ARDeviceController deviceController,
-            ARCONTROLLER_DICTIONARY_KEY_ENUM commandKey,
-            ARControllerDictionary elementDictionary)
+            ARCONTROLLER_DICTIONARY_KEY_ENUM commandKey, ARControllerDictionary elementDictionary)
     {
         if (elementDictionary != null) {
             // if the command received is a battery state changed
             if (commandKey ==
                     ARCONTROLLER_DICTIONARY_KEY_ENUM
                             .ARCONTROLLER_DICTIONARY_KEY_COMMON_COMMONSTATE_BATTERYSTATECHANGED) {
-                ARControllerArgumentDictionary<Object> args = elementDictionary
-                        .get(ARControllerDictionary.ARCONTROLLER_DICTIONARY_SINGLE_KEY);
+                ARControllerArgumentDictionary<Object> args = elementDictionary.get(
+                        ARControllerDictionary.ARCONTROLLER_DICTIONARY_SINGLE_KEY);
 
                 if (args != null) {
-                    Integer batValue = (Integer) args
-                            .get(ARFeatureCommon
+                    Integer batValue = (Integer) args.get(ARFeatureCommon
                                     .ARCONTROLLER_DICTIONARY_KEY_COMMON_COMMONSTATE_BATTERYSTATECHANGED_PERCENT);
                     Log.e("Battery", String.valueOf(batValue));
                     // do what you want with the battery level
@@ -454,19 +482,19 @@ public class MainActivity extends AppCompatActivity implements ARDeviceControlle
             if (commandKey ==
                     ARCONTROLLER_DICTIONARY_KEY_ENUM
                             .ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED) {
-                ARControllerArgumentDictionary<Object> args = elementDictionary
-                        .get(ARControllerDictionary.ARCONTROLLER_DICTIONARY_SINGLE_KEY);
+                ARControllerArgumentDictionary<Object> args = elementDictionary.get(
+                        ARControllerDictionary.ARCONTROLLER_DICTIONARY_SINGLE_KEY);
                 if (args != null) {
-                    Integer flyingStateInt = (Integer) args
-                            .get(
-                                    ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE);
+                    Integer flyingStateInt = (Integer) args.get(
+                            ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE);
                     ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_ENUM flyingState =
                             ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_ENUM
                                     .getFromValue(flyingStateInt);
                     Log.e("Battery", String.valueOf(flyingStateInt));
                 }
             }
-        } else {
+        }
+        else {
             Log.e("OnCommandReceive", "elementDictionary is null");
         }
 
@@ -483,12 +511,11 @@ public class MainActivity extends AppCompatActivity implements ARDeviceControlle
                         ARCONTROLLER_DICTIONARY_KEY_ENUM
                                 .ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED);
                 if (dict != null) {
-                    ARControllerArgumentDictionary<Object> args =
-                            dict.get(ARControllerDictionary.ARCONTROLLER_DICTIONARY_SINGLE_KEY);
+                    ARControllerArgumentDictionary<Object> args = dict.get(
+                            ARControllerDictionary.ARCONTROLLER_DICTIONARY_SINGLE_KEY);
                     if (args != null) {
-                        Integer flyingStateInt = (Integer) args
-                                .get(
-                                        ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE);
+                        Integer flyingStateInt = (Integer) args.get(
+                                ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE);
                         flyingState =
                                 ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_ENUM
                                         .getFromValue(flyingStateInt);

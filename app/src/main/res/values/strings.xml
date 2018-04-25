@@ -4,13 +4,31 @@
     <string name="title_activity_main3">Main3Activity</string>
 
     <string name="hello_world">Hello Accessory!</string>
-    <string name="ConnectionEstablishedMsg">Service Connection with HelloAccessory(P) has been established.</string>
-    <string name="ConnectionTerminateddMsg">Service Connection with HelloAccessory(P) has been terminated.</string>
+    <string name="ConnectionEstablishedMsg">Service Connection with HelloAccessory(P) has been
+        established.
+    </string>
+    <string name="ConnectionTerminateddMsg">Service Connection with HelloAccessory(P) has been
+        terminated.
+    </string>
     <string name="ConnectionAlreadyExist">Service Connection has already been existed!!!</string>
-    <string name="ConnectionAlreadyDisconnected">Service Connection has already been disconnected!!!</string>
+    <string name="ConnectionAlreadyDisconnected">Service Connection has already been
+        disconnected!!!
+    </string>
     <string name="ConnectionFailure">Service Connection Failure</string>
     <string name="NoPeersFound">No peers have been found!!!</string>
     <string name="buttonConnect">Connect</string>
     <string name="buttonDisconnect">Disconnect</string>
     <string name="buttonSend">Send</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="pref_key_camera_stab_mode">camera_stab_mode</string>
+    <string name="pref_key_home_type">home_type</string>
+    <string name="pref_key_smoothing_ui">smoothing_ui</string>
+    <string name="pref_key_smoothing_watch_sensors">smoothing_watch_sensors</string>
+    <string name="pref_key_smoothing_phone_sensors">smoothing_phone_sensors</string>
+    <string name="pref_key_max_altitude">max_altitude</string>
+    <string name="pref_key_max_vert_speed">max_vert_speed</string>
+    <string name="pref_key_max_pitch_roll">max_pitch_roll</string>
+    <string name="pref_key_max_rot_speed">max_rot_speed</string>
+    <string name="pref_key_max_tilt">max_tilt</string>
 </resources>

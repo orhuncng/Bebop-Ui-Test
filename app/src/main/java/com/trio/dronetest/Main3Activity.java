@@ -30,7 +30,6 @@ public class Main3Activity extends GvrActivity
         implements GvrView.StereoRenderer, SurfaceTexture.OnFrameAvailableListener,
         ARDeviceControllerListener, ARDeviceControllerStreamListener
 {
-
     private static final String TAG = "Main3Activity";
     private VideoUiView uiView;
     private SceneRenderer scene;

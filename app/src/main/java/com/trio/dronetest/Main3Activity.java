@@ -497,6 +497,4 @@ public class Main3Activity extends GvrActivity
             }
         }, 5000);
     }
-
-
 }

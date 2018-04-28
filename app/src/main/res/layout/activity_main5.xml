@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="com.trio.dronetest.Main5Activity">
+
+    <com.google.vr.sdk.base.GvrView
+            android:id="@+id/hud5view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true">
+    </com.google.vr.sdk.base.GvrView>
+
+</android.support.constraint.ConstraintLayout>

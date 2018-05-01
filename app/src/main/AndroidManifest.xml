@@ -63,7 +63,8 @@
         </activity>
         <activity
                 android:name="com.trio.dronetest.Main4Activity"
-                android:screenOrientation="landscape">
+                android:screenOrientation="landscape"
+                android:hardwareAccelerated="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>

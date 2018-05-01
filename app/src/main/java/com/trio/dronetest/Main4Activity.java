@@ -88,6 +88,8 @@ public class Main4Activity extends CardBoardAndroidApplication
                 new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = 24;
         font24 = generator.generateFont(parameter);
+        font24.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture
+                .TextureFilter.Linear);
         generator.dispose();
 
         batch = new SpriteBatch();

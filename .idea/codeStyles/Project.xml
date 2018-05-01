@@ -33,7 +33,6 @@
     </XML>
     <codeStyleSettings language="JAVA">
       <option name="RIGHT_MARGIN" value="100" />
-      <option name="KEEP_LINE_BREAKS" value="false" />
       <option name="CLASS_BRACE_STYLE" value="2" />
       <option name="METHOD_BRACE_STYLE" value="2" />
       <option name="ELSE_ON_NEW_LINE" value="true" />
@@ -70,7 +69,7 @@
           </group>
           <group>
             <type>OVERRIDDEN_METHODS</type>
-            <order>KEEP</order>
+            <order>BY_NAME</order>
           </group>
         </groups>
       </arrangement>

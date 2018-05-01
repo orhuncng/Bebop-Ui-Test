@@ -42,25 +42,16 @@ public final class SceneRenderer
     private OnFrameAvailableListener externalFrameListener;
 
     private int droneTexId;
+    static float textureVertices[] = {0.0f, 1.0f,  // A. left-bottom
+            1.0f, 1.0f,  // B. right-bottom
+            0.0f, 0.0f,  // C. left-top
+            1.0f, 0.0f   // D. right-top
+    };
     // private int phoneTexId;
     private final String vertexShaderCode =
-            "attribute vec4 position;" +
-                    "attribute vec2 inputTextureCoordinate;" +
-                    "varying vec2 textureCoordinate;" +
-                    "void main()" +
-                    "{" +
-                    "gl_Position = position;" +
-                    "textureCoordinate = inputTextureCoordinate;" +
-                    "}";
-
-    private final String fragmentShaderCode =
-            "#extension GL_OES_EGL_image_external : require\n" +
-                    "precision mediump float;" +
-                    "varying vec2 textureCoordinate;" +
-                    "uniform samplerExternalOES s_texture;" +
-                    "void main(void) {" +
-                    "  gl_FragColor = texture2D( s_texture, textureCoordinate );" +
-                    "}";
+            "attribute vec4 position;" + "attribute vec2 inputTextureCoordinate;" +
+                    "varying vec2 textureCoordinate;" + "void main()" + "{" +
+                    "gl_Position = position;" + "textureCoordinate = inputTextureCoordinate;" + "}";
 
     private static final int GL_TEXTURE_EXTERNAL_OES = 0x8D65;
     private FloatBuffer vertexBuffer, textureVerticesBuffer;
@@ -79,27 +70,23 @@ public final class SceneRenderer
     };
 
     private short drawOrder[] = {0, 2, 1, 1, 2, 3};
-
-    static float textureVertices[] = {
-            0.0f, 1.0f,  // A. left-bottom
-            1.0f, 1.0f,  // B. right-bottom
-            0.0f, 0.0f,  // C. left-top
-            1.0f, 0.0f   // D. right-top
-    };
-
-
+    private final String fragmentShaderCode =
+            "#extension GL_OES_EGL_image_external : require\n" + "precision mediump float;" +
+                    "varying vec2 textureCoordinate;" + "uniform samplerExternalOES s_texture;" +
+                    "void main(void) {" +
+                    "  gl_FragColor = texture2D( s_texture, textureCoordinate );" + "}";
     @Nullable
-    private final CanvasQuad canvasQuad;
+    private final GLCanvas glCanvas;
     @Nullable
     private final VideoUiView videoUiView;
     @Nullable
     private final Handler uiHandler;
     private boolean droneCameraEnabled;
 
-    private SceneRenderer(CanvasQuad canvasQuad, VideoUiView videoUiView, Handler uiHandler,
+    private SceneRenderer(GLCanvas glCanvas, VideoUiView videoUiView, Handler uiHandler,
             SurfaceTexture.OnFrameAvailableListener externalFrameListener)
     {
-        this.canvasQuad = canvasQuad;
+        this.glCanvas = glCanvas;
         this.videoUiView = videoUiView;
         this.uiHandler = uiHandler;
         this.externalFrameListener = externalFrameListener;
@@ -108,13 +95,12 @@ public final class SceneRenderer
     @MainThread
     public static Pair<SceneRenderer, VideoUiView> createForVR(Context context, ViewGroup parent)
     {
-        CanvasQuad canvasQuad = new CanvasQuad();
-        VideoUiView videoUiView = VideoUiView.createForOpenGl(context, parent, canvasQuad);
+        GLCanvas glCanvas = new GLCanvas();
+        VideoUiView videoUiView = VideoUiView.createForOpenGl(context, parent, glCanvas);
         OnFrameAvailableListener externalFrameListener = videoUiView.getFrameListener();
 
-        SceneRenderer scene = new SceneRenderer(
-                canvasQuad, videoUiView, new Handler(Looper.getMainLooper()),
-                externalFrameListener);
+        SceneRenderer scene = new SceneRenderer(glCanvas, videoUiView,
+                new Handler(Looper.getMainLooper()), externalFrameListener);
         return Pair.create(scene, videoUiView);
     }
 
@@ -167,24 +153,23 @@ public final class SceneRenderer
 
         // mDroneTexture.setOnFrameAvailableListener(this);
 
-        mDroneTexture.setOnFrameAvailableListener(
-                new OnFrameAvailableListener()
-                {
-                    @Override
-                    public void onFrameAvailable(SurfaceTexture surfaceTexture)
-                    {
-                        droneFrameAvailable.set(true);
+        mDroneTexture.setOnFrameAvailableListener(new OnFrameAvailableListener()
+        {
+            @Override
+            public void onFrameAvailable(SurfaceTexture surfaceTexture)
+            {
+                droneFrameAvailable.set(true);
 
-                        synchronized (SceneRenderer.this) {
-                            if (externalFrameListener != null) {
-                                externalFrameListener.onFrameAvailable(surfaceTexture);
-                            }
-                        }
+                synchronized (SceneRenderer.this) {
+                    if (externalFrameListener != null) {
+                        externalFrameListener.onFrameAvailable(surfaceTexture);
                     }
-                });
+                }
+            }
+        });
 
-        if (canvasQuad != null) {
-            canvasQuad.glInit();
+        if (glCanvas != null) {
+            glCanvas.init();
         }
 
         mDroneSurface = new Surface(mDroneTexture);
@@ -243,8 +228,7 @@ public final class SceneRenderer
     public void updateTexture()
     {
         //if (droneCameraEnabled)
-        if (droneFrameAvailable.get())
-            mDroneTexture.updateTexImage();
+        if (droneFrameAvailable.get()) mDroneTexture.updateTexImage();
         // else
         //   mPhoneTexture.updateTexImage();
         GLUtils.checkGlError();
@@ -266,18 +250,17 @@ public final class SceneRenderer
 
             mPositionHandle = GLES20.glGetAttribLocation(mProgram, "position");
             GLES20.glEnableVertexAttribArray(mPositionHandle);
-            GLES20.glVertexAttribPointer(mPositionHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT,
-                    false, vertexStride, vertexBuffer);
+            GLES20.glVertexAttribPointer(mPositionHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT, false,
+                    vertexStride, vertexBuffer);
 
 
-            mTextureCoordHandle =
-                    GLES20.glGetAttribLocation(mProgram, "inputTextureCoordinate");
+            mTextureCoordHandle = GLES20.glGetAttribLocation(mProgram, "inputTextureCoordinate");
             GLES20.glEnableVertexAttribArray(mTextureCoordHandle);
             GLES20.glVertexAttribPointer(mTextureCoordHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT,
                     false, vertexStride, textureVerticesBuffer);
 
-            GLES20.glDrawElements(GLES20.GL_TRIANGLES, drawOrder.length,
-                    GLES20.GL_UNSIGNED_SHORT, drawListBuffer);
+            GLES20.glDrawElements(GLES20.GL_TRIANGLES, drawOrder.length, GLES20.GL_UNSIGNED_SHORT,
+                    drawListBuffer);
 
             // Disable vertex array
             GLES20.glDisableVertexAttribArray(mPositionHandle);
@@ -286,7 +269,7 @@ public final class SceneRenderer
                 GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_DST_ALPHA);
                 GLES20.glEnable(GLES20.GL_BLEND);
 
-                canvasQuad.glDraw(0.7f);
+                glCanvas.draw();
                 GLES20.glDisable(GLES20.GL_BLEND);
             }
         }
@@ -294,6 +277,6 @@ public final class SceneRenderer
 
     public void glShutdown()
     {
-        if (canvasQuad != null) { canvasQuad.glShutdown(); }
+        if (glCanvas != null) { glCanvas.shutdown(); }
     }
 }

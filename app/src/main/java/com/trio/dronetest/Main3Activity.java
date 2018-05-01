@@ -307,7 +307,8 @@ public class Main3Activity extends GvrActivity
                         ARControllerDictionary.ARCONTROLLER_DICTIONARY_SINGLE_KEY);
 
                 if (args != null) {
-                    Integer batValue = (Integer) args.get(ARFeatureCommon
+                    Integer batValue = (Integer) args.get(
+                            ARFeatureCommon
                                     .ARCONTROLLER_DICTIONARY_KEY_COMMON_COMMONSTATE_BATTERYSTATECHANGED_PERCENT);
                     uiView.setBatteryLevel(batValue);
                 }
@@ -319,7 +320,8 @@ public class Main3Activity extends GvrActivity
                 ARControllerArgumentDictionary<Object> args = elementDictionary.get(
                         ARControllerDictionary.ARCONTROLLER_DICTIONARY_SINGLE_KEY);
                 if (args != null) {
-                    short rssi = (short) ((Integer) args.get(ARFeatureCommon
+                    short rssi = (short) ((Integer) args.get(
+                            ARFeatureCommon
                                     .ARCONTROLLER_DICTIONARY_KEY_COMMON_COMMONSTATE_WIFISIGNALCHANGED_RSSI))
                             .intValue();
                     uiView.setWifiSignal(rssi);

@@ -18,9 +18,8 @@ import com.trio.drone.R;
 
 public class VideoUiView extends LinearLayout
 {
-
     private final UiUpdater uiUpdater = new UiUpdater();
-    private CanvasQuad canvasQuad;
+    private GLCanvas glCanvas;
     private static Paint paintWhite = new Paint();
     private static Paint paintCyan = new Paint();
     private static Paint paintOrange = new Paint();
@@ -47,13 +46,13 @@ public class VideoUiView extends LinearLayout
     }
 
     @MainThread
-    public static VideoUiView createForOpenGl(Context context, ViewGroup parent, CanvasQuad quad)
+    public static VideoUiView createForOpenGl(Context context, ViewGroup parent, GLCanvas quad)
     {
         Context theme = new ContextThemeWrapper(context, R.style.AppTheme);
 
         VideoUiView view = (VideoUiView) View.inflate(theme, R.layout.video_ui, null);
-        view.canvasQuad = quad;
-        view.setLayoutParams(CanvasQuad.getLayoutParams());
+        view.glCanvas = quad;
+        view.setLayoutParams(GLCanvas.getLayoutParams());
         view.setVisibility(View.VISIBLE);
         parent.addView(view, 0);
         paintWhite.setColor(Color.WHITE);
@@ -71,14 +70,14 @@ public class VideoUiView extends LinearLayout
     @Override
     public void dispatchDraw(Canvas androidUiCanvas)
     {
-        if (canvasQuad == null) {
+        if (glCanvas == null) {
             // Handle non-VR rendering.
             super.dispatchDraw(androidUiCanvas);
             return;
         }
 
         // Handle VR rendering.
-        Canvas glCanvas = canvasQuad.lockCanvas();
+        Canvas glCanvas = this.glCanvas.lock();
         if (glCanvas == null) {
             // This happens if Android tries to draw this View before GL initialization completes
             // . We need
@@ -109,7 +108,7 @@ public class VideoUiView extends LinearLayout
 
         super.dispatchDraw(glCanvas);
         // Commit the changes.
-        canvasQuad.unlockCanvasAndPost(glCanvas);
+        this.glCanvas.unlockAndPost(glCanvas);
     }
 
     public SurfaceTexture.OnFrameAvailableListener getFrameListener()
@@ -240,7 +239,7 @@ public class VideoUiView extends LinearLayout
             @Override
             public void run()
             {
-                if (canvasQuad != null) {
+                if (glCanvas != null) {
 
                     ((TextView) findViewById(R.id.twBattery)).setText(batteryLevel);
                     ((TextView) findViewById(R.id.twWifi)).setText(wifiSignal);

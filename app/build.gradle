@@ -35,6 +35,7 @@ dependencies {
 
     implementation "com.badlogicgames.gdx:gdx-backend-android:1.9.7"
     implementation "com.badlogicgames.gdx:gdx:1.9.7"
+    implementation "com.badlogicgames.gdx:gdx-freetype:1.9.7"
 
     implementation 'com.google.vr:sdk-base:1.140.0'
     implementation 'com.google.vr:sdk-common:1.140.0'

@@ -7,77 +7,36 @@ import android.hardware.Camera;
 import android.opengl.GLES20;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
-import android.view.Surface;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.badlogic.gdx.backends.android.CardBoardAndroidApplication;
 import com.badlogic.gdx.backends.android.CardBoardApplicationListener;
-import com.badlogic.gdx.backends.android.CardboardCamera;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.VertexAttributes;
-import com.badlogic.gdx.graphics.g3d.*;
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
-import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.google.vr.sdk.base.Eye;
 import com.google.vr.sdk.base.HeadTransform;
 import com.google.vr.sdk.base.Viewport;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
-import java.nio.ShortBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Main4Activity extends CardBoardAndroidApplication
-        implements CardBoardApplicationListener, SurfaceTexture.OnFrameAvailableListener
+        implements CardBoardApplicationListener
 {
-    private static final float Z_NEAR = 0.1f;
-    private static final float Z_FAR = 1000.0f;
-    private static final float CAMERA_Z = 0.01f;
-    private CardboardCamera cam;
-    private Model model;
-    private ModelInstance instance;
-    private ModelBatch batch;
-    private Environment environment;
-    static final int COORDS_PER_VERTEX = 2;
-    private static final int GL_TEXTURE_EXTERNAL_OES = 0x8D65;
-    static float squareVertices[] = { // in counterclockwise order:
-            -1.0f, -1.0f,   // 0.left - mid
-            1.0f, -1.0f,   // 1. right - mid
-            -1.0f, 1.0f,   // 2. left - top
-            1.0f, 1.0f,   // 3. right - top
-    };
-    static float textureVertices[] = {0.0f, 1.0f,  // A. left-bottom
-            1.0f, 1.0f,  // B. right-bottom
-            0.0f, 0.0f,  // C. left-top
-            1.0f, 0.0f   // D. right-top
-    };
-    private final int vertexStride = COORDS_PER_VERTEX * 4;
+    BitmapFont font24;
+    private long frameTime;
     private final AtomicBoolean phoneFrameAvailable = new AtomicBoolean();
-    private final String vertexShaderCode =
-            "attribute vec4 position;" + "attribute vec2 inputTextureCoordinate;" +
-                    "varying vec2 textureCoordinate;" + "void main()" + "{" +
-                    "gl_Position = position;" + "textureCoordinate = inputTextureCoordinate;" + "}";
-    private final String fragmentShaderCode =
-            "#extension GL_OES_EGL_image_external : require\n" + "precision mediump float;" +
-                    "varying vec2 textureCoordinate;" + "uniform samplerExternalOES s_texture;" +
-                    "void main(void) {" +
-                    "  gl_FragColor = texture2D( s_texture, textureCoordinate );" + "}";
-    private Camera camera;
-    private int phoneTexId;
-    private Surface mPhoneSurface;
-    private SurfaceTexture mPhoneTexture;
-    private ShapeRenderer shapeRenderer;
-    private FloatBuffer vertexBuffer, textureVerticesBuffer;
-    private ShortBuffer drawListBuffer;
-    private int mProgram;
-    private int mPositionHandle;
-    private int mTextureCoordHandle;
-    private short drawOrder[] = {0, 2, 1, 1, 2, 3};
+    private OverlayTexture overlayTexture;
+    private float counter;
+    private Sprite sprite;
+    private SpriteBatch batch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -94,212 +53,135 @@ public class Main4Activity extends CardBoardAndroidApplication
         config.g = 8;
         config.b = 8;
         config.a = 8;
+        config.numSamples = 2;
         initialize(this, config);
+
+        overlayTexture = new OverlayTexture(true, 0.01f);
     }
 
     @Override
     public void create()
     {
-        cam = new CardboardCamera();
-        cam.position.set(0f, 0f, CAMERA_Z);
-        cam.lookAt(0, 0, 0);
-        cam.near = Z_NEAR;
-        cam.far = Z_FAR;
+        Pixmap pixmap = new Pixmap(256, 8, Pixmap.Format.RGBA8888);
 
-        environment = new Environment();
-        environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
-        environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
+        pixmap.setColor(1f, 0.7f, 0f, 0.33f);
+        pixmap.fillRectangle(0, 0, 256, 8);
 
-        ModelBuilder modelBuilder = new ModelBuilder();
-        model = modelBuilder.createBox(5f, 5f, 5f,
-                new Material(ColorAttribute.createDiffuse(Color.GREEN)),
-                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
-        instance = new ModelInstance(model);
-        instance.transform.translate(0, 0, -50);
+        pixmap.setColor(1f, 0.7f, 0f, 0.67f);
+        pixmap.fillRectangle(1, 1, 254, 6);
 
-        shapeRenderer = new ShapeRenderer();
+        pixmap.setColor(1f, 0.7f, 0f, 1f);
+        pixmap.fillRectangle(2, 2, 252, 4);
 
-        batch = new ModelBatch();
+        Texture tex = new Texture(pixmap);
+        tex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        sprite = new Sprite(tex);
+        pixmap.dispose();
+
+        /*OrthographicCamera camera = new OrthographicCamera(
+                Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        camera.setToOrtho(true, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());*/
+
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(
+                Gdx.files.internal("font/Roboto-Regular.ttf"));
+        FreeTypeFontGenerator.FreeTypeFontParameter parameter =
+                new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameter.size = 24;
+        font24 = generator.generateFont(parameter);
+        generator.dispose();
+
+        batch = new SpriteBatch();
 
         onSurfaceCreated();
     }
 
     @Override
-    public void resize(int width, int height)
-    {
-    }
+    public void resize(int width, int height) { }
 
     @Override
-    public void render()
-    {
-    }
+    public void render() { }
 
     @Override
-    public void pause()
-    {
-
-    }
+    public void pause() { }
 
     @Override
-    public void resume()
-    {
-
-    }
+    public void resume() { }
 
     @Override
-    public void dispose()
-    {
-        batch.dispose();
-        model.dispose();
-    }
+    public void dispose() { }
 
     @Override
     public void onNewFrame(HeadTransform paramHeadTransform)
     {
-        instance.transform.rotate(0, 1, 0, Gdx.graphics.getDeltaTime() * 30);
-        updateTexture();
+        long currentFrame = SystemClock.elapsedRealtime();
+        //Log.w("Main5Activity fps:", String.valueOf(1000.0f / (currentFrame - frameTime)));
+        frameTime = currentFrame;
+
+        if (phoneFrameAvailable.compareAndSet(true, false))
+            overlayTexture.updateTexImage();
+        counter += 0.5f;
     }
 
     @Override
     public void onDrawEye(Eye eye)
     {
-        //Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
-        //Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-        GLES20.glUseProgram(mProgram);
+        GLES20.glEnable(GL20.GL_DEPTH_TEST);
+        GLES20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+        overlayTexture.draw();
 
-        GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, phoneTexId);
+        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_DST_ALPHA);
+        GLES20.glEnable(GLES20.GL_BLEND);
+        float cPitch = 1.5f * 500;
+        batch.begin();
+        for (int i = 0; i < 30; i++) {
+            float cRelPitch = cPitch + (75.0f * (i - 15));
+            sprite.setCenter(500f, cRelPitch);
+            sprite.setOrigin(128, 4 + 500 - cRelPitch);
+            sprite.setRotation(counter);
+            sprite.draw(batch);
+        }
+        batch.setColor(1f);
+        font24.draw(batch, "hell yeah", 500f, 500f);
+        batch.end();
 
-        mPositionHandle = GLES20.glGetAttribLocation(mProgram, "position");
-        GLES20.glEnableVertexAttribArray(mPositionHandle);
-        GLES20.glVertexAttribPointer(mPositionHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT, false,
-                vertexStride, vertexBuffer);
-
-
-        mTextureCoordHandle = GLES20.glGetAttribLocation(mProgram, "inputTextureCoordinate");
-        GLES20.glEnableVertexAttribArray(mTextureCoordHandle);
-        GLES20.glVertexAttribPointer(mTextureCoordHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT, false,
-                vertexStride, textureVerticesBuffer);
-
-        GLES20.glDrawElements(GLES20.GL_TRIANGLES, drawOrder.length, GLES20.GL_UNSIGNED_SHORT,
-                drawListBuffer);
-
-        // Disable vertex array
-        GLES20.glDisableVertexAttribArray(mPositionHandle);
-        GLES20.glDisableVertexAttribArray(mTextureCoordHandle);
-
-
-        // Apply the eye transformation to the camera.
-        /*cam.setEyeViewAdjustMatrix(new Matrix4(eye.getEyeView()));
-
-        float[] perspective = eye.getPerspective(Z_NEAR, Z_FAR);
-        cam.setEyeProjection(new Matrix4(perspective));
-        cam.update();*/
-
-        //batch.begin(cam);
-        //batch.render(instance, environment);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(Color.RED);
-        shapeRenderer.rect(500, 500, 300, 20);
-        shapeRenderer.end();
-        //batch.end();
+        GLES20.glDisable(GLES20.GL_BLEND);
     }
 
     @Override
-    public void onFinishFrame(Viewport paramViewport)
-    {
+    public void onFinishFrame(Viewport paramViewport) { }
 
-    }
+    @Override
+    public void onRendererShutdown() { }
 
     public void onSurfaceCreated()
     {
         GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-        GLUtils.checkGlError();
+        //Gdx.gl.glHint(GL10.GL_LINE_SMOOTH_HINT, GL10.GL_NICEST);
+        //Gdx.gl.glEnable(GL10.GL_LINE_SMOOTH);
+        SurfaceTexture.OnFrameAvailableListener listener =
+                new SurfaceTexture.OnFrameAvailableListener()
+                {
+                    @Override
+                    public void onFrameAvailable(SurfaceTexture surfaceTexture)
+                    {
+                        phoneFrameAvailable.set(true);
+                    }
+                };
 
-        ByteBuffer bb = ByteBuffer.allocateDirect(squareVertices.length * 4);
-        bb.order(ByteOrder.nativeOrder());
-        vertexBuffer = bb.asFloatBuffer();
-        vertexBuffer.put(squareVertices);
-        vertexBuffer.position(0);
-
-
-        ByteBuffer dlb = ByteBuffer.allocateDirect(drawOrder.length * 2);
-        dlb.order(ByteOrder.nativeOrder());
-        drawListBuffer = dlb.asShortBuffer();
-        drawListBuffer.put(drawOrder);
-        drawListBuffer.position(0);
-
-        ByteBuffer bb2 = ByteBuffer.allocateDirect(textureVertices.length * 4);
-        bb2.order(ByteOrder.nativeOrder());
-        textureVerticesBuffer = bb2.asFloatBuffer();
-        textureVerticesBuffer.put(textureVertices);
-        textureVerticesBuffer.position(0);
-
-        int vertexShader = GLUtils.loadGLShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode);
-        int fragmentShader = GLUtils.loadGLShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode);
-
-        mProgram = GLES20.glCreateProgram();             // create empty OpenGL ES Program
-        GLES20.glAttachShader(mProgram, vertexShader);   // add the vertex shader to program
-        GLES20.glAttachShader(mProgram, fragmentShader); // add the fragment shader to program
-        GLES20.glLinkProgram(mProgram);
-
-        // Create the texture used to render each frame of video.
-        phoneTexId = GLUtils.glCreateExternalTexture();
-        mPhoneTexture = new SurfaceTexture(phoneTexId);
-        GLUtils.checkGlError();
-
-        // When the video decodes a new frame, tell the GL thread to update the image.
-        mPhoneTexture.setOnFrameAvailableListener(new SurfaceTexture.OnFrameAvailableListener()
-        {
-            @Override
-            public void onFrameAvailable(SurfaceTexture surfaceTexture)
-            {
-                phoneFrameAvailable.set(true);
-            }
-        });
-
-        mPhoneSurface = new Surface(mPhoneTexture);
-
-        camera = Camera.open();
-
+        Camera camera = Camera.open();
         Camera.Size cSize = camera.getParameters().getPreviewSize();
 
+        overlayTexture.createSurface(getResources(), listener, cSize.width, cSize.height);
+
         try {
-            mPhoneTexture.setDefaultBufferSize(cSize.width, cSize.height);
-            camera.setPreviewTexture(mPhoneTexture);
+            camera.setPreviewTexture(overlayTexture.getTexture());
             camera.startPreview();
         } catch (IOException ioe) {
-            Log.w("Main3Activity", "CAM LAUNCH FAILED");
+            Log.w("Main5Activity", "CAM LAUNCH FAILED");
         }
     }
 
     @Override
-    public void onRendererShutdown()
-    {
-
-    }
-
-    @Override
-    public void onCardboardTrigger()
-    {
-
-    }
-
-    public void updateTexture()
-    {
-        if (phoneFrameAvailable.get()) {
-            mPhoneTexture.updateTexImage();
-            phoneFrameAvailable.set(false);
-        }
-        GLUtils.checkGlError();
-    }
-
-    @Override
-    public void onFrameAvailable(SurfaceTexture surfaceTexture)
-    {
-
-    }
-
-
+    public void onCardboardTrigger() { }
 }

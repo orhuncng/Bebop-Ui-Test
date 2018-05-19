@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.example.trio.testproject">
+          package="com.trio.drone">
 
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.BLUETOOTH"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
     <uses-permission android:name="com.samsung.accessory.permission.ACCESSORY_FRAMEWORK"/>
-    <uses-permission
-            android:name="com.samsung.android.providers.context.permission.WRITE_USE_APP_FEATURE_SURVEY"/>
+    <uses-permission android:name="com.samsung.android.providers.context.permission.WRITE_USE_APP_FEATURE_SURVEY"/>
     <uses-permission android:name="com.samsung.wmanager.ENABLE_NOTIFICATION"/>
     <uses-permission android:name="com.samsung.WATCH_APP_TYPE.Companion"/>
 
@@ -26,11 +25,6 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
         <activity android:name="com.trio.dronetest.MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
         </activity>
         <activity
                 android:name="com.trio.dronetest.Main2Activity"
@@ -42,11 +36,6 @@
                 android:label="@string/title_activity_main3"
                 android:screenOrientation="landscape"
                 android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
         </activity>
         <activity android:name="com.trio.dronetest.GearSensorActivity"/>
 
@@ -57,8 +46,7 @@
                 <action android:name="com.samsung.accessory.action.REGISTER_AGENT"/>
             </intent-filter>
         </receiver>
-        <receiver
-                android:name="com.samsung.android.sdk.accessory.ServiceConnectionIndicationBroadcastReceiver">
+        <receiver android:name="com.samsung.android.sdk.accessory.ServiceConnectionIndicationBroadcastReceiver">
             <intent-filter>
                 <action android:name="com.samsung.accessory.action.SERVICE_CONNECTION_REQUESTED"/>
             </intent-filter>
@@ -71,6 +59,22 @@
                 android:name="GearAppType"
                 android:value="wgt"/>
 
+        <activity android:name=".core.SettingsActivity">
+        </activity>
+        <activity
+                android:name="com.trio.dronetest.Main4Activity"
+                android:screenOrientation="landscape"
+                android:hardwareAccelerated="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <activity android:name="com.trio.dronetest.Main5Activity"
+                  android:screenOrientation="landscape"
+                  android:theme="@style/AppTheme.NoActionBar"
+                  android:hardwareAccelerated="true">
+        </activity>
     </application>
 
 </manifest>

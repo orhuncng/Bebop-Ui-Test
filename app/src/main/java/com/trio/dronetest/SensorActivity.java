@@ -13,7 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import com.example.trio.testproject.R;
+import com.trio.drone.R;
 
 import java.util.HashMap;
 import java.util.List;
@@ -178,7 +178,8 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
             sensorLayout.addView(seperateGroups);
 
             Log.e("LinearAccl", "Added");
-        } else {
+        }
+        else {
             TextView noLinAccl = new TextView(this);
             noLinAccl.setText("Dont Have Linear Acceleration Sorry :(");
             sensorLayout.addView(noLinAccl);
@@ -216,7 +217,8 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
 
             Log.e("Velocity", "Added");
 
-        } else {
+        }
+        else {
             TextView noAccleration = new TextView(this);
             noAccleration.setText("Dont Have Acceleration Sorry :(");
             sensorLayout.addView(noAccleration);
@@ -240,7 +242,8 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
             sensorLayout.addView(seperateGroups);
 
             Log.e("Gyro", "Added");
-        } else {
+        }
+        else {
             TextView noGyro = new TextView(this);
             noGyro.setText("Dont Have Gyro Sorry :(");
             sensorLayout.addView(noGyro);
@@ -264,7 +267,8 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
             sensorLayout.addView(seperateGroups);
 
             Log.e("Magneto", "Added");
-        } else {
+        }
+        else {
             TextView noMagnetoAccl = new TextView(this);
             noMagnetoAccl.setText("Dont Have Linear Acceleration Sorry :(");
             sensorLayout.addView(noMagnetoAccl);

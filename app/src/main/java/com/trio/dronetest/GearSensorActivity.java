@@ -45,7 +45,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.example.trio.testproject.R;
+import com.trio.drone.R;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -149,9 +149,8 @@ public class GearSensorActivity extends Activity
         mTextGravityY = (TextView) findViewById(R.id.GravityY);
         mTextGravityZ = (TextView) findViewById(R.id.GravityZ);*/
 
-        mIsBound =
-                bindService(new Intent(GearSensorActivity.this, ConsumerService.class),
-                        mConnection, Context.BIND_AUTO_CREATE);
+        mIsBound = bindService(new Intent(GearSensorActivity.this, ConsumerService.class),
+                mConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
@@ -186,9 +185,7 @@ public class GearSensorActivity extends Activity
                     if (mConsumerService.closeConnection() == false) {
                         updateTextView("Disconnected");
                         Toast.makeText(getApplicationContext(),
-                                R.string.ConnectionAlreadyDisconnected,
-                                Toast.LENGTH_LONG)
-                                .show();
+                                R.string.ConnectionAlreadyDisconnected, Toast.LENGTH_LONG).show();
                         //mMessageAdapter.clear();
                     }
                 }
@@ -197,10 +194,10 @@ public class GearSensorActivity extends Activity
             case R.id.buttonSend: {
                 if (mIsBound == true && mConsumerService != null) {
                     if (mConsumerService.sendData("Hello Accessory!")) {
-                    } else {
+                    }
+                    else {
                         Toast.makeText(getApplicationContext(),
-                                R.string.ConnectionAlreadyDisconnected, Toast.LENGTH_LONG)
-                                .show();
+                                R.string.ConnectionAlreadyDisconnected, Toast.LENGTH_LONG).show();
                     }
                 }
                 break;
@@ -255,7 +252,8 @@ public class GearSensorActivity extends Activity
                     if (mMessages.size() == MAX_MESSAGES_TO_DISPLAY) {
                         mMessages.remove(0);
                         mMessages.add(msg);
-                    } else {
+                    }
+                    else {
                         mMessages.add(msg);
                     }
                     notifyDataSetChanged();
@@ -355,8 +353,8 @@ public class GearSensorActivity extends Activity
         @Override
         public View getView(int position, View convertView, ViewGroup parent)
         {
-            LayoutInflater inflator =
-                    (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater inflator = (LayoutInflater) getSystemService(
+                    Context.LAYOUT_INFLATER_SERVICE);
             View messageRecordView = null;
             if (inflator != null) {
                 messageRecordView = inflator.inflate(R.layout.message, null);

@@ -87,7 +87,6 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/assets" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/blame" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/build-info" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/builds" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/check-manifest" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/classes" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental" />
@@ -115,18 +114,17 @@
       <excludeFolder url="file://$MODULE_DIR$/build/outputs" />
       <excludeFolder url="file://$MODULE_DIR$/build/tmp" />
     </content>
-    <orderEntry type="jdk" jdkName="Android API 26 Platform" jdkType="Android SDK" />
+    <orderEntry type="jdk" jdkName="Android API 27 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="android.arch.core:runtime-1.1.1" level="project" />
-    <orderEntry type="library" name="com.android.support:support-media-compat-26.1.0" level="project" />
-    <orderEntry type="library" name="com.android.support:recyclerview-v7-26.1.0" level="project" />
+    <orderEntry type="library" name="com.android.support:appcompat-v7-27.1.1" level="project" />
+    <orderEntry type="library" name="com.android.support:design-27.1.1" level="project" />
+    <orderEntry type="library" name="com.android.support:transition-27.1.1" level="project" />
     <orderEntry type="library" scope="TEST" name="com.squareup:javawriter:2.1.1@jar" level="project" />
+    <orderEntry type="library" name="com.android.support:recyclerview-v7-27.1.1" level="project" />
     <orderEntry type="library" name="com.parrot:libARCommands-3.13.1" level="project" />
-    <orderEntry type="library" name="com.android.support:appcompat-v7-26.1.0" level="project" />
     <orderEntry type="library" name="com.parrot:libARDiscovery-3.13.1" level="project" />
-    <orderEntry type="library" name="com.android.support:support-annotations:26.1.0@jar" level="project" />
     <orderEntry type="library" name="android.arch.lifecycle:livedata-1.1.1" level="project" />
-    <orderEntry type="library" name="com.android.support:support-core-ui-26.1.0" level="project" />
     <orderEntry type="library" name="com.parrot:libARDataTransfer-3.13.1" level="project" />
     <orderEntry type="library" name="com.android.support.constraint:constraint-layout-solver:1.1.0@jar" level="project" />
     <orderEntry type="library" scope="TEST" name="com.android.support.test:runner-1.0.1" level="project" />
@@ -135,44 +133,49 @@
     <orderEntry type="library" name="com.parrot:libARStream2-3.13.1" level="project" />
     <orderEntry type="library" scope="TEST" name="com.android.support.test.espresso:espresso-idling-resource-3.0.1" level="project" />
     <orderEntry type="library" name="com.parrot:arsdk-3.13.1" level="project" />
+    <orderEntry type="library" name="com.badlogicgames.gdx:gdx-backend-android:1.9.7@jar" level="project" />
     <orderEntry type="library" scope="TEST" name="org.hamcrest:hamcrest-core:1.3@jar" level="project" />
-    <orderEntry type="library" name="com.android.support:support-compat-26.1.0" level="project" />
     <orderEntry type="library" name="android.arch.lifecycle:viewmodel-1.1.1" level="project" />
     <orderEntry type="library" scope="TEST" name="org.hamcrest:hamcrest-integration:1.3@jar" level="project" />
     <orderEntry type="library" name="com.parrot:libARMedia-3.13.1" level="project" />
     <orderEntry type="library" name="com.parrot:libARUtils-3.13.1" level="project" />
     <orderEntry type="library" name="com.parrot:libARStream-3.13.1" level="project" />
     <orderEntry type="library" scope="TEST" name="net.sf.kxml:kxml2:2.3.0@jar" level="project" />
+    <orderEntry type="library" name="com.android.support:support-core-utils-27.1.1" level="project" />
     <orderEntry type="library" name="com.parrot:libARNetwork-3.13.1" level="project" />
     <orderEntry type="library" name="com.parrot:libARMavlink-3.13.1" level="project" />
-    <orderEntry type="library" name="com.android.support:transition-26.1.0" level="project" />
-    <orderEntry type="library" name="com.android.support:design-26.1.0" level="project" />
+    <orderEntry type="library" name="com.github.yangweigbh:Libgdx-CardBoard-Extension-0.4.0" level="project" />
     <orderEntry type="library" name="__local_aars__:C.\Users\orhun\AndroidStudioProjects\TestProject\app\libs\sdk-v1.0.0.jar:unspecified@jar" level="project" />
     <orderEntry type="library" name="com.parrot:libARSAL-3.13.1" level="project" />
+    <orderEntry type="library" name="com.android.support:support-annotations:27.1.1@jar" level="project" />
+    <orderEntry type="library" name="com.android.support:animated-vector-drawable-27.1.1" level="project" />
     <orderEntry type="library" name="com.parrot:libARController-3.13.1" level="project" />
     <orderEntry type="library" scope="TEST" name="junit:junit:4.12@jar" level="project" />
     <orderEntry type="library" scope="TEST" name="com.android.support.test.espresso:espresso-core-3.0.1" level="project" />
-    <orderEntry type="library" name="com.android.support:support-fragment-26.1.0" level="project" />
     <orderEntry type="library" scope="TEST" name="javax.inject:javax.inject:1@jar" level="project" />
-    <orderEntry type="library" name="com.android.support:support-vector-drawable-26.1.0" level="project" />
     <orderEntry type="library" name="android.arch.lifecycle:extensions-1.1.1" level="project" />
+    <orderEntry type="library" name="com.badlogicgames.gdx:gdx:1.9.7@jar" level="project" />
+    <orderEntry type="library" name="com.badlogicgames.gdx:gdx-freetype:1.9.7@jar" level="project" />
     <orderEntry type="library" name="__local_aars__:C.\Users\orhun\AndroidStudioProjects\TestProject\app\libs\accessory-v2.5.3.jar:unspecified@jar" level="project" />
     <orderEntry type="library" name="android.arch.core:common:1.1.1@jar" level="project" />
     <orderEntry type="library" name="com.parrot:libmux-3.13.1" level="project" />
-    <orderEntry type="library" name="com.android.support:support-core-utils-26.1.0" level="project" />
     <orderEntry type="library" name="com.parrot:libARUpdater-3.13.1" level="project" />
     <orderEntry type="library" name="com.android.support.constraint:constraint-layout-1.1.0" level="project" />
     <orderEntry type="library" scope="TEST" name="com.android.support.test:rules-1.0.1" level="project" />
     <orderEntry type="library" name="com.google.vr:sdk-common-1.140.0" level="project" />
+    <orderEntry type="library" name="com.android.support:support-vector-drawable-27.1.1" level="project" />
     <orderEntry type="library" name="android.arch.lifecycle:runtime-1.1.1" level="project" />
     <orderEntry type="library" name="org.apache.sanselan:sanselan:0.97-incubator@jar" level="project" />
+    <orderEntry type="library" name="com.android.support:support-core-ui-27.1.1" level="project" />
     <orderEntry type="library" scope="TEST" name="org.hamcrest:hamcrest-library:1.3@jar" level="project" />
+    <orderEntry type="library" name="com.android.support:support-compat-27.1.1" level="project" />
     <orderEntry type="library" name="javax.jmdns:jmdns:3.4.1@jar" level="project" />
-    <orderEntry type="library" name="com.android.support:support-v4-26.1.0" level="project" />
     <orderEntry type="library" name="android.arch.lifecycle:livedata-core-1.1.1" level="project" />
     <orderEntry type="library" name="android.arch.lifecycle:common:1.1.1@jar" level="project" />
     <orderEntry type="library" name="com.google.protobuf.nano:protobuf-javanano:3.1.0@jar" level="project" />
     <orderEntry type="library" name="com.parrot:libARNetworkAL-3.13.1" level="project" />
-    <orderEntry type="library" name="com.android.support:animated-vector-drawable-26.1.0" level="project" />
+    <orderEntry type="library" name="com.android.support:support-fragment-27.1.1" level="project" />
+    <orderEntry type="library" name="com.android.support:support-media-compat-27.1.1" level="project" />
+    <orderEntry type="library" name="com.android.support:support-v4-27.1.1" level="project" />
   </component>
 </module>

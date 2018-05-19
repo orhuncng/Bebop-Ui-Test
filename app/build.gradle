@@ -1,18 +1,13 @@
 apply plugin: 'com.android.application'
 
-ext {
-    gdxVersion = "1.9.3"
-}
-
 android {
-    compileSdkVersion 26
+    compileSdkVersion 27
     defaultConfig {
-        applicationId "com.example.trio.testproject"
+        applicationId "com.trio.drone"
         minSdkVersion 21
-        targetSdkVersion 26
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
@@ -26,6 +21,9 @@ configurations { natives }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
+    implementation 'com.android.support:design:27.1.1'
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.0'
     implementation 'com.android.support:design:26.1.0'
@@ -38,6 +36,12 @@ dependencies {
     implementation "android.arch.lifecycle:viewmodel:1.1.1"
 
     implementation 'com.parrot:arsdk:3.13.1'
+
+    implementation 'com.github.yangweigbh:Libgdx-CardBoard-Extension:0.4.0'
+
+    implementation "com.badlogicgames.gdx:gdx-backend-android:1.9.7"
+    implementation "com.badlogicgames.gdx:gdx:1.9.7"
+    implementation "com.badlogicgames.gdx:gdx-freetype:1.9.7"
 
     implementation 'com.google.vr:sdk-base:1.140.0'
     implementation 'com.google.vr:sdk-common:1.140.0'

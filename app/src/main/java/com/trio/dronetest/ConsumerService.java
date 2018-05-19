@@ -43,12 +43,12 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
-import com.example.trio.testproject.R;
 import com.samsung.android.sdk.SsdkUnsupportedException;
 import com.samsung.android.sdk.accessory.SA;
 import com.samsung.android.sdk.accessory.SAAgent;
 import com.samsung.android.sdk.accessory.SAPeerAgent;
 import com.samsung.android.sdk.accessory.SASocket;
+import com.trio.drone.R;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -133,20 +133,16 @@ public class ConsumerService extends SAAgent
 
             if (notificationManager == null) {
                 String channel_name = "Accessory_SDK_Sample";
-                notificationManager =
-                        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager = (NotificationManager) getSystemService(
+                        Context.NOTIFICATION_SERVICE);
                 NotificationChannel notiChannel = new NotificationChannel(channel_id, channel_name,
-                        NotificationManager
-                                .IMPORTANCE_LOW);
+                        NotificationManager.IMPORTANCE_LOW);
                 notificationManager.createNotificationChannel(notiChannel);
             }
 
             int notifyID = 1;
             Notification notification = new Notification.Builder(getBaseContext(), channel_id)
-                    .setContentTitle(TAG)
-                    .setContentText("")
-                    .setChannelId(channel_id)
-                    .build();
+                    .setContentTitle(TAG).setContentText("").setChannelId(channel_id).build();
 
             startForeground(notifyID, notification);
         }
@@ -190,15 +186,18 @@ public class ConsumerService extends SAAgent
         if ((result == SAAgent.PEER_AGENT_FOUND) && (peerAgents != null)) {
             for (SAPeerAgent peerAgent : peerAgents)
                 requestServiceConnection(peerAgent);
-        } else if (result == SAAgent.FINDPEER_DEVICE_NOT_CONNECTED) {
+        }
+        else if (result == SAAgent.FINDPEER_DEVICE_NOT_CONNECTED) {
             Toast.makeText(getApplicationContext(), "FINDPEER_DEVICE_NOT_CONNECTED",
                     Toast.LENGTH_LONG).show();
             updateTextView("Disconnected");
-        } else if (result == SAAgent.FINDPEER_SERVICE_NOT_FOUND) {
+        }
+        else if (result == SAAgent.FINDPEER_SERVICE_NOT_FOUND) {
             Toast.makeText(getApplicationContext(), "FINDPEER_SERVICE_NOT_FOUND", Toast.LENGTH_LONG)
                     .show();
             updateTextView("Disconnected");
-        } else {
+        }
+        else {
             Toast.makeText(getApplicationContext(), R.string.NoPeersFound, Toast.LENGTH_LONG)
                     .show();
         }
@@ -218,7 +217,8 @@ public class ConsumerService extends SAAgent
                     if (status == SAAgent.PEER_AGENT_AVAILABLE) {
                         Toast.makeText(getApplicationContext(), "PEER_AGENT_AVAILABLE",
                                 Toast.LENGTH_LONG).show();
-                    } else {
+                    }
+                    else {
                         Toast.makeText(getApplicationContext(), "PEER_AGENT_UNAVAILABLE",
                                 Toast.LENGTH_LONG).show();
                     }
@@ -241,13 +241,16 @@ public class ConsumerService extends SAAgent
         if (result == SAAgent.CONNECTION_SUCCESS) {
             mConnectionHandler = (ServiceConnection) socket;
             updateTextView("Connected");
-        } else if (result == SAAgent.CONNECTION_ALREADY_EXIST) {
+        }
+        else if (result == SAAgent.CONNECTION_ALREADY_EXIST) {
             updateTextView("Connected");
             Toast.makeText(getBaseContext(), "CONNECTION_ALREADY_EXIST", Toast.LENGTH_LONG).show();
-        } else if (result == SAAgent.CONNECTION_DUPLICATE_REQUEST) {
+        }
+        else if (result == SAAgent.CONNECTION_DUPLICATE_REQUEST) {
             Toast.makeText(getBaseContext(), "CONNECTION_DUPLICATE_REQUEST", Toast.LENGTH_LONG)
                     .show();
-        } else {
+        }
+        else {
             Toast.makeText(getBaseContext(), R.string.ConnectionFailure, Toast.LENGTH_LONG).show();
         }
     }
@@ -290,7 +293,8 @@ public class ConsumerService extends SAAgent
             mConnectionHandler.close();
             mConnectionHandler = null;
             return true;
-        } else {
+        }
+        else {
             return false;
         }
     }
@@ -299,8 +303,8 @@ public class ConsumerService extends SAAgent
     {
         e.printStackTrace();
         int errType = e.getType();
-        if (errType == SsdkUnsupportedException.VENDOR_NOT_SUPPORTED
-                || errType == SsdkUnsupportedException.DEVICE_NOT_SUPPORTED) {
+        if (errType == SsdkUnsupportedException.VENDOR_NOT_SUPPORTED ||
+                errType == SsdkUnsupportedException.DEVICE_NOT_SUPPORTED) {
             /*
              * Your application can not use Samsung Accessory SDK. You application should work
              * smoothly
@@ -309,11 +313,14 @@ public class ConsumerService extends SAAgent
              * resources, stop Service threads, close UI thread, etc.)
              */
             stopSelf();
-        } else if (errType == SsdkUnsupportedException.LIBRARY_NOT_INSTALLED) {
+        }
+        else if (errType == SsdkUnsupportedException.LIBRARY_NOT_INSTALLED) {
             Log.e(TAG, "You need to install Samsung Accessory SDK to use this application.");
-        } else if (errType == SsdkUnsupportedException.LIBRARY_UPDATE_IS_REQUIRED) {
+        }
+        else if (errType == SsdkUnsupportedException.LIBRARY_UPDATE_IS_REQUIRED) {
             Log.e(TAG, "You need to update Samsung Accessory SDK to use this application.");
-        } else if (errType == SsdkUnsupportedException.LIBRARY_UPDATE_IS_RECOMMENDED) {
+        }
+        else if (errType == SsdkUnsupportedException.LIBRARY_UPDATE_IS_RECOMMENDED) {
             Log.e(TAG,
                     "We recommend that you update your Samsung Accessory SDK before using this " +
                             "application.");

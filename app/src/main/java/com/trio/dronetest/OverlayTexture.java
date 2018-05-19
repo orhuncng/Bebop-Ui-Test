@@ -4,9 +4,7 @@ import android.content.res.Resources;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
-import android.support.annotation.NonNull;
 import android.view.Surface;
-import android.widget.FrameLayout;
 import com.trio.drone.R;
 
 import java.nio.FloatBuffer;
@@ -21,12 +19,6 @@ public class OverlayTexture
     private static final int VERTEX_COUNT = 4;
     private static final int VERTEX_STRIDE_BYTES = COORDS_PER_VERTEX * BYTES_PER_COORD;
 
-    private static final float WIDTH = 1f;
-    private static final float HEIGHT = 1f;
-    private static final int PX_PER_UNIT = 1024;
-    private static final int PX_WIDTH = (int) WIDTH * PX_PER_UNIT;
-    private static final int PX_HEIGHT = (int) HEIGHT * PX_PER_UNIT;
-
     private static final float DEFAULT_ALPHA = 0.7f;
 
     private int program = 0;
@@ -38,54 +30,43 @@ public class OverlayTexture
     private boolean hasAlpha;
     private float alpha = DEFAULT_ALPHA;
 
+    private int width;
+    private int height;
+
     private SurfaceTexture texture;
     private FloatBuffer vertexBuffer;
 
-    public OverlayTexture(boolean hasAlpha, float depth)
+    public OverlayTexture(boolean hasAlpha, float depth, int screenWidth, int screenHeight,
+            int width, int height)
     {
         this.hasAlpha = hasAlpha;
 
-        vertexBuffer = GLUtils.createBuffer(new float[]{
-                -WIDTH, -HEIGHT, depth, 0, 1,
-                WIDTH, -HEIGHT, depth, 1, 1,
-                -WIDTH, HEIGHT, depth, 0, 0,
-                WIDTH, HEIGHT, depth, 1, 0
-        });
-    }
+        this.width = width;
+        this.height = height;
 
-    @NonNull
-    public static FrameLayout.LayoutParams getLayoutParams()
-    {
-        return new FrameLayout.LayoutParams(PX_WIDTH, PX_HEIGHT);
+        width *= ((float) screenHeight) / screenWidth;
+
+        if (width > height) {
+            float xAspectCoeff = (1f - (((float) height) / width)) / 2f;
+            vertexBuffer = GLUtils.createBuffer(new float[]{
+                    -1f, -1f, depth, xAspectCoeff, 1,
+                    1f, -1f, depth, 1 - xAspectCoeff, 1,
+                    -1f, 1f, depth, xAspectCoeff, 0,
+                    1f, 1f, depth, 1 - xAspectCoeff, 0
+            });
+        }
+        else {
+            float yAspectCoeff = (1f - (((float) width) / height)) / 2f;
+            vertexBuffer = GLUtils.createBuffer(new float[]{
+                    -1f, -1f, depth, 0, 1 - yAspectCoeff,
+                    1f, -1f, depth, 1, 1 - yAspectCoeff,
+                    -1f, 1f, depth, 0, yAspectCoeff,
+                    1f, 1f, depth, 1, yAspectCoeff
+            });
+        }
     }
 
     Surface createSurface(Resources res, SurfaceTexture.OnFrameAvailableListener listener)
-    {
-        int fragShaderId;
-
-        if (hasAlpha)
-            fragShaderId = R.raw.overlay_alpha_frag;
-        else
-            fragShaderId = R.raw.overlay_frag;
-
-        program = GLUtils.compileProgram(res, R.raw.overlay_vert, fragShaderId);
-
-        positionHandle = GLES20.glGetAttribLocation(program, "aPosition");
-        textureCoordsHandle = GLES20.glGetAttribLocation(program, "aTexCoords");
-        textureHandle = GLES20.glGetUniformLocation(program, "uTexture");
-        textureId = GLUtils.glCreateExternalTexture();
-
-        if (hasAlpha) alphaHandle = GLES20.glGetUniformLocation(program, "uAlpha");
-
-        texture = new SurfaceTexture(textureId);
-        texture.setDefaultBufferSize(PX_WIDTH, PX_HEIGHT);
-        texture.setOnFrameAvailableListener(listener);
-
-        return new Surface(texture);
-    }
-
-    Surface createSurface(Resources res, SurfaceTexture.OnFrameAvailableListener listener,
-            int width, int height)
     {
         program = GLUtils.compileProgram(res, R.raw.overlay_vert,
                 hasAlpha ? R.raw.overlay_alpha_frag : R.raw.overlay_frag);

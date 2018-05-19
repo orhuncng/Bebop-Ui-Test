@@ -17,7 +17,7 @@ public class GLCanvas
 
     public static FrameLayout.LayoutParams getLayoutParams()
     {
-        return OverlayTexture.getLayoutParams();
+        return null;//OverlayTexture.getLayoutParams();
     }
 
     public Canvas lock()
@@ -41,7 +41,7 @@ public class GLCanvas
 
     void init(Resources res, SurfaceTexture.OnFrameAvailableListener listener)
     {
-        overlayTexture = new OverlayTexture(true, 0);
+        //overlayTexture = new OverlayTexture(true, 0);
         surface = overlayTexture.createSurface(res, listener);
     }
 

@@ -3,12 +3,12 @@ package com.trio.dronetest;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.SurfaceTexture;
-import android.hardware.Camera;
 import android.opengl.GLES20;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.util.Log;
+import android.util.DisplayMetrics;
+import android.view.Surface;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.badlogic.gdx.backends.android.CardBoardAndroidApplication;
@@ -23,20 +23,25 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.google.vr.sdk.base.Eye;
 import com.google.vr.sdk.base.HeadTransform;
 import com.google.vr.sdk.base.Viewport;
+import com.trio.drone.bebop.BebopBro;
 
-import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Main4Activity extends CardBoardAndroidApplication
         implements CardBoardApplicationListener
 {
     BitmapFont font24;
     private long frameTime;
-    private final AtomicBoolean phoneFrameAvailable = new AtomicBoolean();
-    private OverlayTexture overlayTexture;
+    private final AtomicBoolean videoFrameAvailable = new AtomicBoolean();
+    String fps;
     private float counter;
     private Sprite sprite;
     private SpriteBatch batch;
+    Surface surface;
+    private OverlayTexture videoTexture;
+    private Lock mReadyLock;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -56,7 +61,9 @@ public class Main4Activity extends CardBoardAndroidApplication
         config.numSamples = 2;
         initialize(this, config);
 
-        overlayTexture = new OverlayTexture(true, 0.01f);
+        BebopBro.getInstance().onCreate(getApplicationContext());
+
+        mReadyLock = new ReentrantLock();
     }
 
     @Override
@@ -77,10 +84,6 @@ public class Main4Activity extends CardBoardAndroidApplication
         tex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         sprite = new Sprite(tex);
         pixmap.dispose();
-
-        /*OrthographicCamera camera = new OrthographicCamera(
-                Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        camera.setToOrtho(true, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());*/
 
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(
                 Gdx.files.internal("font/Roboto-Regular.ttf"));
@@ -116,24 +119,29 @@ public class Main4Activity extends CardBoardAndroidApplication
     public void onNewFrame(HeadTransform paramHeadTransform)
     {
         long currentFrame = SystemClock.elapsedRealtime();
-        //Log.w("Main5Activity fps:", String.valueOf(1000.0f / (currentFrame - frameTime)));
+        fps = String.valueOf(1000.0f / (currentFrame - frameTime));
         frameTime = currentFrame;
 
-        if (phoneFrameAvailable.compareAndSet(true, false))
-            overlayTexture.updateTexImage();
         counter += 0.5f;
     }
 
     @Override
     public void onDrawEye(Eye eye)
     {
-        GLES20.glEnable(GL20.GL_DEPTH_TEST);
         GLES20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
-        overlayTexture.draw();
+        synchronized (surface) {
+            if (videoFrameAvailable.compareAndSet(true, false)) {
+                videoTexture.updateTexImage();
+            }
+        }
 
-        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_DST_ALPHA);
-        GLES20.glEnable(GLES20.GL_BLEND);
+        videoTexture.draw();
+        drawUI();
+    }
+
+    public void drawUI()
+    {
         float cPitch = 1.5f * 500;
         batch.begin();
         for (int i = 0; i < 30; i++) {
@@ -144,10 +152,8 @@ public class Main4Activity extends CardBoardAndroidApplication
             sprite.draw(batch);
         }
         batch.setColor(1f);
-        font24.draw(batch, "hell yeah", 500f, 500f);
+        font24.draw(batch, fps, 500f, 500f);
         batch.end();
-
-        GLES20.glDisable(GLES20.GL_BLEND);
     }
 
     @Override
@@ -159,29 +165,29 @@ public class Main4Activity extends CardBoardAndroidApplication
     public void onSurfaceCreated()
     {
         GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-        //Gdx.gl.glHint(GL10.GL_LINE_SMOOTH_HINT, GL10.GL_NICEST);
-        //Gdx.gl.glEnable(GL10.GL_LINE_SMOOTH);
+        GLES20.glEnable(GL20.GL_DEPTH_TEST);
+        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_DST_ALPHA);
+        GLES20.glEnable(GLES20.GL_BLEND);
+
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
+        videoTexture = new OverlayTexture(false, 0.01f, metrics.widthPixels / 2, metrics
+                .heightPixels, BebopBro.getVideoWidth(), BebopBro.getVideoHeight());
+
         SurfaceTexture.OnFrameAvailableListener listener =
                 new SurfaceTexture.OnFrameAvailableListener()
                 {
                     @Override
                     public void onFrameAvailable(SurfaceTexture surfaceTexture)
                     {
-                        phoneFrameAvailable.set(true);
+                        videoFrameAvailable.set(true);
                     }
                 };
 
-        Camera camera = Camera.open();
-        Camera.Size cSize = camera.getParameters().getPreviewSize();
+        surface = videoTexture.createSurface(getResources(), listener);
 
-        overlayTexture.createSurface(getResources(), listener, cSize.width, cSize.height);
-
-        try {
-            camera.setPreviewTexture(overlayTexture.getTexture());
-            camera.startPreview();
-        } catch (IOException ioe) {
-            Log.w("Main5Activity", "CAM LAUNCH FAILED");
-        }
+        BebopBro.getInstance().setVideoSurface(surface);
     }
 
     @Override

@@ -21,6 +21,7 @@ import com.parrot.arsdk.ardiscovery.*;
 import com.parrot.arsdk.ardiscovery.receivers.ARDiscoveryServicesDevicesListUpdatedReceiver;
 import com.parrot.arsdk.ardiscovery.receivers.ARDiscoveryServicesDevicesListUpdatedReceiverDelegate;
 import com.trio.drone.R;
+import com.trio.drone.bebop.H264VideoController;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import java.util.ArrayList;
@@ -34,7 +35,6 @@ public class Main3Activity extends GvrActivity
     private VideoUiView uiView;
     private SceneRenderer scene;
     public ArrayList<String> DeviceNames = new ArrayList<>();
-    private boolean videoStarted;
     ARDiscoveryDevice trioDrone;
     ARDiscoveryServicesDevicesListUpdatedReceiver receiver;
     ARDeviceController deviceController;
@@ -47,7 +47,7 @@ public class Main3Activity extends GvrActivity
 
     Context mContext;
 
-    private H264VideoProvider h264VideoProvider;
+    private H264VideoController h264VideoProvider;
 
     static {
         ARSDK.loadSDKLibs();
@@ -259,18 +259,7 @@ public class Main3Activity extends GvrActivity
     public void onSurfaceCreated(EGLConfig eglConfig)
     {
         scene.onSurfaceCreated();
-        h264VideoProvider.init(scene.getDroneCamTexture(VIDEO_WIDTH, VIDEO_HEIGHT));
-
-            /*camera = Camera.open();
-
-            Camera.Size cSize = camera.getParameters().getPreviewSize();
-
-            try {
-                camera.setPreviewTexture(scene.getPhoneCamTexture(cSize.width, cSize.height));
-                camera.startPreview();
-            } catch (IOException ioe) {
-                Log.w("Main3Activity", "CAM LAUNCH FAILED");
-            }*/
+        h264VideoProvider.setVideoSurface(scene.getDroneCamTexture(VIDEO_WIDTH, VIDEO_HEIGHT));
     }
 
     @Override
@@ -298,79 +287,52 @@ public class Main3Activity extends GvrActivity
     public void onCommandReceived(ARDeviceController deviceController,
             ARCONTROLLER_DICTIONARY_KEY_ENUM commandKey, ARControllerDictionary elementDictionary)
     {
-        if (elementDictionary != null) {
-            // if the command received is a battery state changed
-            if (commandKey ==
-                    ARCONTROLLER_DICTIONARY_KEY_ENUM
-                            .ARCONTROLLER_DICTIONARY_KEY_COMMON_COMMONSTATE_BATTERYSTATECHANGED) {
-                ARControllerArgumentDictionary<Object> args = elementDictionary.get(
-                        ARControllerDictionary.ARCONTROLLER_DICTIONARY_SINGLE_KEY);
+        ARControllerArgumentDictionary<Object> args = (elementDictionary == null) ? null :
+                elementDictionary.get(ARControllerDictionary.ARCONTROLLER_DICTIONARY_SINGLE_KEY);
 
-                if (args != null) {
-                    Integer batValue = (Integer) args.get(
-                            ARFeatureCommon
-                                    .ARCONTROLLER_DICTIONARY_KEY_COMMON_COMMONSTATE_BATTERYSTATECHANGED_PERCENT);
+        if (args != null) {
+            switch (commandKey) {
+
+                case ARCONTROLLER_DICTIONARY_KEY_COMMON_COMMONSTATE_BATTERYSTATECHANGED: {
+                    Integer batValue = (Integer) args.get(ARFeatureCommon
+                            .ARCONTROLLER_DICTIONARY_KEY_COMMON_COMMONSTATE_BATTERYSTATECHANGED_PERCENT);
                     uiView.setBatteryLevel(batValue);
+                    break;
                 }
-            }
-            else if ((commandKey ==
-                    ARCONTROLLER_DICTIONARY_KEY_ENUM
-                            .ARCONTROLLER_DICTIONARY_KEY_COMMON_COMMONSTATE_WIFISIGNALCHANGED) &&
-                    (elementDictionary != null)) {
-                ARControllerArgumentDictionary<Object> args = elementDictionary.get(
-                        ARControllerDictionary.ARCONTROLLER_DICTIONARY_SINGLE_KEY);
-                if (args != null) {
-                    short rssi = (short) ((Integer) args.get(
-                            ARFeatureCommon
-                                    .ARCONTROLLER_DICTIONARY_KEY_COMMON_COMMONSTATE_WIFISIGNALCHANGED_RSSI))
+                case ARCONTROLLER_DICTIONARY_KEY_COMMON_COMMONSTATE_WIFISIGNALCHANGED: {
+
+                    short rssi = (short) ((Integer) args.get(ARFeatureCommon
+                            .ARCONTROLLER_DICTIONARY_KEY_COMMON_COMMONSTATE_WIFISIGNALCHANGED_RSSI))
                             .intValue();
                     uiView.setWifiSignal(rssi);
+                    break;
                 }
-            }
-            else if ((commandKey ==
-                    ARCONTROLLER_DICTIONARY_KEY_ENUM
-                            .ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED) &&
-                    (elementDictionary != null)) {
-                ARControllerArgumentDictionary<Object> args = elementDictionary.get(
-                        ARControllerDictionary.ARCONTROLLER_DICTIONARY_SINGLE_KEY);
-                if (args != null) {
+                case ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED: {
                     ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_ENUM state =
                             ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_ENUM
-                                    .getFromValue((Integer) args
-                                            .get(ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE));
+                                    .getFromValue((Integer) args.get(ARFeatureARDrone3
+                                            .ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE));
                     uiView.setPilotingState(state);
+                    break;
                 }
-            }
-            else if ((commandKey ==
-                    ARCONTROLLER_DICTIONARY_KEY_ENUM
-                            .ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_POSITIONCHANGED) &&
-                    (elementDictionary != null)) {
-                ARControllerArgumentDictionary<Object> args = elementDictionary.get(
-                        ARControllerDictionary.ARCONTROLLER_DICTIONARY_SINGLE_KEY);
-                if (args != null) {
-                    double latitude = (double) args.get(
-                            ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_POSITIONCHANGED_LATITUDE);
-                    double longitude = (double) args.get(
-                            ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_POSITIONCHANGED_LONGITUDE);
-                    double altitude = (double) args.get(
-                            ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_POSITIONCHANGED_ALTITUDE);
+                case ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_POSITIONCHANGED: {
+                    double latitude = (double) args.get(ARFeatureARDrone3
+                            .ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_POSITIONCHANGED_LATITUDE);
+                    double longitude = (double) args.get(ARFeatureARDrone3
+                            .ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_POSITIONCHANGED_LONGITUDE);
+                    double altitude = (double) args.get(ARFeatureARDrone3
+                            .ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_POSITIONCHANGED_ALTITUDE);
                     uiView.setLatitude(latitude);
                     uiView.setLongitude(longitude);
                     uiView.setPosAlt(altitude);
+                    break;
                 }
-            }
-            else if ((commandKey ==
-                    ARCONTROLLER_DICTIONARY_KEY_ENUM
-                            .ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_SPEEDCHANGED) &&
-                    (elementDictionary != null)) {
-                ARControllerArgumentDictionary<Object> args = elementDictionary.get(
-                        ARControllerDictionary.ARCONTROLLER_DICTIONARY_SINGLE_KEY);
-                if (args != null) {
-                    float speedX = (float) ((Double) args.get(
-                            ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_SPEEDCHANGED_SPEEDX))
+                case ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_SPEEDCHANGED: {
+                    float speedX = (float) ((Double) args.get(ARFeatureARDrone3
+                            .ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_SPEEDCHANGED_SPEEDX))
                             .doubleValue();
-                    float speedY = (float) ((Double) args.get(
-                            ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_SPEEDCHANGED_SPEEDY))
+                    float speedY = (float) ((Double) args.get(ARFeatureARDrone3
+                            .ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_SPEEDCHANGED_SPEEDY))
                             .doubleValue();
                     float speedZ = (float) ((Double) args.get(
                             ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_SPEEDCHANGED_SPEEDZ))
@@ -378,57 +340,42 @@ public class Main3Activity extends GvrActivity
                     uiView.setSpeedX(speedX);
                     uiView.setSpeedY(speedY);
                     uiView.setSpeedZ(speedZ);
+                    break;
                 }
-            }
-            else if ((commandKey ==
-                    ARCONTROLLER_DICTIONARY_KEY_ENUM
-                            .ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_ATTITUDECHANGED) &&
-                    (elementDictionary != null)) {
-                ARControllerArgumentDictionary<Object> args = elementDictionary.get(
-                        ARControllerDictionary.ARCONTROLLER_DICTIONARY_SINGLE_KEY);
-                if (args != null) {
-                    float roll = (float) ((Double) args.get(
-                            ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_ATTITUDECHANGED_ROLL))
+                case ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_ATTITUDECHANGED: {
+                    float roll = (float) ((Double) args.get(ARFeatureARDrone3
+                            .ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_ATTITUDECHANGED_ROLL))
                             .doubleValue();
-                    float pitch = (float) ((Double) args.get(
-                            ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_ATTITUDECHANGED_PITCH))
+                    float pitch = (float) ((Double) args.get(ARFeatureARDrone3
+                            .ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_ATTITUDECHANGED_PITCH))
                             .doubleValue();
-                    float yaw = (float) ((Double) args.get(
-                            ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_ATTITUDECHANGED_YAW))
+                    float yaw = (float) ((Double) args.get(ARFeatureARDrone3
+                            .ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_ATTITUDECHANGED_YAW))
                             .doubleValue();
                     uiView.setRoll(roll);
                     uiView.setPitch(pitch);
                     uiView.setYaw(yaw);
+                    break;
                 }
-            }
-            else if ((commandKey ==
-                    ARCONTROLLER_DICTIONARY_KEY_ENUM
-                            .ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_ALTITUDECHANGED) &&
-                    (elementDictionary != null)) {
-                ARControllerArgumentDictionary<Object> args = elementDictionary.get(
-                        ARControllerDictionary.ARCONTROLLER_DICTIONARY_SINGLE_KEY);
-                if (args != null) {
-                    double altitude = (double) args.get(
-                            ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_ALTITUDECHANGED_ALTITUDE);
+                case ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_ALTITUDECHANGED: {
+                    double altitude = (double) args.get(ARFeatureARDrone3
+                            .ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_ALTITUDECHANGED_ALTITUDE);
                     uiView.setAltitude(altitude);
+                    break;
                 }
-            }
-            else if ((commandKey ==
-                    ARCONTROLLER_DICTIONARY_KEY_ENUM
-                            .ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_CAMERASTATE_ORIENTATION) &&
-                    (elementDictionary != null)) {
-                ARControllerArgumentDictionary<Object> args = elementDictionary.get(
-                        ARControllerDictionary.ARCONTROLLER_DICTIONARY_SINGLE_KEY);
-                if (args != null) {
-                    byte tilt = (byte) ((Integer) args.get(
-                            ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_CAMERASTATE_ORIENTATION_TILT))
+                case ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_CAMERASTATE_ORIENTATION: {
+                    byte tilt = (byte) ((Integer) args.get(ARFeatureARDrone3
+                            .ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_CAMERASTATE_ORIENTATION_TILT))
                             .intValue();
-                    byte pan = (byte) ((Integer) args.get(
-                            ARFeatureARDrone3.ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_CAMERASTATE_ORIENTATION_PAN))
+                    byte pan = (byte) ((Integer) args.get(ARFeatureARDrone3
+                            .ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_CAMERASTATE_ORIENTATION_PAN))
                             .intValue();
                     uiView.setCameraTilt(tilt);
                     uiView.setCameraPan(pan);
+                    break;
                 }
+                default:
+                    break;
             }
         }
     }
@@ -483,7 +430,7 @@ public class Main3Activity extends GvrActivity
         initializeGvrView();
 
         mContext = this;
-        h264VideoProvider = new H264VideoProvider();
+        h264VideoProvider = new H264VideoController(VIDEO_WIDTH, VIDEO_HEIGHT);
 
         initDiscoveryService();
         registerReceivers();

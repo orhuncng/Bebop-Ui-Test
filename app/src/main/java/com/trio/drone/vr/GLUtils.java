@@ -1,4 +1,4 @@
-package com.trio.dronetest;
+package com.trio.drone.vr;
 
 import android.content.res.Resources;
 import android.opengl.GLES11Ext;

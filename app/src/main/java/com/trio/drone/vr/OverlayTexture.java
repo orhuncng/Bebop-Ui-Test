@@ -1,4 +1,4 @@
-package com.trio.dronetest;
+package com.trio.drone.vr;
 
 import android.content.res.Resources;
 import android.graphics.SurfaceTexture;
@@ -66,7 +66,7 @@ public class OverlayTexture
         }
     }
 
-    Surface createSurface(Resources res, SurfaceTexture.OnFrameAvailableListener listener)
+    public Surface createSurface(Resources res, SurfaceTexture.OnFrameAvailableListener listener)
     {
         program = GLUtils.compileProgram(res, R.raw.overlay_vert,
                 hasAlpha ? R.raw.overlay_alpha_frag : R.raw.overlay_frag);
@@ -85,9 +85,9 @@ public class OverlayTexture
         return new Surface(texture);
     }
 
-    void updateTexImage() { texture.updateTexImage(); }
+    public void updateTexImage() { texture.updateTexImage(); }
 
-    void draw()
+    public void draw()
     {
         GLES20.glUseProgram(program);
         GLUtils.checkGlError();
@@ -116,7 +116,7 @@ public class OverlayTexture
         GLES20.glDisableVertexAttribArray(textureCoordsHandle);
     }
 
-    void shutdown()
+    public void shutdown()
     {
         if (program != 0) {
             GLES20.glDeleteProgram(program);

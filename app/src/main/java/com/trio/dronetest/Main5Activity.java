@@ -15,6 +15,8 @@ import android.view.View;
 import com.badlogic.gdx.graphics.GL20;
 import com.google.vr.sdk.base.*;
 import com.trio.drone.R;
+import com.trio.drone.vr.GLUtils;
+import com.trio.drone.vr.OverlayTexture;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import java.io.IOException;

@@ -15,7 +15,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class H264VideoController
 {
-
     private static final String TAG = "H264VideoView";
     private static final String VIDEO_MIME_TYPE = "video/avc";
     private static final int VIDEO_DEQUEUE_TIMEOUT = 33000;

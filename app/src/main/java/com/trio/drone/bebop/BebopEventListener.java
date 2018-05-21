@@ -1,15 +1,12 @@
 package com.trio.drone.bebop;
 
-import com.parrot.arsdk.arcommands.ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_ENUM;
-
 public interface BebopEventListener
 {
     void onBatteryStateChanged(int batteryLevel);
 
     void onWifiSignalChanged(int rssi);
 
-    void onFlyingStateChanged(
-            ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_ENUM flyingState);
+    void onFlyingStateChanged(FlyingState flyingState);
 
     void onPositionChanged(float latitude, float longitude, float altitude);
 
@@ -20,4 +17,8 @@ public interface BebopEventListener
     void onRelativeAltitudeChanged(float altitude);
 
     void onCameraOrientationChanged(int tiltPerc, int panPerc);
+
+    void onRelativeMotionEnded(float dX, float dY, float dZ, RelativeMotionResult result);
+
+    void onControllerStateChanged(boolean isRunning);
 }

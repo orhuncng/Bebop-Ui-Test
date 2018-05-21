@@ -6,6 +6,7 @@ import android.graphics.SurfaceTexture;
 import android.os.Build;
 import android.view.Surface;
 import android.widget.FrameLayout;
+import com.trio.drone.vr.OverlayTexture;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 

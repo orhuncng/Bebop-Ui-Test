@@ -2,6 +2,7 @@ package com.trio.drone.bebop;
 
 import android.util.Log;
 import android.view.Surface;
+import com.parrot.arsdk.arcommands.ARCOMMANDS_ARDRONE3_PILOTINGEVENT_MOVEBYEND_ERROR_ENUM;
 import com.parrot.arsdk.arcommands.ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_ENUM;
 import com.parrot.arsdk.arcontroller.*;
 import com.parrot.arsdk.ardiscovery.ARDISCOVERY_PRODUCT_ENUM;
@@ -15,7 +16,8 @@ public class DeviceController implements ARDeviceControllerListener,
     private H264VideoController videoController;
     private ARDeviceController controller;
     private BebopMediator mediator;
-    private boolean droneRunning = false;
+    private boolean isRunning = false;
+    private FlyingState flyingState = FlyingState.LANDED;
 
     DeviceController(BebopMediator mediator, int videoWidth, int videoHeight)
     {
@@ -27,14 +29,41 @@ public class DeviceController implements ARDeviceControllerListener,
 
     public void setVideoSurface(Surface surface) {videoController.setVideoSurface(surface);}
 
+    public boolean IsRunning() { return isRunning; }
+
+    public FlyingState GetFlyingState() { return flyingState; }
+
+    public void calibrateAccelerometerAndGyro()
+    {
+        if (flyingState == FlyingState.LANDED)
+            controller.getFeatureARDrone3().sendPilotingFlatTrim();
+    }
+
+    public void moveToRelative(float dX, float dY, float dZ, float dRotation)
+    {
+        controller.getFeatureARDrone3().sendPilotingMoveBy(dX, dY, dZ, dRotation);
+    }
+
+    public void move(int rollPerc, int pitchPerc, int yawPerc, int gazPerc)
+    {
+        controller.getFeatureARDrone3().sendPilotingPCMD((byte) 1, (byte) rollPerc,
+                (byte) pitchPerc, (byte) yawPerc, (byte) gazPerc, 0);
+    }
+
+    public void doEmergencyLanding() {controller.getFeatureARDrone3().sendPilotingEmergency();}
+
+    public void takeOff() {controller.getFeatureARDrone3().sendPilotingTakeOff();}
+
+    public void land() {controller.getFeatureARDrone3().sendPilotingLanding();}
+
     @Override
     public void onStateChanged(ARDeviceController deviceController,
             ARCONTROLLER_DEVICE_STATE_ENUM newState, ARCONTROLLER_ERROR_ENUM error)
     {
-        droneRunning =
+        isRunning =
                 (newState == ARCONTROLLER_DEVICE_STATE_ENUM.ARCONTROLLER_DEVICE_STATE_RUNNING);
 
-        if (droneRunning) { controller.startVideoStream(); }
+        if (isRunning) { controller.startVideoStream(); }
         else {
             try {
                 controller.stopVideoStream();
@@ -42,15 +71,15 @@ public class DeviceController implements ARDeviceControllerListener,
                 e.printStackTrace();
             }
         }
+
+        mediator.onControllerStateChanged(isRunning);
     }
 
     @Override
     public void onExtensionStateChanged(ARDeviceController deviceController,
             ARCONTROLLER_DEVICE_STATE_ENUM newState, ARDISCOVERY_PRODUCT_ENUM product, String name,
             ARCONTROLLER_ERROR_ENUM error)
-    {
-
-    }
+    { }
 
     @Override
     public void onCommandReceived(ARDeviceController deviceController,
@@ -61,7 +90,6 @@ public class DeviceController implements ARDeviceControllerListener,
 
         if (args != null) {
             switch (commandKey) {
-
                 case ARCONTROLLER_DICTIONARY_KEY_COMMON_COMMONSTATE_BATTERYSTATECHANGED: {
                     mediator.onBatteryStateChanged((int) args.get(ARFeatureCommon
                             .ARCONTROLLER_DICTIONARY_KEY_COMMON_COMMONSTATE_BATTERYSTATECHANGED_PERCENT));
@@ -73,10 +101,45 @@ public class DeviceController implements ARDeviceControllerListener,
                     break;
                 }
                 case ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED: {
-                    mediator.onFlyingStateChanged(
+                    ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_ENUM state =
                             ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_ENUM
                                     .getFromValue((Integer) args.get(ARFeatureARDrone3
-                                            .ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE)));
+                                            .ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE));
+
+                    switch (state) {
+                        case ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_EMERGENCY:
+                            flyingState = FlyingState.EMERGENCY;
+                            break;
+                        case ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_EMERGENCY_LANDING:
+                            flyingState = FlyingState.EMERGENCY_LANDING;
+                            break;
+                        case ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_USERTAKEOFF:
+                            flyingState = FlyingState.USERTAKEOFF;
+                            break;
+                        case ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_TAKINGOFF:
+                            flyingState = FlyingState.TAKINGOFF;
+                            break;
+                        case ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_MOTOR_RAMPING:
+                            flyingState = FlyingState.MOTOR_RAMPING;
+                            break;
+                        case ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_LANDING:
+                            flyingState = FlyingState.LANDING;
+                            break;
+                        case ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_LANDED:
+                            flyingState = FlyingState.LANDED;
+                            break;
+                        case ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_HOVERING:
+                            flyingState = FlyingState.HOVERING;
+                            break;
+                        case ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_FLYING:
+                            flyingState = FlyingState.FLYING;
+                            break;
+                        default:
+                            flyingState = FlyingState.LANDED;
+                            break;
+                    }
+
+                    mediator.onFlyingStateChanged(flyingState);
                     break;
                 }
                 case ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGSTATE_POSITIONCHANGED: {
@@ -132,6 +195,45 @@ public class DeviceController implements ARDeviceControllerListener,
                                     .ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_CAMERASTATE_ORIENTATION_PAN));
                     break;
                 }
+                case ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGEVENT_MOVEBYEND: {
+                    float dX = (float) ((Double) args.get(ARFeatureARDrone3
+                            .ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGEVENT_MOVEBYEND_DX))
+                            .doubleValue();
+                    float dY = (float) ((Double) args.get(ARFeatureARDrone3
+                            .ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGEVENT_MOVEBYEND_DY))
+                            .doubleValue();
+                    float dZ = (float) ((Double) args.get(ARFeatureARDrone3
+                            .ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGEVENT_MOVEBYEND_DZ))
+                            .doubleValue();
+                    float dPsi = (float) ((Double) args.get(ARFeatureARDrone3
+                            .ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGEVENT_MOVEBYEND_DPSI))
+                            .doubleValue();
+
+                    RelativeMotionResult result;
+
+                    ARCOMMANDS_ARDRONE3_PILOTINGEVENT_MOVEBYEND_ERROR_ENUM error =
+                            ARCOMMANDS_ARDRONE3_PILOTINGEVENT_MOVEBYEND_ERROR_ENUM.getFromValue(
+                                    (Integer) args.get(ARFeatureARDrone3
+                                            .ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_PILOTINGEVENT_MOVEBYEND_ERROR));
+
+                    switch (error) {
+                        case ARCOMMANDS_ARDRONE3_PILOTINGEVENT_MOVEBYEND_ERROR_BUSY:
+                            result = RelativeMotionResult.BUSY;
+                            break;
+                        case ARCOMMANDS_ARDRONE3_PILOTINGEVENT_MOVEBYEND_ERROR_INTERRUPTED:
+                            result = RelativeMotionResult.INTERRUPTED;
+                            break;
+                        case ARCOMMANDS_ARDRONE3_PILOTINGEVENT_MOVEBYEND_ERROR_OK:
+                            result = RelativeMotionResult.OK;
+                            break;
+                        default:
+                            result = RelativeMotionResult.UNKNOWN;
+                            break;
+                    }
+
+                    mediator.onRelativeMotionEnded(dX, dY, dZ, result);
+                }
+
                 default:
                     break;
             }
@@ -156,10 +258,7 @@ public class DeviceController implements ARDeviceControllerListener,
     }
 
     @Override
-    public void onFrameTimeout(ARDeviceController deviceController)
-    {
-
-    }
+    public void onFrameTimeout(ARDeviceController deviceController) { }
 
     @Override
     public void onServicesDevicesListUpdated()
@@ -170,10 +269,10 @@ public class DeviceController implements ARDeviceControllerListener,
             try {
                 controller = new ARDeviceController(device);
                 device.dispose();
-                Log.e("DeviceCOntrollerYaratma", "trioDrone Null Değil");
+
                 controller.addListener(this);
-                ARCONTROLLER_ERROR_ENUM error = controller.start();
                 controller.addStreamListener(this);
+                controller.start();
             } catch (ARControllerException e) {
                 e.printStackTrace();
             }

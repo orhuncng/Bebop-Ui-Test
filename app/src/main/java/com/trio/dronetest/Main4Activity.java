@@ -24,6 +24,7 @@ import com.google.vr.sdk.base.Eye;
 import com.google.vr.sdk.base.HeadTransform;
 import com.google.vr.sdk.base.Viewport;
 import com.trio.drone.bebop.BebopBro;
+import com.trio.drone.vr.OverlayTexture;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;

@@ -15,6 +15,8 @@ import android.view.View;
 import com.badlogic.gdx.graphics.GL20;
 import com.google.vr.sdk.base.*;
 import com.trio.drone.R;
+import com.trio.drone.vr.GLUtils;
+import com.trio.drone.vr.OverlayTexture;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import java.io.IOException;
@@ -55,7 +57,7 @@ public class Main5Activity extends GvrActivity implements GvrView.StereoRenderer
         overlayView = (OverlayView) View.inflate(theme, R.layout.overlay_ui, null);
         overlayView.onCreate(gvrView);
 
-        overlayTexture = new OverlayTexture(true, 0.01f);
+        //overlayTexture = new OverlayTexture(true, 0.01f);
     }
 
     @Override
@@ -117,7 +119,7 @@ public class Main5Activity extends GvrActivity implements GvrView.StereoRenderer
         Camera camera = Camera.open();
         Camera.Size cSize = camera.getParameters().getPreviewSize();
 
-        overlayTexture.createSurface(getResources(), listener, cSize.width, cSize.height);
+        //overlayTexture.createSurface(getResources(), listener, cSize.width, cSize.height);
 
         try {
             camera.setPreviewTexture(overlayTexture.getTexture());

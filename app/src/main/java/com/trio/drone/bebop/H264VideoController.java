@@ -1,4 +1,4 @@
-package com.trio.dronetest;
+package com.trio.drone.bebop;
 
 import android.media.MediaCodec;
 import android.media.MediaFormat;
@@ -13,9 +13,8 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class H264VideoProvider
+public class H264VideoController
 {
-
     private static final String TAG = "H264VideoView";
     private static final String VIDEO_MIME_TYPE = "video/avc";
     private static final int VIDEO_DEQUEUE_TIMEOUT = 33000;
@@ -30,71 +29,72 @@ public class H264VideoProvider
 
     private ByteBuffer[] mBuffers;
 
-    private static final int VIDEO_WIDTH = 480;
-    private static final int VIDEO_HEIGHT = 480;
+    private int width;
+    private int height;
 
     private Surface surface;
 
-
-    public H264VideoProvider()
+    public H264VideoController(int width, int height)
     {
+        this.width = width;
+        this.height = height;
         mReadyLock = new ReentrantLock();
     }
 
     public void displayFrame(ARFrame frame)
     {
-        mReadyLock.lock();
-
-        if ((mMediaCodec != null)) {
-            if (mIsCodecConfigured) {
-                // Here we have either a good PFrame, or an IFrame
-                int index = -1;
-
-                try {
-                    index = mMediaCodec.dequeueInputBuffer(VIDEO_DEQUEUE_TIMEOUT);
-                } catch (IllegalStateException e) {
-                    Log.e(TAG, "Error while dequeue input buffer");
-                }
-                if (index >= 0) {
-                    ByteBuffer b;
-                    if (android.os.Build.VERSION.SDK_INT >=
-                            android.os.Build.VERSION_CODES.LOLLIPOP) {
-                        b = mMediaCodec.getInputBuffer(index);
-                    } else {
-                        b = mBuffers[index];
-                        b.clear();
-                    }
-
-                    if (b != null) {
-                        b.put(frame.getByteData(), 0, frame.getDataSize());
-                    }
-
+        synchronized (surface) {
+            mReadyLock.lock();
+            if ((mMediaCodec != null)) {
+                if (mIsCodecConfigured) {
+                    // Here we have either a good PFrame, or an IFrame
+                    int index = -1;
 
                     try {
-                        mMediaCodec.queueInputBuffer(index, 0, frame.getDataSize(), 0, 0);
+                        index = mMediaCodec.dequeueInputBuffer(VIDEO_DEQUEUE_TIMEOUT);
                     } catch (IllegalStateException e) {
-                        Log.e(TAG, "Error while queue input buffer");
+                        Log.e(TAG, "Error while dequeue input buffer");
+                    }
+                    if (index >= 0) {
+                        ByteBuffer b;
+                        if (android.os.Build.VERSION.SDK_INT >=
+                                android.os.Build.VERSION_CODES.LOLLIPOP) {
+                            b = mMediaCodec.getInputBuffer(index);
+                        }
+                        else {
+                            b = mBuffers[index];
+                            b.clear();
+                        }
+
+                        if (b != null) {
+                            b.put(frame.getByteData(), 0, frame.getDataSize());
+                        }
+
+                        try {
+                            mMediaCodec.queueInputBuffer(index, 0, frame.getDataSize(), 0, 0);
+                        } catch (IllegalStateException e) {
+                            Log.e(TAG, "Error while queue input buffer");
+                        }
                     }
                 }
-            }
 
-            // Try to display previous frame
-            MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
-            int outIndex;
-            try {
-                outIndex = mMediaCodec.dequeueOutputBuffer(info, 0);
-
-                while (outIndex >= 0) {
-                    mMediaCodec.releaseOutputBuffer(outIndex, true);
+                // Try to display previous frame
+                MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
+                int outIndex;
+                try {
                     outIndex = mMediaCodec.dequeueOutputBuffer(info, 0);
+
+                    while (outIndex >= 0) {
+                        mMediaCodec.releaseOutputBuffer(outIndex, true);
+                        outIndex = mMediaCodec.dequeueOutputBuffer(info, 0);
+                    }
+                } catch (IllegalStateException e) {
+                    Log.e(TAG, "Error while dequeue input buffer (outIndex)");
                 }
-            } catch (IllegalStateException e) {
-                Log.e(TAG, "Error while dequeue input buffer (outIndex)");
             }
+
+            mReadyLock.unlock();
         }
-
-
-        mReadyLock.unlock();
     }
 
     public void configureDecoder(ARControllerCodec codec)
@@ -120,7 +120,7 @@ public class H264VideoProvider
     {
         mMediaCodec.stop();
         MediaFormat format =
-                MediaFormat.createVideoFormat(VIDEO_MIME_TYPE, VIDEO_WIDTH, VIDEO_HEIGHT);
+                MediaFormat.createVideoFormat(VIDEO_MIME_TYPE, width, height);
         format.setByteBuffer("csd-0", mSpsBuffer);
         format.setByteBuffer("csd-1", mPpsBuffer);
 
@@ -160,7 +160,7 @@ public class H264VideoProvider
         }
     }
 
-    public void init(Surface surface)
+    public void setVideoSurface(Surface surface)
     {
         this.surface = surface;
         mReadyLock.lock();

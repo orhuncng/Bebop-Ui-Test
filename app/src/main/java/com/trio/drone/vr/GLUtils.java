@@ -1,9 +1,8 @@
-package com.trio.dronetest;
+package com.trio.drone.vr;
 
 import android.content.res.Resources;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
-import android.text.TextUtils;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -81,50 +80,6 @@ public class GLUtils
         }
 
         return shader;
-    }
-
-    /**
-     * Builds a GL shader program from vertex & fragment shader code. The vertex and fragment
-     * shaders
-     * are passed as arrays of strings in order to make debugging compilation issues easier.
-     *
-     * @param vertexCode   GLES20 vertex shader program.
-     * @param fragmentCode GLES20 fragment shader program.
-     * @return GLES20 program id.
-     */
-    public static int compileProgram(String[] vertexCode, String[] fragmentCode)
-    {
-        checkGlError();
-        // prepare shaders and OpenGL program
-        int vertexShader = GLES20.glCreateShader(GLES20.GL_VERTEX_SHADER);
-        GLES20.glShaderSource(vertexShader, TextUtils.join("\n", vertexCode));
-        GLES20.glCompileShader(vertexShader);
-        checkGlError();
-
-        int fragmentShader = GLES20.glCreateShader(GLES20.GL_FRAGMENT_SHADER);
-        GLES20.glShaderSource(fragmentShader, TextUtils.join("\n", fragmentCode));
-        GLES20.glCompileShader(fragmentShader);
-        checkGlError();
-
-        int program = GLES20.glCreateProgram();
-        GLES20.glAttachShader(program, vertexShader);
-        GLES20.glAttachShader(program, fragmentShader);
-
-        // Link and check for errors.
-        GLES20.glLinkProgram(program);
-        int[] linkStatus = new int[1];
-        GLES20.glGetProgramiv(program, GLES20.GL_LINK_STATUS, linkStatus, 0);
-        if (linkStatus[0] != GLES20.GL_TRUE) {
-            String errorMsg = "Unable to link shader program: \n" + GLES20.glGetProgramInfoLog(
-                    program);
-            Log.e(TAG, errorMsg);
-            if (HALT_ON_GL_ERROR) {
-                throw new RuntimeException(errorMsg);
-            }
-        }
-        checkGlError();
-
-        return program;
     }
 
     private static int createShader(Resources res, int shaderId, int shaderType)

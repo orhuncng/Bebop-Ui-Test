@@ -79,7 +79,8 @@ public class H264VideoView extends SurfaceView implements SurfaceHolder.Callback
                     if (android.os.Build.VERSION.SDK_INT >=
                             android.os.Build.VERSION_CODES.LOLLIPOP) {
                         b = mMediaCodec.getInputBuffer(index);
-                    } else {
+                    }
+                    else {
                         b = mBuffers[index];
                         b.clear();
                     }

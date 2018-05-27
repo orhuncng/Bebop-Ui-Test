@@ -140,6 +140,12 @@
                 android:onClick="openSensor"
                 android:text="Sensors"/>
 
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="sendState"
+            android:text="SendPilotingState" />
+
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

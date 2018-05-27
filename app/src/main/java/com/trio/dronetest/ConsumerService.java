@@ -43,12 +43,14 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
+
 import com.samsung.android.sdk.SsdkUnsupportedException;
 import com.samsung.android.sdk.accessory.SA;
 import com.samsung.android.sdk.accessory.SAAgent;
 import com.samsung.android.sdk.accessory.SAPeerAgent;
 import com.samsung.android.sdk.accessory.SASocket;
 import com.trio.drone.R;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -287,6 +289,20 @@ public class ConsumerService extends SAAgent
         return retvalue;
     }
 
+    public boolean sendState(final String data) {
+        boolean retvalue = false;
+        if (mConnectionHandler != null) {
+            try {
+                mConnectionHandler.send(getServiceChannelId(0), data.getBytes());
+                retvalue = true;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            //addMessage("Sent: ", data);
+        }
+        return retvalue;
+    }
+
     public boolean closeConnection()
     {
         if (mConnectionHandler != null) {
@@ -365,16 +381,32 @@ public class ConsumerService extends SAAgent
         }, 500);
     }
 
-    private void rotateDrone(final String str)
+    private void receivedRotateDrone(final String str)
     {
-        Log.e("ServiceRotateDrone", str);
+        Log.e("receivedRotateDrone", str);
         int dir = 100;
         if (str.equals("CCW")) {
             dir *= -1;
         }
 
         if (serviceCallbacks != null) {
-            serviceCallbacks.doSomething(dir);
+            serviceCallbacks.watchRotateDrone(dir);
+        }
+    }
+
+    private void receivedLandDrone() {
+        Log.e("receivedLandDrone", "Land Drone received from watch");
+
+        if (serviceCallbacks != null) {
+            serviceCallbacks.watchLandDrone();
+        }
+    }
+
+    private void receivedTakeOffDrone() {
+        Log.e("receivedTakeOffDrone", "TakeOff Drone received from watch");
+
+        if (serviceCallbacks != null) {
+            serviceCallbacks.watchTakeOffDrone();
         }
     }
 
@@ -407,7 +439,7 @@ public class ConsumerService extends SAAgent
         {
             final String message = new String(data);
             Log.e("X", message);
-            rotateDrone(message);
+            //rotateDrone(message);
             try {
                 JSONObject obj = new JSONObject(message);
 
@@ -423,20 +455,29 @@ public class ConsumerService extends SAAgent
                     Log.e("X", obj.get(obj.names().getString(1)).toString());
                     //  Log.e("Y",obj.get(obj.names().getString(2)).toString());
                     //Log.e("Z",obj.get(obj.names().getString(3)).toString());
-                    /*String key = it.next();
+                    String key = it.next();
                     if ( obj.getString(key).equals("gyro")) {
                         addGyroXMessage(obj.get(obj.names().getString(1)).toString());
                         addGyroYMessage(obj.get(obj.names().getString(2)).toString());
                         addGyroZMessage(obj.get(obj.names().getString(3)).toString());
-                    }
-                    /*else if (obj.getString(it.next()).equals("accelero"))
+                    } else if (obj.getString(key).equals("rotary")) {
+                        receivedRotateDrone(obj.get(obj.names().getString(1)).toString());
+                    } else if (obj.getString(key).equals("flightState")) {
+                        if (obj.get(obj.names().getString(1)).toString().equals("0")) {
+                            receivedLandDrone();
+                        } else {
+                            receivedTakeOffDrone();
+                        }
+
+                    }/*
+                    else if (obj.getString(it.next()).equals("accelero"))
                     {
                         accelData.add(obj.get(obj.names().getString(1)).toString());
                         accelData.add(obj.get(obj.names().getString(2)).toString());
                         accelData.add(obj.get(obj.names().getString(3)).toString());
                         addAcceleroMessage(accelData);
                         accelData.clear();
-                    }
+                    }/*
                     else if (obj.getString(it.next()).equals("gravity"))
                     {
                         gravityData.add(obj.get(obj.names().getString(1)).toString());

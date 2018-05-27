@@ -2,7 +2,11 @@ package com.trio.dronetest;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.*;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -13,10 +17,27 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+
 import com.parrot.arsdk.ARSDK;
 import com.parrot.arsdk.arcommands.ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_ENUM;
-import com.parrot.arsdk.arcontroller.*;
-import com.parrot.arsdk.ardiscovery.*;
+import com.parrot.arsdk.arcontroller.ARCONTROLLER_DEVICE_STATE_ENUM;
+import com.parrot.arsdk.arcontroller.ARCONTROLLER_DICTIONARY_KEY_ENUM;
+import com.parrot.arsdk.arcontroller.ARCONTROLLER_ERROR_ENUM;
+import com.parrot.arsdk.arcontroller.ARControllerArgumentDictionary;
+import com.parrot.arsdk.arcontroller.ARControllerCodec;
+import com.parrot.arsdk.arcontroller.ARControllerDictionary;
+import com.parrot.arsdk.arcontroller.ARControllerException;
+import com.parrot.arsdk.arcontroller.ARDeviceController;
+import com.parrot.arsdk.arcontroller.ARDeviceControllerListener;
+import com.parrot.arsdk.arcontroller.ARDeviceControllerStreamListener;
+import com.parrot.arsdk.arcontroller.ARFeatureARDrone3;
+import com.parrot.arsdk.arcontroller.ARFeatureCommon;
+import com.parrot.arsdk.arcontroller.ARFrame;
+import com.parrot.arsdk.ardiscovery.ARDISCOVERY_PRODUCT_ENUM;
+import com.parrot.arsdk.ardiscovery.ARDiscoveryDevice;
+import com.parrot.arsdk.ardiscovery.ARDiscoveryDeviceService;
+import com.parrot.arsdk.ardiscovery.ARDiscoveryException;
+import com.parrot.arsdk.ardiscovery.ARDiscoveryService;
 import com.parrot.arsdk.ardiscovery.receivers.ARDiscoveryServicesDevicesListUpdatedReceiver;
 import com.parrot.arsdk.ardiscovery.receivers.ARDiscoveryServicesDevicesListUpdatedReceiverDelegate;
 import com.trio.drone.R;
@@ -157,21 +178,21 @@ public class MainActivity extends AppCompatActivity
                 count++;
 
                 if (acceleration != null && acceleration.length == 3) {
-                    Log.e("raw", Float.toString(acceleration[0]));
+                    //Log.e("raw", Float.toString(acceleration[0]));
                 }
 
                 if (accelerationFilter != null && accelerationFilter.length == 3) {
-                    Log.e("filtered", Float.toString(accelerationFilter[0]));
+                    //Log.e("filtered", Float.toString(accelerationFilter[0]));
                 }
 
                 if (count >= 100) {
-                    Log.e("count", "Ayar yapıldı");
+                    //Log.e("count", "Ayar yapıldı");
                     deltaX = deltaX + accelerationFilter[2];
-                    Log.e("Gidilen Yol", Float.toString(deltaX));
+                    //Log.e("Gidilen Yol", Float.toString(deltaX));
 
                     int yaw = Math.round(accelerationFilter[2] * 10);
 
-                    setYawFromAcclSensor(yaw);
+                    //setYawFromAcclSensor(yaw);
 
                 }
 
@@ -253,7 +274,7 @@ public class MainActivity extends AppCompatActivity
 
     public void setYawFromBezelRotate(int dir)
     {
-        Log.e("MainActRotateDrone", "" + dir);
+        //Log.e("MainActRotateDrone", "" + dir);
 
         if (deviceController != null) {
 
@@ -263,10 +284,10 @@ public class MainActivity extends AppCompatActivity
             if ((getDeviceState() ==
                     ARCONTROLLER_DEVICE_STATE_ENUM.ARCONTROLLER_DEVICE_STATE_RUNNING)) {
                 deviceController.getFeatureARDrone3().setPilotingPCMDYaw((byte) dir);
-                Log.e("MainActRotateDrone", "dirSent");
+                //Log.e("MainActRotateDrone", "dirSent");
             }
             else {
-                Log.e("MainActRotateDrone", "else ye girdi");
+                //Log.e("MainActRotateDrone", "else ye girdi");
 
             }
         }
@@ -274,20 +295,20 @@ public class MainActivity extends AppCompatActivity
 
     public void setYawFromAcclSensor(int dir)
     {
-        Log.e("MainActRotateDrone", "" + dir);
+        //Log.e("MainActRotateDrone", "" + dir);
 
         if (deviceController != null) {
 
             deviceController.getFeatureARDrone3().setPilotingPCMDFlag((byte) 0);
 
-            Log.e("SetYawpilotingState", getDeviceState().toString());
+            //Log.e("SetYawpilotingState", getDeviceState().toString());
             if ((getDeviceState() ==
                     (ARCONTROLLER_DEVICE_STATE_ENUM.ARCONTROLLER_DEVICE_STATE_RUNNING))) {
                 deviceController.getFeatureARDrone3().setPilotingPCMDYaw((byte) dir);
-                Log.e("MainActRotateDrone", "dirSent");
+                //Log.e("MainActRotateDrone", "dirSent");
             }
             else {
-                Log.e("MainActRotateDrone", "else ye girdi");
+                //Log.e("MainActRotateDrone", "else ye girdi");
 
             }
         }
@@ -299,6 +320,48 @@ public class MainActivity extends AppCompatActivity
 
         Intent intent = new Intent(this, SensorActivity.class);
         startActivity(intent);
+    }
+
+    private int myState = 0;
+
+    public void sendState(View view) {
+        Log.e("sendState", "SendState basıldı");
+        String deneme = "";
+        if (myState == 0) {
+            myState = 1;
+            deneme = "1";
+        } else {
+            myState = 0;
+            deneme = "0";
+        }
+
+        if (mIsBound == true && mConsumerService != null) {
+            if (mConsumerService.sendState(deneme)) {
+                Log.e("sendState", "SendState gitti");
+            } else {
+                Log.e("sendState", "SendState gitmedi");
+            }
+        }
+    }
+
+    public void sendFlyingState(ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_ENUM flyingState) {
+        Log.e("sendFlyingState", flyingState.toString());
+        String stateToSend = "0";
+        if (flyingState == ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_ENUM
+                .ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_LANDED) {
+            stateToSend = "1";
+        } else if (flyingState == ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_ENUM
+                .ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_FLYING) {
+            stateToSend = "0";
+        }
+
+        if (mIsBound == true && mConsumerService != null) {
+            if (mConsumerService.sendState(stateToSend)) {
+                Log.e("sendFlyingState", "SendState gitti");
+            } else {
+                Log.e("sendFlyingState", "SendState gitmedi");
+            }
+        }
     }
 
     public void openGearSensor(View view)
@@ -490,7 +553,8 @@ public class MainActivity extends AppCompatActivity
                     ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_ENUM flyingState =
                             ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_ENUM
                                     .getFromValue(flyingStateInt);
-                    Log.e("Battery", String.valueOf(flyingStateInt));
+                    Log.e("FlyingState", String.valueOf(flyingStateInt));
+                    sendFlyingState(flyingState);
                 }
             }
         }
@@ -593,9 +657,23 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+
     @Override
-    public void doSomething(int dir)
-    {
+    public void watchRotateDrone(int dir) {
+        Log.e("watchRotateDron", "rotate drone received " + dir);
         setYawFromBezelRotate(dir);
     }
+
+    @Override
+    public void watchTakeOffDrone() {
+        Log.e("watchTakeOff", "takeoff received ");
+        takeoff();
+    }
+
+    @Override
+    public void watchLandDrone() {
+        Log.e("watchTakeOff", "land received ");
+        land();
+    }
+
 }

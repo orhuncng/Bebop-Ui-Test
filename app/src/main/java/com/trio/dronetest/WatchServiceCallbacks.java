@@ -5,5 +5,10 @@ package com.trio.dronetest;
  */
 public interface WatchServiceCallbacks
 {
-    void doSomething(int dir);
+    void watchRotateDrone(int dir);
+
+    void watchTakeOffDrone();
+
+    void watchLandDrone();
+
 }

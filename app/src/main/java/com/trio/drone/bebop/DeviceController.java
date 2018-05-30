@@ -2,9 +2,22 @@ package com.trio.drone.bebop;
 
 import android.util.Log;
 import android.view.Surface;
+
 import com.parrot.arsdk.arcommands.ARCOMMANDS_ARDRONE3_PILOTINGEVENT_MOVEBYEND_ERROR_ENUM;
 import com.parrot.arsdk.arcommands.ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_ENUM;
-import com.parrot.arsdk.arcontroller.*;
+import com.parrot.arsdk.arcontroller.ARCONTROLLER_DEVICE_STATE_ENUM;
+import com.parrot.arsdk.arcontroller.ARCONTROLLER_DICTIONARY_KEY_ENUM;
+import com.parrot.arsdk.arcontroller.ARCONTROLLER_ERROR_ENUM;
+import com.parrot.arsdk.arcontroller.ARControllerArgumentDictionary;
+import com.parrot.arsdk.arcontroller.ARControllerCodec;
+import com.parrot.arsdk.arcontroller.ARControllerDictionary;
+import com.parrot.arsdk.arcontroller.ARControllerException;
+import com.parrot.arsdk.arcontroller.ARDeviceController;
+import com.parrot.arsdk.arcontroller.ARDeviceControllerListener;
+import com.parrot.arsdk.arcontroller.ARDeviceControllerStreamListener;
+import com.parrot.arsdk.arcontroller.ARFeatureARDrone3;
+import com.parrot.arsdk.arcontroller.ARFeatureCommon;
+import com.parrot.arsdk.arcontroller.ARFrame;
 import com.parrot.arsdk.ardiscovery.ARDISCOVERY_PRODUCT_ENUM;
 import com.parrot.arsdk.ardiscovery.ARDiscoveryDevice;
 import com.parrot.arsdk.ardiscovery.receivers.ARDiscoveryServicesDevicesListUpdatedReceiverDelegate;
@@ -46,7 +59,7 @@ public class DeviceController implements ARDeviceControllerListener,
 
     public void move(int rollPerc, int pitchPerc, int yawPerc, int gazPerc)
     {
-        controller.getFeatureARDrone3().sendPilotingPCMD((byte) 1, (byte) rollPerc,
+        controller.getFeatureARDrone3().setPilotingPCMD((byte) 1, (byte) rollPerc,
                 (byte) pitchPerc, (byte) yawPerc, (byte) gazPerc, 0);
     }
 

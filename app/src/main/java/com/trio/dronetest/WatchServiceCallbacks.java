@@ -11,4 +11,6 @@ public interface WatchServiceCallbacks
 
     void watchLandDrone();
 
+    void watchEmergencyDrone();
+
 }

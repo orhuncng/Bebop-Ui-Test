@@ -11,7 +11,6 @@ public class DataFilterer
 
     public float[] lowPassFilter(float[] output, float[] input)
     {
-
         output[0] = ALPHA * output[0] + (1 - ALPHA) * input[0];
         output[1] = ALPHA * output[1] + (1 - ALPHA) * input[1];
         output[2] = ALPHA * output[2] + (1 - ALPHA) * input[2];

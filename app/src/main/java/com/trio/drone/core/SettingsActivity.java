@@ -1,9 +1,15 @@
 package com.trio.drone.core;
 
 import android.os.Bundle;
-import android.preference.*;
+import android.preference.ListPreference;
+import android.preference.Preference;
+import android.preference.PreferenceActivity;
+import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.view.MenuItem;
+
 import com.trio.drone.R;
+import com.trio.drone.data.LowPassData;
 
 public class SettingsActivity extends PreferenceActivity
 {
@@ -25,6 +31,7 @@ public class SettingsActivity extends PreferenceActivity
                     else {
                         preference.setSummary(stringValue);
                     }
+
                     return true;
                 }
             };
@@ -75,6 +82,18 @@ public class SettingsActivity extends PreferenceActivity
             bindSummary(findPreference(getString(R.string.pref_key_max_pitch_roll)));
             bindSummary(findPreference(getString(R.string.pref_key_max_rot_speed)));
             bindSummary(findPreference(getString(R.string.pref_key_max_tilt)));
+
+            // register smoothing related events to LowPassData
+            findPreference(getString(R.string.pref_key_smoothing_phone_sensors))
+                    .setOnPreferenceChangeListener(
+                            new Preference.OnPreferenceChangeListener() {
+                                @Override
+                                public boolean onPreferenceChange(Preference preference,
+                                                                  Object newValue) {
+                                    LowPassData.setSmoothingPerc(Float.valueOf(newValue.toString()));
+                                    return true;
+                                }
+                            });
         }
     }
 }

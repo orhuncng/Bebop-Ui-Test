@@ -7,6 +7,9 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
+import com.trio.drone.data.FilterData;
+import com.trio.drone.data.LowPassData;
+
 import java.util.HashMap;
 
 /**
@@ -21,9 +24,8 @@ public class DeviceSensorProvider<T> extends LiveData<HashMap<String, float[]>>
 
     private SensorManager mSensorManager;
 
-    private DataFilterer dataFilterer = new DataFilterer();
+    private FilterData filterData = new LowPassData();
 
-    float[] history = new float[]{0.0F, 0.0F, 0.0F};
     private float[] acceleration = new float[]{0.0F, 0.0F, 0.0F};
 
     //Config
@@ -56,7 +58,7 @@ public class DeviceSensorProvider<T> extends LiveData<HashMap<String, float[]>>
     {
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             if (filterActive) {
-                acceleration = dataFilterer.lowPassFilter(history, event.values);
+                acceleration = filterData.get(event.values);
 
                 sensorMap.put("accelerationFilter", acceleration);
                 setValue(sensorMap);

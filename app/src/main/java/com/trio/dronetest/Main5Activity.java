@@ -16,7 +16,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.google.vr.sdk.base.*;
 import com.trio.drone.R;
 import com.trio.drone.vr.GLUtils;
-import com.trio.drone.vr.OverlayTexture;
+import com.trio.drone.vr.elements.OverlayTexture;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import java.io.IOException;
@@ -67,8 +67,8 @@ public class Main5Activity extends GvrActivity implements GvrView.StereoRenderer
         //Log.w("Main5Activity fps:", String.valueOf(1000.0f / (currentFrame - frameTime)));
         frameTime = currentFrame;
 
-        if (phoneFrameAvailable.compareAndSet(true, false))
-            overlayTexture.updateTexImage();
+        //if (phoneFrameAvailable.compareAndSet(true, false))
+        //    overlayTexture.updateTexImage();
     }
 
     @Override
@@ -78,7 +78,7 @@ public class Main5Activity extends GvrActivity implements GvrView.StereoRenderer
         GLES20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
         GLES20.glDisable(GLES20.GL_BLEND);
-        overlayTexture.draw();
+        //overlayTexture.draw();
 
         GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_DST_ALPHA);
         GLES20.glEnable(GLES20.GL_BLEND);

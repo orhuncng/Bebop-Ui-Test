@@ -27,10 +27,6 @@
         <activity android:name="com.trio.dronetest.MainActivity"
                   android:theme="@style/AppTheme.NoActionBar"
                   android:hardwareAccelerated="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
         </activity>
         <activity
                 android:name="com.trio.dronetest.Main2Activity"
@@ -71,6 +67,10 @@
                 android:name="com.trio.dronetest.Main4Activity"
                 android:screenOrientation="landscape"
                 android:hardwareAccelerated="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
         </activity>
         <activity android:name="com.trio.dronetest.Main5Activity"
                   android:screenOrientation="landscape"

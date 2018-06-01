@@ -1,4 +1,4 @@
-package com.trio.drone.bebop;
+package com.trio.drone.bebop.controller;
 
 import android.content.*;
 import android.os.IBinder;

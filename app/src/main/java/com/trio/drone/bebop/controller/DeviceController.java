@@ -1,26 +1,17 @@
-package com.trio.drone.bebop;
+package com.trio.drone.bebop.controller;
 
+import android.content.Context;
 import android.util.Log;
 import android.view.Surface;
-
 import com.parrot.arsdk.arcommands.ARCOMMANDS_ARDRONE3_PILOTINGEVENT_MOVEBYEND_ERROR_ENUM;
 import com.parrot.arsdk.arcommands.ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_ENUM;
-import com.parrot.arsdk.arcontroller.ARCONTROLLER_DEVICE_STATE_ENUM;
-import com.parrot.arsdk.arcontroller.ARCONTROLLER_DICTIONARY_KEY_ENUM;
-import com.parrot.arsdk.arcontroller.ARCONTROLLER_ERROR_ENUM;
-import com.parrot.arsdk.arcontroller.ARControllerArgumentDictionary;
-import com.parrot.arsdk.arcontroller.ARControllerCodec;
-import com.parrot.arsdk.arcontroller.ARControllerDictionary;
-import com.parrot.arsdk.arcontroller.ARControllerException;
-import com.parrot.arsdk.arcontroller.ARDeviceController;
-import com.parrot.arsdk.arcontroller.ARDeviceControllerListener;
-import com.parrot.arsdk.arcontroller.ARDeviceControllerStreamListener;
-import com.parrot.arsdk.arcontroller.ARFeatureARDrone3;
-import com.parrot.arsdk.arcontroller.ARFeatureCommon;
-import com.parrot.arsdk.arcontroller.ARFrame;
+import com.parrot.arsdk.arcontroller.*;
 import com.parrot.arsdk.ardiscovery.ARDISCOVERY_PRODUCT_ENUM;
 import com.parrot.arsdk.ardiscovery.ARDiscoveryDevice;
 import com.parrot.arsdk.ardiscovery.receivers.ARDiscoveryServicesDevicesListUpdatedReceiverDelegate;
+import com.trio.drone.bebop.BebopMediator;
+import com.trio.drone.bebop.FlyingState;
+import com.trio.drone.bebop.RelativeMotionResult;
 
 public class DeviceController implements ARDeviceControllerListener,
         ARDeviceControllerStreamListener, ARDiscoveryServicesDevicesListUpdatedReceiverDelegate
@@ -32,10 +23,11 @@ public class DeviceController implements ARDeviceControllerListener,
     private boolean isRunning = false;
     private FlyingState flyingState = FlyingState.LANDED;
 
-    DeviceController(BebopMediator mediator, int videoWidth, int videoHeight)
+    public DeviceController(Context context, BebopMediator mediator, int videoWidth, int
+            videoHeight)
     {
         this.mediator = mediator;
-        discoveryService = new DiscoveryService(mediator.getContext());
+        discoveryService = new DiscoveryService(context);
         discoveryService.registerReceiver(this);
         videoController = new H264VideoController(videoWidth, videoHeight);
     }
@@ -61,6 +53,11 @@ public class DeviceController implements ARDeviceControllerListener,
     {
         controller.getFeatureARDrone3().setPilotingPCMD((byte) 1, (byte) rollPerc,
                 (byte) pitchPerc, (byte) yawPerc, (byte) gazPerc, 0);
+    }
+
+    public void moveCamera(float tilt, float pan)
+    {
+        controller.getFeatureARDrone3().sendCameraOrientationV2(tilt, pan);
     }
 
     public void doEmergencyLanding() {controller.getFeatureARDrone3().sendPilotingEmergency();}

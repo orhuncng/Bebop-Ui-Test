@@ -1,15 +1,18 @@
-package com.trio.drone.vr;
+package com.trio.drone.vr.elements;
 
 import android.content.res.Resources;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
+import android.util.DisplayMetrics;
 import android.view.Surface;
 import com.trio.drone.R;
+import com.trio.drone.vr.GLUtils;
 
 import java.nio.FloatBuffer;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-public class OverlayTexture
+public class OverlayTexture implements SurfaceTexture.OnFrameAvailableListener
 {
     private static final int POSITION_COORDS_PER_VERTEX = 3;
     private static final int TEXTURE_COORDS_PER_VERTEX = 2;
@@ -32,19 +35,30 @@ public class OverlayTexture
 
     private int width;
     private int height;
+    private final AtomicBoolean textureAvailable = new AtomicBoolean();
 
     private SurfaceTexture texture;
+    private float depth;
     private FloatBuffer vertexBuffer;
+    private Surface surface;
 
-    public OverlayTexture(boolean hasAlpha, float depth, int screenWidth, int screenHeight,
-            int width, int height)
+    public OverlayTexture(boolean hasAlpha, float depth, int width, int height)
     {
         this.hasAlpha = hasAlpha;
-
         this.width = width;
         this.height = height;
+        this.depth = depth;
+    }
 
-        width *= ((float) screenHeight) / screenWidth;
+    public void setAlpha(float alpha) { this.alpha = alpha; }
+
+    public SurfaceTexture getTexture() { return texture; }
+
+    public Surface getSurface() { return surface; }
+
+    public void create(DisplayMetrics metrics, Resources res)
+    {
+        width *= ((float) metrics.heightPixels) / metrics.widthPixels;
 
         if (width > height) {
             float xAspectCoeff = (1f - (((float) height) / width)) / 2f;
@@ -64,10 +78,6 @@ public class OverlayTexture
                     1f, 1f, depth, 1, yAspectCoeff
             });
         }
-    }
-
-    public Surface createSurface(Resources res, SurfaceTexture.OnFrameAvailableListener listener)
-    {
         program = GLUtils.compileProgram(res, R.raw.overlay_vert,
                 hasAlpha ? R.raw.overlay_alpha_frag : R.raw.overlay_frag);
 
@@ -80,15 +90,17 @@ public class OverlayTexture
 
         texture = new SurfaceTexture(textureId);
         texture.setDefaultBufferSize(width, height);
-        texture.setOnFrameAvailableListener(listener);
+        texture.setOnFrameAvailableListener(this);
 
-        return new Surface(texture);
+        surface = new Surface(texture);
     }
-
-    public void updateTexImage() { texture.updateTexImage(); }
 
     public void draw()
     {
+        //synchronized (surface) {
+        if (textureAvailable.compareAndSet(true, false)) texture.updateTexImage();
+        //}
+
         GLES20.glUseProgram(program);
         GLUtils.checkGlError();
 
@@ -126,7 +138,9 @@ public class OverlayTexture
         if (texture != null) texture.release();
     }
 
-    public void setAlpha(float alpha) { this.alpha = alpha; }
-
-    public SurfaceTexture getTexture() { return texture; }
+    @Override
+    public void onFrameAvailable(SurfaceTexture surfaceTexture)
+    {
+        if (surfaceTexture == texture) textureAvailable.set(true);
+    }
 }

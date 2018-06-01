@@ -6,7 +6,7 @@ import android.graphics.SurfaceTexture;
 import android.os.Build;
 import android.view.Surface;
 import android.widget.FrameLayout;
-import com.trio.drone.vr.OverlayTexture;
+import com.trio.drone.vr.elements.OverlayTexture;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -43,15 +43,15 @@ public class GLCanvas
     void init(Resources res, SurfaceTexture.OnFrameAvailableListener listener)
     {
         //overlayTexture = new OverlayTexture(true, 0);
-        surface = overlayTexture.createSurface(res, listener);
+        //surface = overlayTexture.createSurface(res, listener);
     }
 
     void draw()
     {
-        if (surfaceDirty.compareAndSet(true, false))
-            overlayTexture.updateTexImage();
+        // if (surfaceDirty.compareAndSet(true, false))
+        //    overlayTexture.updateTexImage();
 
-        overlayTexture.draw();
+        // overlayTexture.draw();
     }
 
     void shutdown() { overlayTexture.shutdown(); }

@@ -3,6 +3,10 @@ package com.trio.drone.bebop;
 import android.content.Context;
 import android.view.Surface;
 import com.parrot.arsdk.ARSDK;
+import com.trio.drone.bebop.controller.DeviceController;
+import com.trio.drone.bebop.strategy.CameraLookupControlStrategy;
+import com.trio.drone.bebop.strategy.DroneControlStrategy;
+import com.trio.drone.bebop.strategy.PilotingControlStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,65 +19,91 @@ public class BebopBro implements BebopMediator
 
     static { ARSDK.loadSDKLibs(); }
 
-    private Context context;
     private DeviceController controller;
-    private List<BebopEventListener> listeners;
+    private ControlState controlState = ControlState.CAMERA_LOOKUP;
+    private List<BebopEventListener> listeners = new ArrayList<>();
+    private DroneControlStrategy controlStrategy = new CameraLookupControlStrategy();
 
     private BebopBro() { }
 
     public static BebopBro getInstance() { return instance; }
 
+    public static int getVideoWidth() { return VIDEO_WIDTH; }
+
+    // Listener subscription
+
+    public static int getVideoHeight() { return VIDEO_HEIGHT; }
+
+    @Override
     public void onCreate(Context context)
     {
-        this.context = context;
-        listeners = new ArrayList<>();
-        controller = new DeviceController(this, VIDEO_WIDTH, VIDEO_HEIGHT);
+        if (controller == null)
+            controller = new DeviceController(context, this, VIDEO_WIDTH, VIDEO_HEIGHT);
     }
 
     // controller and drone state
 
-    public static int getVideoWidth() { return VIDEO_WIDTH; }
-
-    public static int getVideoHeight() { return VIDEO_HEIGHT; }
-
-    // Listener subscription
-
+    @Override
     public void register(BebopEventListener listener) {listeners.add(listener);}
 
-    public void unRegister(BebopEventListener listener) {listeners.remove(listener);}
+    @Override
+    public void unregister(BebopEventListener listener) {listeners.remove(listener);}
+
+    @Override
+    public void calibrateAccelerometerAndGyro()
+    {
+        controlStrategy.calibrateAccelerometerAndGyro(controller);
+    }
+
+    @Override
+    public void moveToRelative(float dX, float dY, float dZ, float dRotation)
+    {
+        controlStrategy.moveToRelative(controller, dX, dY, dZ, dRotation);
+    }
 
     // Video related
 
     public void setVideoSurface(Surface surface) {controller.setVideoSurface(surface);}
 
-    public boolean IsRunning() { return controller.IsRunning(); }
+    @Override
+    public void move(int rollPerc, int pitchPerc, int yawPerc, int gazPerc)
+    {
+        controlStrategy.move(controller, rollPerc, pitchPerc, yawPerc, gazPerc);
+    }
 
-    public FlyingState GetFlyingState() { return controller.GetFlyingState(); }
+    @Override
+    public void doEmergencyLanding() {controlStrategy.doEmergencyLanding(controller);}
 
     // Piloting commands
 
-    public void calibrateAccelerometerAndGyro() { controller.calibrateAccelerometerAndGyro(); }
-
-    public void moveToRelative(float dX, float dY, float dZ, float dRotation)
-    {
-        controller.moveToRelative(dX, dY, dZ, dRotation);
-    }
-
-    public void move(int rollPerc, int pitchPerc, int yawPerc, int gazPerc)
-    {
-        controller.move(rollPerc, pitchPerc, yawPerc, gazPerc);
-    }
-
-    public void doEmergencyLanding() {controller.doEmergencyLanding();}
-
-    public void takeOff() {controller.takeOff();}
-
-    public void land() {controller.land();}
-
-    // Notifications to listeners
+    @Override
+    public void takeOff() {controlStrategy.takeOff(controller);}
 
     @Override
-    public Context getContext() { return context; }
+    public void land() {controlStrategy.land(controller);}
+
+    public boolean isRunning() { return controller.IsRunning(); }
+
+    public FlyingState getFlyingState() { return controller.GetFlyingState(); }
+
+    public ControlState getControlState()
+    {
+        return controlState;
+    }
+
+    public void setControlState(ControlState controlState)
+    {
+        if (this.controlState != controlState) {
+            this.controlState = controlState;
+
+            if (controlState == ControlState.CAMERA_LOOKUP)
+                controlStrategy = new CameraLookupControlStrategy();
+            else if (controlState == ControlState.PILOTING)
+                controlStrategy = new PilotingControlStrategy();
+        }
+    }
+
+    // Notifications to listeners
 
     @Override
     public void onBatteryStateChanged(int batteryLevel)

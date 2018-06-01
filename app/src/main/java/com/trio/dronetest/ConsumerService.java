@@ -410,6 +410,14 @@ public class ConsumerService extends SAAgent
         }
     }
 
+    private void receivedEmergencyDrone() {
+        Log.e("receivedEmergencyDrone", "Emergency Drone received from watch");
+
+        if (serviceCallbacks != null) {
+            serviceCallbacks.watchEmergencyDrone();
+        }
+    }
+
     private void addGyroZMessage(final String str)
     {
         mHandler.postDelayed(new Runnable()
@@ -469,7 +477,11 @@ public class ConsumerService extends SAAgent
                             receivedTakeOffDrone();
                         }
 
-                    }/*
+                    } else if (obj.getString(key).equals("emergency")) {
+                        receivedEmergencyDrone();
+                    }
+
+                    /*
                     else if (obj.getString(it.next()).equals("accelero"))
                     {
                         accelData.add(obj.get(obj.names().getString(1)).toString());

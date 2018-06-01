@@ -35,8 +35,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
-                <com.trio.dronetest.H264VideoView
-                        android:id="@+id/videoView"
+                <SurfaceView
+                    android:id="@+id/video_texture_view"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"/>
             </FrameLayout>
@@ -66,33 +66,11 @@
                         android:onClick="stopVideo"
                         android:text="Stop Video"/>
 
-
-                <Button
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:onClick="openVR"
-                        android:text="Open VR"/>
-
             </TableRow>
 
             <TableRow
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
-
-                <Button
-                        android:id="@+id/discoveryBtn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:onClick="showDevices"
-                        android:text="DEVICES"
-                        tools:layout_editor_absoluteX="104dp"
-                        tools:layout_editor_absoluteY="318dp"/>
-
-                <Button
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:onClick="stopControl"
-                        android:text="Stop Control"/>
 
                 <Button
                         android:layout_width="wrap_content"

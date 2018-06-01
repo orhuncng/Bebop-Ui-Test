@@ -21,7 +21,7 @@ import com.parrot.arsdk.ardiscovery.*;
 import com.parrot.arsdk.ardiscovery.receivers.ARDiscoveryServicesDevicesListUpdatedReceiver;
 import com.parrot.arsdk.ardiscovery.receivers.ARDiscoveryServicesDevicesListUpdatedReceiverDelegate;
 import com.trio.drone.R;
-import com.trio.drone.bebop.H264VideoController;
+import com.trio.drone.bebop.controller.H264VideoController;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import java.util.ArrayList;

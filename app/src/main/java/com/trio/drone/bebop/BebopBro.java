@@ -3,6 +3,7 @@ package com.trio.drone.bebop;
 import android.content.Context;
 import android.view.Surface;
 import com.parrot.arsdk.ARSDK;
+import com.parrot.arsdk.arcontroller.ARFeatureARDrone3;
 import com.trio.drone.bebop.controller.DeviceController;
 import com.trio.drone.bebop.strategy.CameraLookupControlStrategy;
 import com.trio.drone.bebop.strategy.DroneControlStrategy;
@@ -39,6 +40,13 @@ public class BebopBro implements BebopMediator
     {
         if (controller == null)
             controller = new DeviceController(context, this, VIDEO_WIDTH, VIDEO_HEIGHT);
+    }
+
+    public ARFeatureARDrone3 getControllerArDrone(){
+        if (controller.getFeatureArDrone() != null) {
+            return controller.getFeatureArDrone();
+        }
+        return null;
     }
 
     // controller and drone state
@@ -151,6 +159,12 @@ public class BebopBro implements BebopMediator
     public void onCameraOrientationChanged(int tiltPerc, int panPerc)
     {
         for (BebopEventListener ls : listeners) ls.onCameraOrientationChanged(tiltPerc, panPerc);
+    }
+
+    @Override
+    public void onCameraOrientationChangedV2(float tiltPerc, float panPerc)
+    {
+        for (BebopEventListener ls : listeners) ls.onCameraOrientationChangedV2(tiltPerc, panPerc);
     }
 
     @Override

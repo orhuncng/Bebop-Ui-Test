@@ -17,7 +17,7 @@ public class CameraLookupControlStrategy implements DroneControlStrategy
     @Override
     public void move(DeviceController c, int rollPerc, int pitchPerc, int yawPerc, int gazPerc)
     {
-        c.moveCamera(pitchPerc * 180f, rollPerc * 180f);
+        c.moveCamera(pitchPerc, rollPerc);
     }
 
     @Override

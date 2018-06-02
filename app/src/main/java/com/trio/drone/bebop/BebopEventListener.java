@@ -18,6 +18,8 @@ public interface BebopEventListener
 
     void onCameraOrientationChanged(int tiltPerc, int panPerc);
 
+    void onCameraOrientationChangedV2(float tiltPerc, float panPerc);
+
     void onRelativeMotionEnded(float dX, float dY, float dZ, RelativeMotionResult result);
 
     void onControllerStateChanged(boolean isRunning);

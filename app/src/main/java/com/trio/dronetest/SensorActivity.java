@@ -116,7 +116,7 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
                 if (accelerationFilter != null && accelerationFilter.length == 3) {
                     acclXTextView.setText(Float.toString(accelerationFilter[0]));
                     acclYTextView.setText(Float.toString(accelerationFilter[1]));
-                    acclZTextView.setText(Float.toString(accelerationFilter[2]));
+                    acclZTextView.setText("------------------------->>><<<"+ Float.toString(accelerationFilter[2]));
 
                     //Log.e("filtered", Float.toString(accelerationFilter[0]));
                 }

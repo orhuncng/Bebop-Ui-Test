@@ -21,6 +21,7 @@ import com.parrot.arsdk.ardiscovery.receivers.ARDiscoveryServicesDevicesListUpda
 import com.trio.drone.R;
 import com.trio.drone.bebop.BebopBro;
 import com.trio.drone.bebop.BebopEventListener;
+import com.trio.drone.bebop.ControlState;
 import com.trio.drone.bebop.FlyingState;
 import com.trio.drone.bebop.RelativeMotionResult;
 import com.trio.drone.core.SettingsActivity;
@@ -84,6 +85,9 @@ public class MainActivity extends AppCompatActivity implements WatchServiceCallb
     private boolean mIsBound = false;
     private ConsumerService mConsumerService = null;
 
+    float currentTilt = 0f;
+    float currentPan = 0f;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -123,19 +127,51 @@ public class MainActivity extends AppCompatActivity implements WatchServiceCallb
                 }
 
                 if (accelerationFilter != null && accelerationFilter.length == 3) {
-                    //Log.e("filtered", Float.toString(accelerationFilter[0]));
+
+                    if(BebopBro.getInstance().getControlState() == ControlState.CAMERA_LOOKUP){
+
+                        float interpolatedTilt = Math.round(-10 * accelerationFilter[2]);
+                        int tiltMovement = Math.round(currentTilt - interpolatedTilt);
+                        int toDegreeTilt = Math.round(interpolatedTilt);
+
+
+                        if(Math.abs(tiltMovement) > 5 ){
+                            if(BebopBro.getInstance().getControllerArDrone() != null) {
+                                BebopBro.getInstance().move(0, toDegreeTilt, 0, 0);
+                            }
+                        }else{
+                            Log.e("No Cam current", Float.toString(currentTilt));
+                        }
+
+                        float interpolatedPan = Math.round(-10 * accelerationFilter[1]);
+                        int panMovement = Math.round(currentPan - interpolatedPan);
+                        int toDegreePan = Math.round(interpolatedPan);
+
+                        if(Math.abs(panMovement) > 5 ){
+                            if(BebopBro.getInstance().getControllerArDrone() != null) {
+                                BebopBro.getInstance().move(-toDegreePan, 0, 0, 0);
+                            }
+                        }else{
+                            Log.e("No Cam current", Float.toString(currentPan));
+                        }
+
+
+
+                    }else if(BebopBro.getInstance().getControlState() == ControlState.PILOTING){
+                        deltaX = deltaX + accelerationFilter[2];
+                        //Log.e("Gidilen Yol", Float.toString(deltaX));
+
+                        int pitch = Math.round(accelerationFilter[2]);
+                        int roll = Math.round(accelerationFilter[1]);
+                        //int pitch = Math.round(accelerationFilter[0]);
+
+                        if(BebopBro.getInstance().getControllerArDrone() != null) {
+                            Log.e("Piloting roll", Integer.toString(roll));
+                            Log.e("Piloting pitch", Integer.toString(pitch));
+                            BebopBro.getInstance().move(roll, pitch, 0, 0);
+                        }
+                    }
                 }
-
-                if (count >= 100) {
-                    //Log.e("count", "Ayar yapıldı");
-                    deltaX = deltaX + accelerationFilter[2];
-                    //Log.e("Gidilen Yol", Float.toString(deltaX));
-
-                    int yaw = Math.round(accelerationFilter[2] * 10);
-
-                    //BebopBro.getInstance().move(0,0,yaw,0);
-                }
-
             }
         });
     }
@@ -197,6 +233,14 @@ public class MainActivity extends AppCompatActivity implements WatchServiceCallb
 
         Intent intent = new Intent(this, GearSensorActivity.class);
         startActivity(intent);
+    }
+
+    public void changeControlState(View view){
+        Log.e("Change State", "State tuşu basıldı");
+        if (BebopBro.getInstance().getControlState() == ControlState.CAMERA_LOOKUP)
+            BebopBro.getInstance().setControlState(ControlState.PILOTING);
+        else if (BebopBro.getInstance().getControlState() == ControlState.PILOTING)
+            BebopBro.getInstance().setControlState(ControlState.CAMERA_LOOKUP);
     }
 
     @Override
@@ -269,7 +313,17 @@ public class MainActivity extends AppCompatActivity implements WatchServiceCallb
 
     @Override
     public void onCameraOrientationChanged(int tiltPerc, int panPerc) {
+        //Log.e("Camera tilt: ", Integer.toString(tiltPerc));
+        //Log.e("Camera pan: ", Integer.toString(panPerc));
+    }
 
+    @Override
+    public void onCameraOrientationChangedV2(float tiltPerc, float panPerc) {
+        //Log.e("Camera tilt: ", Float.toString(tiltPerc));
+        //Log.e("Camera pan: ", Float.toString(panPerc));
+
+        currentTilt = tiltPerc;
+        currentPan = panPerc;
     }
 
     @Override

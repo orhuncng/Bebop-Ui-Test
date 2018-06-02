@@ -4,6 +4,8 @@ import android.content.res.Resources;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.util.Log;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -24,6 +26,8 @@ public class GLUtils
     private static final String TAG = "Video360.Utils";
 
     public static final int BYTES_PER_FLOAT = 4;
+
+    private static ShaderProgram defaultLibgdxShader;
 
     /**
      * Debug builds should fail quickly. Release versions of the app should have this disabled.
@@ -59,27 +63,11 @@ public class GLUtils
         }
     }
 
-    public static int loadGLShader(int type, String code)
+    public static ShaderProgram getDefaultLibgdxShader()
     {
-        int shader = GLES20.glCreateShader(type);
-        GLES20.glShaderSource(shader, code);
-        GLES20.glCompileShader(shader);
-
-        int[] compileStatus = new int[1];
-        GLES20.glGetShaderiv(shader, GLES20.GL_COMPILE_STATUS, compileStatus, 0);
-
-        // If the compilation failed, delete the shader.
-        if (compileStatus[0] == 0) {
-            Log.e(TAG, "Error compiling shader: " + GLES20.glGetShaderInfoLog(shader));
-            GLES20.glDeleteShader(shader);
-            shader = 0;
-        }
-
-        if (shader == 0) {
-            throw new RuntimeException("Error creating shader.");
-        }
-
-        return shader;
+        if (defaultLibgdxShader == null)
+            defaultLibgdxShader = SpriteBatch.createDefaultShader();
+        return defaultLibgdxShader;
     }
 
     private static int createShader(Resources res, int shaderId, int shaderType)

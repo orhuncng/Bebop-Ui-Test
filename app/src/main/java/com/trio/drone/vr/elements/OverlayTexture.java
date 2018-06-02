@@ -6,13 +6,15 @@ import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.util.DisplayMetrics;
 import android.view.Surface;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.trio.drone.R;
 import com.trio.drone.vr.GLUtils;
+import com.trio.drone.vr.SceneListener;
 
 import java.nio.FloatBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class OverlayTexture implements SurfaceTexture.OnFrameAvailableListener
+public class OverlayTexture implements SceneListener, SurfaceTexture.OnFrameAvailableListener
 {
     private static final int POSITION_COORDS_PER_VERTEX = 3;
     private static final int TEXTURE_COORDS_PER_VERTEX = 2;
@@ -56,50 +58,11 @@ public class OverlayTexture implements SurfaceTexture.OnFrameAvailableListener
 
     public Surface getSurface() { return surface; }
 
-    public void create(DisplayMetrics metrics, Resources res)
-    {
-        width *= ((float) metrics.heightPixels) / metrics.widthPixels;
-
-        if (width > height) {
-            float xAspectCoeff = (1f - (((float) height) / width)) / 2f;
-            vertexBuffer = GLUtils.createBuffer(new float[]{
-                    -1f, -1f, depth, xAspectCoeff, 1,
-                    1f, -1f, depth, 1 - xAspectCoeff, 1,
-                    -1f, 1f, depth, xAspectCoeff, 0,
-                    1f, 1f, depth, 1 - xAspectCoeff, 0
-            });
-        }
-        else {
-            float yAspectCoeff = (1f - (((float) width) / height)) / 2f;
-            vertexBuffer = GLUtils.createBuffer(new float[]{
-                    -1f, -1f, depth, 0, 1 - yAspectCoeff,
-                    1f, -1f, depth, 1, 1 - yAspectCoeff,
-                    -1f, 1f, depth, 0, yAspectCoeff,
-                    1f, 1f, depth, 1, yAspectCoeff
-            });
-        }
-        program = GLUtils.compileProgram(res, R.raw.overlay_vert,
-                hasAlpha ? R.raw.overlay_alpha_frag : R.raw.overlay_frag);
-
-        positionHandle = GLES20.glGetAttribLocation(program, "aPosition");
-        textureCoordsHandle = GLES20.glGetAttribLocation(program, "aTexCoords");
-        textureHandle = GLES20.glGetUniformLocation(program, "uTexture");
-        textureId = GLUtils.glCreateExternalTexture();
-
-        if (hasAlpha) alphaHandle = GLES20.glGetUniformLocation(program, "uAlpha");
-
-        texture = new SurfaceTexture(textureId);
-        texture.setDefaultBufferSize(width, height);
-        texture.setOnFrameAvailableListener(this);
-
-        surface = new Surface(texture);
-    }
-
     public void draw()
     {
-        //synchronized (surface) {
-        if (textureAvailable.compareAndSet(true, false)) texture.updateTexImage();
-        //}
+        synchronized (surface) {
+            if (textureAvailable.compareAndSet(true, false)) texture.updateTexImage();
+        }
 
         GLES20.glUseProgram(program);
         GLUtils.checkGlError();
@@ -128,6 +91,54 @@ public class OverlayTexture implements SurfaceTexture.OnFrameAvailableListener
         GLES20.glDisableVertexAttribArray(textureCoordsHandle);
     }
 
+    @Override
+    public void create(DisplayMetrics metrics, Resources res)
+    {
+        width *= ((float) metrics.heightPixels) / metrics.widthPixels;
+
+        if (width > height) {
+            float xAspectCoeff = (1f - (((float) height) / width)) / 2f;
+            vertexBuffer = GLUtils.createBuffer(new float[]{
+                    -1f, -1f, depth, xAspectCoeff, 1,
+                    1f, -1f, depth, 1 - xAspectCoeff, 1,
+                    -1f, 1f, depth, xAspectCoeff, 0,
+                    1f, 1f, depth, 1 - xAspectCoeff, 0
+            });
+        }
+        else {
+            float yAspectCoeff = (1f - (((float) width) / height)) / 2f;
+            vertexBuffer = GLUtils.createBuffer(new float[]{
+                    -1f, -1f, depth, 0, 1 - yAspectCoeff,
+                    1f, -1f, depth, 1, 1 - yAspectCoeff,
+                    -1f, 1f, depth, 0, yAspectCoeff,
+                    1f, 1f, depth, 1, yAspectCoeff
+            });
+        }
+
+        program = GLUtils.compileProgram(res, R.raw.overlay_vert,
+                hasAlpha ? R.raw.overlay_alpha_frag : R.raw.overlay_frag);
+
+        positionHandle = GLES20.glGetAttribLocation(program, "aPosition");
+        textureCoordsHandle = GLES20.glGetAttribLocation(program, "aTexCoords");
+        textureHandle = GLES20.glGetUniformLocation(program, "uTexture");
+        textureId = GLUtils.glCreateExternalTexture();
+
+        if (hasAlpha) alphaHandle = GLES20.glGetUniformLocation(program, "uAlpha");
+
+        texture = new SurfaceTexture(textureId);
+        texture.setDefaultBufferSize(width, height);
+        texture.setOnFrameAvailableListener(this);
+
+        surface = new Surface(texture);
+    }
+
+    @Override
+    public void update() { }
+
+    @Override
+    public void draw(SpriteBatch batch) { }
+
+    @Override
     public void shutdown()
     {
         if (program != 0) {

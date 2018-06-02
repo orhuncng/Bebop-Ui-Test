@@ -34,13 +34,14 @@ public class FpsTestPattern implements SceneListener
         pixmap.setColor(1f, 0.7f, 0f, 1f);
         pixmap.fillRectangle(2, 2, 252, 4);
 
-        Texture tex = new Texture(pixmap);
+        //Texture tex = new Texture(pixmap);
+        Texture tex = new Texture(Gdx.files.internal("images/DroneUI.png"));
         tex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         sprite = new Sprite(tex);
         pixmap.dispose();
 
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(
-                Gdx.files.internal("font/Roboto-Regular.ttf"));
+                Gdx.files.internal("fonts/Roboto-Regular.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter =
                 new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = 24;
@@ -62,14 +63,18 @@ public class FpsTestPattern implements SceneListener
     @Override
     public void draw(SpriteBatch batch)
     {
-        float cPitch = 1.5f * 500;
+        /*float cPitch = 1.5f * 500;
         for (int i = 0; i < 30; i++) {
             float cRelPitch = cPitch + (75.0f * (i - 15));
             sprite.setCenter(500f, cRelPitch);
             sprite.setOrigin(128, 4 + 500 - cRelPitch);
             sprite.setRotation(counter);
             sprite.draw(batch);
-        }
+        }*/
+
+        sprite.setCenter(540f, 480f);
+        sprite.setRotation(counter);
+        sprite.draw(batch);
 
         batch.setColor(1f);
         font24.draw(batch, fps, 500f, 500f);

@@ -2,12 +2,10 @@ package com.trio.dronetest;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.hardware.Camera;
 import android.opengl.GLES20;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.badlogic.gdx.backends.android.CardBoardAndroidApplication;
 import com.badlogic.gdx.backends.android.CardBoardApplicationListener;
@@ -15,9 +13,8 @@ import com.badlogic.gdx.graphics.GL20;
 import com.google.vr.sdk.base.Eye;
 import com.google.vr.sdk.base.HeadTransform;
 import com.google.vr.sdk.base.Viewport;
+import com.trio.drone.bebop.BebopBro;
 import com.trio.drone.vr.Scene;
-
-import java.io.IOException;
 
 public class Main4Activity extends CardBoardAndroidApplication
         implements CardBoardApplicationListener
@@ -50,28 +47,16 @@ public class Main4Activity extends CardBoardAndroidApplication
         GLES20.glEnable(GL20.GL_DEPTH_TEST);
         GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_DST_ALPHA);
         GLES20.glEnable(GLES20.GL_BLEND);
-/*
+
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
-        videoTexture = new OverlayTexture(false, 0.01f, metrics.widthPixels / 2, metrics
-                .heightPixels, BebopBro.getVideoWidth(), BebopBro.getVideoHeight());
+        scene = new Scene(BebopBro.getVideoWidth(), BebopBro.getVideoHeight());
+        scene.create(metrics, getResources());
+        BebopBro.getInstance().register(scene);
+        BebopBro.getInstance().setVideoSurface(scene.getBackgroundSurface());
 
-        SurfaceTexture.OnFrameAvailableListener listener =
-                new SurfaceTexture.OnFrameAvailableListener()
-                {
-                    @Override
-                    public void onFrameAvailable(SurfaceTexture surfaceTexture)
-                    {
-                        videoFrameAvailable.set(true);
-                    }
-                };
-
-        surface = videoTexture.createSurface(getResources(), listener);
-
-        BebopBro.getInstance().setVideoSurface(surface);*/
-
-        Camera camera = Camera.open();
+        /*Camera camera = Camera.open();
         Camera.Size cSize = camera.getParameters().getPreviewSize();
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
@@ -84,7 +69,7 @@ public class Main4Activity extends CardBoardAndroidApplication
             camera.startPreview();
         } catch (IOException ioe) {
             Log.w("Main5Activity", "CAM LAUNCH FAILED");
-        }
+        }*/
     }
 
     @Override

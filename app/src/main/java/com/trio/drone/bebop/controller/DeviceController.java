@@ -66,13 +66,6 @@ public class DeviceController implements ARDeviceControllerListener,
 
     public void land() {controller.getFeatureARDrone3().sendPilotingLanding();}
 
-    public ARFeatureARDrone3 getFeatureArDrone(){
-        if(controller != null){
-            return controller.getFeatureARDrone3();
-        }
-        return null;
-    }
-
     @Override
     public void onStateChanged(ARDeviceController deviceController,
             ARCONTROLLER_DEVICE_STATE_ENUM newState, ARCONTROLLER_ERROR_ENUM error)
@@ -204,21 +197,15 @@ public class DeviceController implements ARDeviceControllerListener,
                             .floatValue());
                     break;
                 }
-                case ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_CAMERASTATE_ORIENTATION: {
-                    mediator.onCameraOrientationChanged(
-                            (Integer) args.get(ARFeatureARDrone3
-                                    .ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_CAMERASTATE_ORIENTATION_TILT),
-                            (Integer) args.get(ARFeatureARDrone3
-                                    .ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_CAMERASTATE_ORIENTATION_PAN));
-                    break;
-                }
 
                 case ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_CAMERASTATE_ORIENTATIONV2: {
-                    mediator.onCameraOrientationChangedV2(
-                            (float)((Double) args.get(ARFeatureARDrone3
-                                    .ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_CAMERASTATE_ORIENTATIONV2_TILT)).doubleValue(),
+                    mediator.onCameraOrientationChanged(
                             (float) ((Double) args.get(ARFeatureARDrone3
-                                    .ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_CAMERASTATE_ORIENTATIONV2_PAN)).doubleValue());
+                                    .ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_CAMERASTATE_ORIENTATIONV2_TILT))
+                                    .doubleValue(),
+                            (float) ((Double) args.get(ARFeatureARDrone3
+                                    .ARCONTROLLER_DICTIONARY_KEY_ARDRONE3_CAMERASTATE_ORIENTATIONV2_PAN))
+                                    .doubleValue());
                     break;
                 }
 

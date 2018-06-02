@@ -16,22 +16,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SurfaceView;
 import android.view.View;
-
-import com.parrot.arsdk.ardiscovery.receivers.ARDiscoveryServicesDevicesListUpdatedReceiver;
 import com.trio.drone.R;
-import com.trio.drone.bebop.BebopBro;
-import com.trio.drone.bebop.BebopEventListener;
-import com.trio.drone.bebop.ControlState;
-import com.trio.drone.bebop.FlyingState;
-import com.trio.drone.bebop.RelativeMotionResult;
+import com.trio.drone.bebop.*;
 import com.trio.drone.core.SettingsActivity;
 
 import java.util.HashMap;
 
-public class MainActivity extends AppCompatActivity implements WatchServiceCallbacks, BebopEventListener
+public class MainActivity extends AppCompatActivity
+        implements WatchServiceCallbacks, BebopEventListener
 {
     Context mContext;
-    ARDiscoveryServicesDevicesListUpdatedReceiver receiver;
 
     private final ServiceConnection mConnection = new ServiceConnection()
     {
@@ -41,7 +35,7 @@ public class MainActivity extends AppCompatActivity implements WatchServiceCallb
             mConsumerService = ((ConsumerService.LocalBinder) service).getService();
             //updateTextView("onServiceConnected");
             Log.e("MainAct", "onServiceConnected");
-            if (mIsBound == true && mConsumerService != null) {
+            if (mIsBound && mConsumerService != null) {
                 Log.e("MainAct", "oncreate bind and consumer");
                 mConsumerService.findPeers();
                 mConsumerService.setCallbacks(MainActivity.this); // register
@@ -58,17 +52,20 @@ public class MainActivity extends AppCompatActivity implements WatchServiceCallb
         }
     };
 
-    public void takeOffDrone(View view) {
+    public void takeOffDrone(View view)
+    {
         Log.e("TakeOffDrone", "TakeOff fonksiyonunda");
         BebopBro.getInstance().takeOff();
     }
 
-    public void landDrone(View view) {
+    public void landDrone(View view)
+    {
         Log.e("landDrone", "landDrone fonksiyonunda");
         BebopBro.getInstance().land();
     }
 
-    public void cancelFlight(View view) {
+    public void cancelFlight(View view)
+    {
         Log.e("cancelFlight", "cancelFlight fonksiyonunda");
         BebopBro.getInstance().doEmergencyLanding();
     }
@@ -128,49 +125,39 @@ public class MainActivity extends AppCompatActivity implements WatchServiceCallb
 
                 if (accelerationFilter != null && accelerationFilter.length == 3) {
 
-                    if(BebopBro.getInstance().getControlState() == ControlState.CAMERA_LOOKUP){
+                    if (BebopBro.getInstance().getControlState() == ControlState.CAMERA_LOOKUP) {
 
                         float interpolatedTilt = Math.round(-10 * accelerationFilter[2]);
                         int tiltMovement = Math.round(currentTilt - interpolatedTilt);
                         int toDegreeTilt = Math.round(interpolatedTilt);
 
 
-                        if(Math.abs(tiltMovement) > 5 ){
-                            if(BebopBro.getInstance().getControllerArDrone() != null) {
-                                BebopBro.getInstance().move(0, toDegreeTilt, 0, 0);
-                            }
-                        }else{
+                        if (Math.abs(tiltMovement) > 5)
+                            BebopBro.getInstance().move(0, toDegreeTilt, 0, 0);
+                        else
                             Log.e("No Cam current", Float.toString(currentTilt));
-                        }
 
                         float interpolatedPan = Math.round(-10 * accelerationFilter[1]);
                         int panMovement = Math.round(currentPan - interpolatedPan);
                         int toDegreePan = Math.round(interpolatedPan);
 
-                        if(Math.abs(panMovement) > 5 ){
-                            if(BebopBro.getInstance().getControllerArDrone() != null) {
-                                BebopBro.getInstance().move(-toDegreePan, 0, 0, 0);
-                            }
-                        }else{
-                            Log.e("No Cam current", Float.toString(currentPan));
-                        }
-
-
-
-                    }else if(BebopBro.getInstance().getControlState() == ControlState.PILOTING){
-                        deltaX = deltaX + accelerationFilter[2];
-                        //Log.e("Gidilen Yol", Float.toString(deltaX));
-
-                        int pitch = Math.round(accelerationFilter[2]);
-                        int roll = Math.round(accelerationFilter[1]);
-                        //int pitch = Math.round(accelerationFilter[0]);
-
-                        if(BebopBro.getInstance().getControllerArDrone() != null) {
-                            Log.e("Piloting roll", Integer.toString(roll));
-                            Log.e("Piloting pitch", Integer.toString(pitch));
-                            BebopBro.getInstance().move(roll, pitch, 0, 0);
-                        }
+                        if (Math.abs(panMovement) > 5)
+                            BebopBro.getInstance().move(-toDegreePan, 0, 0, 0);
                     }
+                    else
+                        Log.e("No Cam current", Float.toString(currentPan));
+                }
+                else if (BebopBro.getInstance().getControlState() == ControlState.PILOTING) {
+                    deltaX = deltaX + accelerationFilter[2];
+                    //Log.e("Gidilen Yol", Float.toString(deltaX));
+
+                    int pitch = Math.round(accelerationFilter[2]);
+                    int roll = Math.round(accelerationFilter[1]);
+                    //int pitch = Math.round(accelerationFilter[0]);
+
+                    Log.e("Piloting roll", Integer.toString(roll));
+                    Log.e("Piloting pitch", Integer.toString(pitch));
+                    BebopBro.getInstance().move(roll, pitch, 0, 0);
                 }
             }
         });
@@ -207,13 +194,15 @@ public class MainActivity extends AppCompatActivity implements WatchServiceCallb
 
     private int myState = 0;
 
-    public void sendState(View view) {
+    public void sendState(View view)
+    {
         Log.e("sendState", "SendState basıldı");
         String deneme = "";
         if (myState == 0) {
             myState = 1;
             deneme = "1";
-        } else {
+        }
+        else {
             myState = 0;
             deneme = "0";
         }
@@ -221,7 +210,8 @@ public class MainActivity extends AppCompatActivity implements WatchServiceCallb
         if (mIsBound == true && mConsumerService != null) {
             if (mConsumerService.sendState(deneme)) {
                 Log.e("sendState", "SendState gitti");
-            } else {
+            }
+            else {
                 Log.e("sendState", "SendState gitmedi");
             }
         }
@@ -235,7 +225,8 @@ public class MainActivity extends AppCompatActivity implements WatchServiceCallb
         startActivity(intent);
     }
 
-    public void changeControlState(View view){
+    public void changeControlState(View view)
+    {
         Log.e("Change State", "State tuşu basıldı");
         if (BebopBro.getInstance().getControlState() == ControlState.CAMERA_LOOKUP)
             BebopBro.getInstance().setControlState(ControlState.PILOTING);
@@ -244,102 +235,112 @@ public class MainActivity extends AppCompatActivity implements WatchServiceCallb
     }
 
     @Override
-    public void watchRotateDrone(int dir) {
+    public void watchRotateDrone(int dir)
+    {
         Log.e("watchRotateDron", "rotate drone received " + dir);
         BebopBro.getInstance().move(0, 0, dir, 0);
     }
 
     @Override
-    public void watchTakeOffDrone() {
+    public void watchTakeOffDrone()
+    {
         Log.e("watchTakeOff", "takeoff received ");
         BebopBro.getInstance().takeOff();
     }
 
     @Override
-    public void watchLandDrone() {
+    public void watchLandDrone()
+    {
         Log.e("watchTakeOff", "land received ");
         BebopBro.getInstance().land();
     }
 
     @Override
-    public void watchEmergencyDrone() {
+    public void watchEmergencyDrone()
+    {
         Log.e("watchEmergency", "emergency received ");
         BebopBro.getInstance().doEmergencyLanding();
     }
 
     @Override
-    public void onBatteryStateChanged(int batteryLevel) {
+    public void onBatteryStateChanged(int batteryLevel)
+    {
 
     }
 
     @Override
-    public void onWifiSignalChanged(int rssi) {
+    public void onWifiSignalChanged(int rssi)
+    {
 
     }
 
     @Override
-    public void onFlyingStateChanged(FlyingState flyingState) {
+    public void onFlyingStateChanged(FlyingState flyingState)
+    {
 
         String state = (flyingState == FlyingState.LANDED) ? "1" : "0";
 
         if (mIsBound == true && mConsumerService != null) {
             if (mConsumerService.sendState(state)) {
                 Log.e("sendFlyingState", "SendState gitti");
-            } else {
+            }
+            else {
                 Log.e("sendFlyingState", "SendState gitmedi");
             }
         }
     }
 
     @Override
-    public void onPositionChanged(float latitude, float longitude, float altitude) {
+    public void onPositionChanged(float latitude, float longitude, float altitude)
+    {
 
     }
 
     @Override
-    public void onSpeedChanged(float x, float y, float z) {
+    public void onSpeedChanged(float x, float y, float z)
+    {
 
     }
 
     @Override
-    public void onOrientationChanged(float roll, float pitch, float yaw) {
+    public void onOrientationChanged(float roll, float pitch, float yaw)
+    {
 
     }
 
     @Override
-    public void onRelativeAltitudeChanged(float altitude) {
+    public void onRelativeAltitudeChanged(float altitude)
+    {
 
     }
 
     @Override
-    public void onCameraOrientationChanged(int tiltPerc, int panPerc) {
+    public void onCameraOrientationChanged(float tiltPerc, float panPerc)
+    {
         //Log.e("Camera tilt: ", Integer.toString(tiltPerc));
         //Log.e("Camera pan: ", Integer.toString(panPerc));
-    }
-
-    @Override
-    public void onCameraOrientationChangedV2(float tiltPerc, float panPerc) {
-        //Log.e("Camera tilt: ", Float.toString(tiltPerc));
-        //Log.e("Camera pan: ", Float.toString(panPerc));
-
         currentTilt = tiltPerc;
         currentPan = panPerc;
     }
 
     @Override
-    public void onRelativeMotionEnded(float dX, float dY, float dZ, RelativeMotionResult result) {
+    public void onRelativeMotionEnded(float dX, float dY, float dZ, RelativeMotionResult result)
+    {
 
     }
 
     @Override
-    public void onControllerStateChanged(boolean isRunning) {
+    public void onControllerStateChanged(boolean isRunning)
+    {
 
     }
 
-    public void stopVideo(View view) {
+    public void stopVideo(View view)
+    {
     }
 
 
-    public void startVideo(View view) {
+    public void startVideo(View view)
+    {
     }
 }

@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import com.trio.drone.R;
 
 import java.util.HashMap;
@@ -108,7 +109,7 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
                     linearAcclYTextView.setText(Float.toString(acceleration[1]));
                     linearAcclZTextView.setText(Float.toString(acceleration[2]));
 
-                    Log.e("raw", Float.toString(acceleration[0]));
+                    //Log.e("raw", Float.toString(acceleration[0]));
                 }
 
 
@@ -117,11 +118,11 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
                     acclYTextView.setText(Float.toString(accelerationFilter[1]));
                     acclZTextView.setText(Float.toString(accelerationFilter[2]));
 
-                    Log.e("filtered", Float.toString(accelerationFilter[0]));
+                    //Log.e("filtered", Float.toString(accelerationFilter[0]));
                 }
 
                 if (count >= 100) {
-                    Log.e("count", "Ayar yapıldı");
+                    //Log.e("count", "Ayar yapıldı");
 
                     deltaX = deltaX + accelerationFilter[2];
 

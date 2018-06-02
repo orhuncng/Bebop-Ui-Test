@@ -6,7 +6,7 @@ package com.trio.drone.data;
 
 public class LowPassData implements FilterData {
     private float[] history = new float[3];
-    private static float smoothingPerc = 1f;
+    private static float smoothingPerc = 0f;
 
     public static void setSmoothingPerc(float smoothingPerc) {
         LowPassData.smoothingPerc = smoothingPerc / 100f;

@@ -7,7 +7,7 @@
             android:entryValues="@array/pref_camera_stab_values"
             android:key="@string/pref_key_camera_stab_mode"/>
     <ListPreference
-            android:defaultValue="1"
+        android:defaultValue="2"
             android:title="Returning point"
             android:entries="@array/pref_home_type_titles"
             android:entryValues="@array/pref_home_type_values"

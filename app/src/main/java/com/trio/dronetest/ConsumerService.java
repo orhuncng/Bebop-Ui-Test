@@ -43,12 +43,16 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
+
 import com.samsung.android.sdk.SsdkUnsupportedException;
 import com.samsung.android.sdk.accessory.SA;
 import com.samsung.android.sdk.accessory.SAAgent;
 import com.samsung.android.sdk.accessory.SAPeerAgent;
 import com.samsung.android.sdk.accessory.SASocket;
 import com.trio.drone.R;
+import com.trio.drone.data.FilterData;
+import com.trio.drone.data.LowPassData;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -108,6 +112,9 @@ public class ConsumerService extends SAAgent
     private ServiceConnection mConnectionHandler = null;
     private MainActivity droneCtrlObj;
     private WatchServiceCallbacks serviceCallbacks;
+
+    private FilterData filterData = new LowPassData();
+    private float[] watchGravity = new float[]{0.0F, 0.0F, 0.0F};
 
     public ConsumerService()
     {
@@ -420,6 +427,19 @@ public class ConsumerService extends SAAgent
         }
     }
 
+    private void receivedAcceleroData(float x, float y, float z) {
+        //Log.e("receivedAcceleroData", "Accelero data received from watch");
+
+        if (serviceCallbacks != null) {
+            watchGravity[0] = x;
+            watchGravity[1] = y;
+            watchGravity[2] = z;
+
+            watchGravity = filterData.get(watchGravity);
+            serviceCallbacks.watchAcceleroMoveDrone(watchGravity);
+        }
+    }
+
     private void addGyroZMessage(final String str)
     {
         mHandler.postDelayed(new Runnable()
@@ -448,7 +468,7 @@ public class ConsumerService extends SAAgent
         public void onReceive(int channelId, byte[] data)
         {
             final String message = new String(data);
-            Log.e("X", message);
+            //Log.e("X", message);
             //rotateDrone(message);
             try {
                 JSONObject obj = new JSONObject(message);
@@ -462,7 +482,7 @@ public class ConsumerService extends SAAgent
                         e.printStackTrace();
                     }*/
 
-                    Log.e("X", obj.get(obj.names().getString(1)).toString());
+                    //Log.e("X", obj.get(obj.names().getString(1)).toString());
                     //  Log.e("Y",obj.get(obj.names().getString(2)).toString());
                     //Log.e("Z",obj.get(obj.names().getString(3)).toString());
                     String key = it.next();
@@ -485,16 +505,12 @@ public class ConsumerService extends SAAgent
                     }
                     else if (obj.getString(key).equals("emergency")) {
                         receivedEmergencyDrone();
-                    }
-
-                    /*
-                    else if (obj.getString(it.next()).equals("accelero"))
+                    } else if (obj.getString(key).equals("accelero"))
                     {
-                        accelData.add(obj.get(obj.names().getString(1)).toString());
-                        accelData.add(obj.get(obj.names().getString(2)).toString());
-                        accelData.add(obj.get(obj.names().getString(3)).toString());
-                        addAcceleroMessage(accelData);
-                        accelData.clear();
+                        float x = Float.parseFloat(obj.get(obj.names().getString(1)).toString());
+                        float y = Float.parseFloat(obj.get(obj.names().getString(2)).toString());
+                        float z = Float.parseFloat(obj.get(obj.names().getString(3)).toString());
+                        receivedAcceleroData(x, y, z);
                     }/*
                     else if (obj.getString(it.next()).equals("gravity"))
                     {

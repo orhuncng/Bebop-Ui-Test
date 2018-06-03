@@ -16,8 +16,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SurfaceView;
 import android.view.View;
+
 import com.trio.drone.R;
-import com.trio.drone.bebop.*;
+import com.trio.drone.bebop.BebopBro;
+import com.trio.drone.bebop.BebopEventListener;
+import com.trio.drone.bebop.ControlState;
+import com.trio.drone.bebop.FlyingState;
+import com.trio.drone.bebop.RelativeMotionResult;
 import com.trio.drone.core.SettingsActivity;
 
 import java.util.HashMap;
@@ -35,6 +40,7 @@ public class MainActivity extends AppCompatActivity
     private DeviceSensorProvider<HashMap<String, float[]>> liveData;
     private int count = 0;
     private boolean mIsBound = false;
+    float watchDataZ = 0;
     private ConsumerService mConsumerService = null;
     private final ServiceConnection mConnection = new ServiceConnection()
     {
@@ -128,34 +134,31 @@ public class MainActivity extends AppCompatActivity
 
 
                         if (Math.abs(tiltMovement) > 5){
-                            BebopBro.getInstance().move(0, toDegreeTilt, 0, 0);
+                            //BebopBro.getInstance().move(0, toDegreeTilt, 0, 0);
+                        } else {
+                            //Log.e("No Cam current", Float.toString(currentTilt));
                         }
-                        else
-                            Log.e("No Cam current", Float.toString(currentTilt));
-
                         float interpolatedPan = Math.round(-10 * accelerationFilter[1]);
                         int panMovement = Math.round(currentPan - interpolatedPan);
                         int toDegreePan = Math.round(interpolatedPan);
 
                         if (Math.abs(panMovement) > 5){
-                            BebopBro.getInstance().move(-toDegreePan, 0, 0, 0);
+                            //BebopBro.getInstance().move(-toDegreePan, 0, 0, 0);
                         }
+                    } else if (BebopBro.getInstance().getControlState() == ControlState.PILOTING) {
+                        deltaX = deltaX + accelerationFilter[2];
+                        //Log.e("Gidilen Yol", Float.toString(deltaX));
+
+                        int pitch = Math.round(accelerationFilter[2]);
+                        int roll = Math.round(accelerationFilter[1]);
+                        //int pitch = Math.round(accelerationFilter[0]);
+
+                        //Log.e("Piloting roll", Integer.toString(roll));
+                        //Log.e("Piloting pitch", Integer.toString(pitch));
+                        //BebopBro.getInstance().move(roll, pitch, 0, 0);
                     }
-                    else
-                        Log.e("No Cam current", Float.toString(currentPan));
                 }
-                else if (BebopBro.getInstance().getControlState() == ControlState.PILOTING) {
-                    deltaX = deltaX + accelerationFilter[2];
-                    //Log.e("Gidilen Yol", Float.toString(deltaX));
 
-                    int pitch = Math.round(accelerationFilter[2]);
-                    int roll = Math.round(accelerationFilter[1]);
-                    //int pitch = Math.round(accelerationFilter[0]);
-
-                    Log.e("Piloting roll", Integer.toString(roll));
-                    Log.e("Piloting pitch", Integer.toString(pitch));
-                    BebopBro.getInstance().move(roll, pitch, 0, 0);
-                }
             }
         });
     }
@@ -233,7 +236,13 @@ public class MainActivity extends AppCompatActivity
     public void watchRotateDrone(int dir)
     {
         Log.e("watchRotateDron", "rotate drone received " + dir);
-        BebopBro.getInstance().move(0, 0, dir, 0);
+        if (watchDataZ > 4.5f) {
+            BebopBro.getInstance().move(0, 0, dir, 0);
+        } else {
+            BebopBro.getInstance().move(0, 0, 0, dir);
+        }
+
+
     }
 
     @Override
@@ -255,6 +264,48 @@ public class MainActivity extends AppCompatActivity
     {
         Log.e("watchEmergency", "emergency received ");
         BebopBro.getInstance().doEmergencyLanding();
+    }
+
+    @Override
+    public void watchAcceleroMoveDrone(float[] watchData) {
+        //Log.e("watchAccelero", "accelero received ");
+        watchDataZ = watchData[2];
+        if (BebopBro.getInstance().getControlState() == ControlState.CAMERA_LOOKUP) {
+
+            float interpolatedTilt = Math.round(10 * watchData[0]);
+            int tiltMovement = Math.round(currentTilt - interpolatedTilt);
+            int toDegreeTilt = Math.round(interpolatedTilt);
+
+            Log.e("interpolated", Float.toString(interpolatedTilt));
+            Log.e("tiltMovement", Integer.toString(tiltMovement));
+            Log.e("toDegree", Integer.toString(toDegreeTilt));
+            Log.e("Tilt Move", Float.toString(currentTilt));
+
+            if (Math.abs(tiltMovement) > 5) {
+                BebopBro.getInstance().move(0, toDegreeTilt, 0, 0);
+                Log.e("Move", "bigger 5");
+            } else
+                Log.e("No Cam current", Float.toString(currentTilt));
+
+            float interpolatedPan = Math.round(-10 * watchData[1]);
+            int panMovement = Math.round(currentPan - interpolatedPan);
+            int toDegreePan = Math.round(interpolatedPan);
+
+            if (Math.abs(panMovement) > 5) {
+                BebopBro.getInstance().move(-toDegreePan, 0, 0, 0);
+            }
+        } else if (BebopBro.getInstance().getControlState() == ControlState.PILOTING) {
+            deltaX = deltaX + watchData[0];
+            //Log.e("Gidilen Yol", Float.toString(deltaX));
+
+            int pitch = Math.round(watchData[0]);
+            int roll = Math.round(watchData[1]);
+            //int pitch = Math.round(accelerationFilter[0]);
+
+            Log.e("Piloting roll", Integer.toString(roll));
+            Log.e("Piloting pitch", Integer.toString(pitch));
+            BebopBro.getInstance().move(roll, pitch, 0, 0);
+        }
     }
 
     @Override
@@ -321,6 +372,7 @@ public class MainActivity extends AppCompatActivity
         //Log.e("Camera tilt: ", Integer.toString(tiltPerc));
         //Log.e("Camera pan: ", Integer.toString(panPerc));
         currentTilt = tiltPerc;
+        Log.e("onCameraorient", Float.toString(currentTilt));
         currentPan = panPerc;
     }
 

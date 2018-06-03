@@ -13,4 +13,6 @@ public interface WatchServiceCallbacks
 
     void watchEmergencyDrone();
 
+    void watchAcceleroMoveDrone(float[] watchData);
+
 }

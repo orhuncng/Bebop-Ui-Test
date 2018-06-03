@@ -2,6 +2,7 @@ package com.trio.dronetest;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.hardware.Camera;
 import android.opengl.GLES20;
 import android.os.Build;
 import android.os.Bundle;
@@ -10,12 +11,15 @@ import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.badlogic.gdx.backends.android.CardBoardAndroidApplication;
 import com.badlogic.gdx.backends.android.CardBoardApplicationListener;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.math.Matrix4;
 import com.google.vr.sdk.base.Eye;
 import com.google.vr.sdk.base.HeadTransform;
 import com.google.vr.sdk.base.Viewport;
 import com.trio.drone.bebop.BebopBro;
 import com.trio.drone.vr.Scene;
 import com.trio.drone.vr.util.AnimationState;
+
+import java.io.IOException;
 
 public class Main4Activity extends CardBoardAndroidApplication
         implements CardBoardApplicationListener
@@ -39,6 +43,8 @@ public class Main4Activity extends CardBoardAndroidApplication
         config.a = 8;
         config.numSamples = 2;
         initialize(this, config);
+
+        BebopBro.getInstance().onCreate(getApplicationContext());
 
         AnimationState.getInstance().start();
     }

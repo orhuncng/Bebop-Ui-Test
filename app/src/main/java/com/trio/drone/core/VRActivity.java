@@ -40,6 +40,8 @@ public class VRActivity extends CardBoardAndroidApplication
         config.numSamples = 2;
         initialize(this, config);
 
+        BebopBro.getInstance().onCreate(getApplicationContext());
+
         AnimationState.getInstance().start();
     }
 

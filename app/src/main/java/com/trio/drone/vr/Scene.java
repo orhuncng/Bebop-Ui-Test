@@ -5,6 +5,8 @@ import android.graphics.SurfaceTexture;
 import android.util.DisplayMetrics;
 import android.view.Surface;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Quaternion;
 import com.trio.drone.bebop.BebopEventListener;
 import com.trio.drone.bebop.ControlState;
 import com.trio.drone.bebop.FlyingState;
@@ -59,6 +61,11 @@ public class Scene implements SceneMediator, BebopEventListener
     public void create(DisplayMetrics metrics, Resources res)
     {
         metrics.widthPixels /= 2f;
+
+        Matrix4 asd = batch.getTransformMatrix().scale(0.5f, 0.5f, 1f);
+        Matrix4 asdasd = asd.translate(1f,1,0f);
+        batch.setTransformMatrix(asdasd);
+
         for (SceneListener l : listeners) l.create(metrics, res);
     }
 

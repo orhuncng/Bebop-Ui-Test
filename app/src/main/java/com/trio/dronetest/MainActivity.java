@@ -337,6 +337,12 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    public void onControlStateChanged(ControlState controlState)
+    {
+        
+    }
+
+    @Override
     public void onPositionChanged(float latitude, float longitude, float altitude)
     {
 

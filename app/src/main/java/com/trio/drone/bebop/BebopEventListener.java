@@ -8,6 +8,8 @@ public interface BebopEventListener
 
     void onFlyingStateChanged(FlyingState flyingState);
 
+    void onControlStateChanged(ControlState controlState);
+
     void onPositionChanged(float latitude, float longitude, float altitude);
 
     void onSpeedChanged(float x, float y, float z);

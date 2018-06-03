@@ -1,0 +1,69 @@
+
+pack.png
+size: 512,2048
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+aircraft
+  rotate: false
+  xy: 2, 2
+  size: 28, 28
+  orig: 28, 28
+  offset: 0, 0
+  index: -1
+battery
+  rotate: false
+  xy: 2, 32
+  size: 35, 91
+  orig: 35, 91
+  offset: 0, 0
+  index: -1
+battery_level
+  rotate: false
+  xy: 260, 380
+  size: 27, 75
+  orig: 27, 75
+  offset: 0, 0
+  index: -1
+pitch
+  rotate: false
+  xy: 2, 457
+  size: 300, 1380
+  orig: 300, 1380
+  offset: 0, 0
+  index: -1
+ring_outlier
+  rotate: false
+  xy: 304, 1703
+  size: 20, 134
+  orig: 20, 134
+  offset: 0, 0
+  index: -1
+rings
+  rotate: false
+  xy: 2, 199
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: -1
+roll
+  rotate: false
+  xy: 2, 125
+  size: 338, 72
+  orig: 338, 72
+  offset: 0, 0
+  index: -1
+roll_pointer
+  rotate: false
+  xy: 39, 102
+  size: 22, 21
+  orig: 22, 21
+  offset: 0, 0
+  index: -1
+wifi
+  rotate: false
+  xy: 326, 1811
+  size: 33, 26
+  orig: 33, 26
+  offset: 0, 0
+  index: -1

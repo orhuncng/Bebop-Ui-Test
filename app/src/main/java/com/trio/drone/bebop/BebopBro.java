@@ -100,6 +100,8 @@ public class BebopBro implements BebopMediator
                 controlStrategy = new CameraLookupControlStrategy();
             else if (controlState == ControlState.PILOTING)
                 controlStrategy = new PilotingControlStrategy();
+
+            for (BebopEventListener ls : listeners) ls.onControlStateChanged(controlState);
         }
     }
 
@@ -122,6 +124,9 @@ public class BebopBro implements BebopMediator
     {
         for (BebopEventListener ls : listeners) ls.onFlyingStateChanged(flyingState);
     }
+
+    @Override
+    public void onControlStateChanged(ControlState controlState) { }
 
     @Override
     public void onPositionChanged(float latitude, float longitude, float altitude)

@@ -62,6 +62,9 @@ public class Main6Activity extends AppCompatActivity {
 
     public void onClickBtn2(View view){
         Toast.makeText(this,"FLY VR",Toast.LENGTH_SHORT).show();
+
+        Intent intent = new Intent(this, VRIntroActivity.class);
+        startActivity(intent);
     }
 
     public void onClickBtn3(View view){

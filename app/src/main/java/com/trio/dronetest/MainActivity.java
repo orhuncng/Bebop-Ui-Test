@@ -127,8 +127,9 @@ public class MainActivity extends AppCompatActivity
                         int toDegreeTilt = Math.round(interpolatedTilt);
 
 
-                        if (Math.abs(tiltMovement) > 5)
+                        if (Math.abs(tiltMovement) > 5){
                             BebopBro.getInstance().move(0, toDegreeTilt, 0, 0);
+                        }
                         else
                             Log.e("No Cam current", Float.toString(currentTilt));
 
@@ -136,8 +137,9 @@ public class MainActivity extends AppCompatActivity
                         int panMovement = Math.round(currentPan - interpolatedPan);
                         int toDegreePan = Math.round(interpolatedPan);
 
-                        if (Math.abs(panMovement) > 5)
+                        if (Math.abs(panMovement) > 5){
                             BebopBro.getInstance().move(-toDegreePan, 0, 0, 0);
+                        }
                     }
                     else
                         Log.e("No Cam current", Float.toString(currentPan));

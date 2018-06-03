@@ -85,7 +85,9 @@
             </intent-filter>
         </activity>
         <activity android:name="com.trio.dronetest.GearIntroActivity"
-            android:label="How to Fly" />
+            android:label="How to Fly - Gear" />
+        <activity android:name="com.trio.dronetest.VRIntroActivity"
+            android:label="How to Fly - VR" />
     </application>
 
 </manifest>

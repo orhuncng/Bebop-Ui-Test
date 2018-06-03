@@ -5,7 +5,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 
 import com.github.paolorotolo.appintro.AppIntro;
 import com.github.paolorotolo.appintro.AppIntroFragment;
@@ -15,17 +14,17 @@ import com.trio.drone.R;
  * Created by orhun on 6/3/2018.
  */
 
-public class GearIntroActivity extends AppIntro {
+public class VRIntroActivity extends AppIntro {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
 
         // Instead of fragments, you can also use our default slide
         // Just set a title, description, background and image. AppIntro will do the rest.
-        addSlide(AppIntroFragment.newInstance("Connection", "Connect your smartwatch to android Phone by Bluetooth", R.drawable.bluetooth_image, Color.parseColor("#00838F")));
-        addSlide(AppIntroFragment.newInstance("Open App", "Open your smartwatch app ", R.drawable.android_logo, Color.parseColor("#0097A7")));
-        addSlide(AppIntroFragment.newInstance("Set your Arm", "Wear your smartwatch and adjust your arm ", R.drawable.watch_arm, Color.parseColor("#00ACC1")));
-        addSlide(AppIntroFragment.newInstance("Takeoff", "You are ready to FLY ", R.drawable.drone_bebop, Color.parseColor("#00BCD4")));
+        addSlide(AppIntroFragment.newInstance("Connection", "Connect your smartwatch to android Phone by Bluetooth", R.drawable.bluetooth_image, Color.parseColor("#0277BD")));
+        addSlide(AppIntroFragment.newInstance("Open App", "Open your smartwatch app ", R.drawable.android_logo, Color.parseColor("#0288D1")));
+        addSlide(AppIntroFragment.newInstance("Set your Arm", "Wear your smartwatch and adjust your arm ", R.drawable.watch_arm, Color.parseColor("#039BE5")));
+        addSlide(AppIntroFragment.newInstance("Takeoff", "You are ready to FLY ", R.drawable.drone_bebop, Color.parseColor("#03A9F4")));
 
         // OPTIONAL METHODS
         // Override bar/separator color.

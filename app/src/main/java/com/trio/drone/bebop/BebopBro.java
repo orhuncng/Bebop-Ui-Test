@@ -63,8 +63,6 @@ public class BebopBro implements BebopMediator
 
     // Video related
 
-    public void setVideoSurface(Surface surface) {controller.setVideoSurface(surface);}
-
     @Override
     public void move(int rollPerc, int pitchPerc, int yawPerc, int gazPerc)
     {
@@ -72,15 +70,17 @@ public class BebopBro implements BebopMediator
     }
 
     @Override
-    public void doEmergencyLanding() {controlStrategy.doEmergencyLanding(controller);}
+    public void doEmergencyLanding() { controlStrategy.doEmergencyLanding(controller); }
+
+    @Override
+    public void takeOff() { controlStrategy.takeOff(controller); }
 
     // Piloting commands
 
     @Override
-    public void takeOff() {controlStrategy.takeOff(controller);}
+    public void land() { controlStrategy.land(controller); }
 
-    @Override
-    public void land() {controlStrategy.land(controller);}
+    public void setVideoSurface(Surface surface) { controller.setVideoSurface(surface); }
 
     public boolean isRunning() { return controller.IsRunning(); }
 

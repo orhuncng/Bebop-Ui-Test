@@ -1,0 +1,27 @@
+
+vr_gui.png
+size: 512,2048
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+adi_pitch
+  rotate: false
+  xy: 2, 39
+  size: 300, 1380
+  orig: 300, 1380
+  offset: 0, 0
+  index: -1
+adi_roll
+  rotate: false
+  xy: 2, 2
+  size: 225, 35
+  orig: 225, 35
+  offset: 0, 0
+  index: -1
+aircraft
+  rotate: false
+  xy: 304, 1391
+  size: 28, 28
+  orig: 28, 28
+  offset: 0, 0
+  index: -1

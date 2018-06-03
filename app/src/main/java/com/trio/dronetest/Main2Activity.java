@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ListView;
-
 import com.trio.drone.R;
 
 import java.util.ArrayList;

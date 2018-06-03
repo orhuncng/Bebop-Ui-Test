@@ -6,7 +6,8 @@ import android.util.Log;
  * Created by orhun on 4/17/2018.
  */
 
-public class DataFilterer {
+public class DataFilterer
+{
     static final float ALPHA = 0.8f;
 
     public float[] lowPassFilter(float[] output, float[] input)

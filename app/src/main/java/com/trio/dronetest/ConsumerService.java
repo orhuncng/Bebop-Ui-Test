@@ -43,14 +43,12 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
-
 import com.samsung.android.sdk.SsdkUnsupportedException;
 import com.samsung.android.sdk.accessory.SA;
 import com.samsung.android.sdk.accessory.SAAgent;
 import com.samsung.android.sdk.accessory.SAPeerAgent;
 import com.samsung.android.sdk.accessory.SASocket;
 import com.trio.drone.R;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -106,8 +104,8 @@ public class ConsumerService extends SAAgent
     private static final String TAG = "HelloAccessory(C)";
     private static final Class<ServiceConnection> SASOCKET_CLASS = ServiceConnection.class;
     private final IBinder mBinder = new LocalBinder();
-    private ServiceConnection mConnectionHandler = null;
     Handler mHandler = new Handler();
+    private ServiceConnection mConnectionHandler = null;
     private MainActivity droneCtrlObj;
     private WatchServiceCallbacks serviceCallbacks;
 
@@ -196,12 +194,12 @@ public class ConsumerService extends SAAgent
         }
         else if (result == SAAgent.FINDPEER_SERVICE_NOT_FOUND) {
             Toast.makeText(getApplicationContext(), "FINDPEER_SERVICE_NOT_FOUND", Toast.LENGTH_LONG)
-                    .show();
+                 .show();
             updateTextView("Disconnected");
         }
         else {
             Toast.makeText(getApplicationContext(), R.string.NoPeersFound, Toast.LENGTH_LONG)
-                    .show();
+                 .show();
         }
     }
 
@@ -250,7 +248,7 @@ public class ConsumerService extends SAAgent
         }
         else if (result == SAAgent.CONNECTION_DUPLICATE_REQUEST) {
             Toast.makeText(getBaseContext(), "CONNECTION_DUPLICATE_REQUEST", Toast.LENGTH_LONG)
-                    .show();
+                 .show();
         }
         else {
             Toast.makeText(getBaseContext(), R.string.ConnectionFailure, Toast.LENGTH_LONG).show();
@@ -289,7 +287,8 @@ public class ConsumerService extends SAAgent
         return retvalue;
     }
 
-    public boolean sendState(final String data) {
+    public boolean sendState(final String data)
+    {
         boolean retvalue = false;
         if (mConnectionHandler != null) {
             try {
@@ -394,7 +393,8 @@ public class ConsumerService extends SAAgent
         }
     }
 
-    private void receivedLandDrone() {
+    private void receivedLandDrone()
+    {
         Log.e("receivedLandDrone", "Land Drone received from watch");
 
         if (serviceCallbacks != null) {
@@ -402,7 +402,8 @@ public class ConsumerService extends SAAgent
         }
     }
 
-    private void receivedTakeOffDrone() {
+    private void receivedTakeOffDrone()
+    {
         Log.e("receivedTakeOffDrone", "TakeOff Drone received from watch");
 
         if (serviceCallbacks != null) {
@@ -410,7 +411,8 @@ public class ConsumerService extends SAAgent
         }
     }
 
-    private void receivedEmergencyDrone() {
+    private void receivedEmergencyDrone()
+    {
         Log.e("receivedEmergencyDrone", "Emergency Drone received from watch");
 
         if (serviceCallbacks != null) {
@@ -464,20 +466,24 @@ public class ConsumerService extends SAAgent
                     //  Log.e("Y",obj.get(obj.names().getString(2)).toString());
                     //Log.e("Z",obj.get(obj.names().getString(3)).toString());
                     String key = it.next();
-                    if ( obj.getString(key).equals("gyro")) {
+                    if (obj.getString(key).equals("gyro")) {
                         addGyroXMessage(obj.get(obj.names().getString(1)).toString());
                         addGyroYMessage(obj.get(obj.names().getString(2)).toString());
                         addGyroZMessage(obj.get(obj.names().getString(3)).toString());
-                    } else if (obj.getString(key).equals("rotary")) {
+                    }
+                    else if (obj.getString(key).equals("rotary")) {
                         receivedRotateDrone(obj.get(obj.names().getString(1)).toString());
-                    } else if (obj.getString(key).equals("flightState")) {
+                    }
+                    else if (obj.getString(key).equals("flightState")) {
                         if (obj.get(obj.names().getString(1)).toString().equals("0")) {
                             receivedLandDrone();
-                        } else {
+                        }
+                        else {
                             receivedTakeOffDrone();
                         }
 
-                    } else if (obj.getString(key).equals("emergency")) {
+                    }
+                    else if (obj.getString(key).equals("emergency")) {
                         receivedEmergencyDrone();
                     }
 

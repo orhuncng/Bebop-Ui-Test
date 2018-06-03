@@ -8,8 +8,8 @@ import android.util.DisplayMetrics;
 import android.view.Surface;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.trio.drone.R;
-import com.trio.drone.vr.GLUtils;
 import com.trio.drone.vr.SceneListener;
+import com.trio.drone.vr.util.GLUtils;
 
 import java.nio.FloatBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -25,7 +25,7 @@ public class OverlayTexture implements SceneListener, SurfaceTexture.OnFrameAvai
     private static final int VERTEX_STRIDE_BYTES = COORDS_PER_VERTEX * BYTES_PER_COORD;
 
     private static final float DEFAULT_ALPHA = 0.7f;
-
+    private final AtomicBoolean textureAvailable = new AtomicBoolean();
     private int program = 0;
     private int positionHandle;
     private int textureCoordsHandle;
@@ -34,11 +34,8 @@ public class OverlayTexture implements SceneListener, SurfaceTexture.OnFrameAvai
     private int alphaHandle;
     private boolean hasAlpha;
     private float alpha = DEFAULT_ALPHA;
-
     private int width;
     private int height;
-    private final AtomicBoolean textureAvailable = new AtomicBoolean();
-
     private SurfaceTexture texture;
     private float depth;
     private FloatBuffer vertexBuffer;

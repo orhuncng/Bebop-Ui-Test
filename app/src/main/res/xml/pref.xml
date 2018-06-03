@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <ListPreference
-        android:defaultValue="0"
+            android:defaultValue="0"
             android:title="Camera Stabilization"
             android:entries="@array/pref_camera_stab_titles"
             android:entryValues="@array/pref_camera_stab_values"
             android:key="@string/pref_key_camera_stab_mode"/>
     <ListPreference
-        android:defaultValue="2"
+            android:defaultValue="2"
             android:title="Returning point"
             android:entries="@array/pref_home_type_titles"
             android:entryValues="@array/pref_home_type_values"
             android:key="@string/pref_key_home_type"/>
     <PreferenceCategory android:title="Smoothing">
         <ListPreference
-            android:defaultValue="75"
+                android:defaultValue="75"
                 android:title="User interface animations"
                 android:entries="@array/pref_smoothing_titles"
                 android:entryValues="@array/pref_smoothing_values"
                 android:key="@string/pref_key_smoothing_ui"/>
         <ListPreference
-            android:defaultValue="75"
+                android:defaultValue="75"
                 android:title="Smartwatch sensors"
                 android:entries="@array/pref_smoothing_titles"
                 android:entryValues="@array/pref_smoothing_values"
                 android:key="@string/pref_key_smoothing_watch_sensors"/>
         <ListPreference
-            android:defaultValue="75"
+                android:defaultValue="75"
                 android:title="Phone sensors"
                 android:entries="@array/pref_smoothing_titles"
                 android:entryValues="@array/pref_smoothing_values"

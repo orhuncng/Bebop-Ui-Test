@@ -18,8 +18,6 @@ import com.trio.drone.R;
 
 public class VideoUiView extends LinearLayout
 {
-    private final UiUpdater uiUpdater = new UiUpdater();
-    private GLCanvas glCanvas;
     private static Paint paintWhite = new Paint();
     private static Paint paintCyan = new Paint();
     private static Paint paintOrange = new Paint();
@@ -39,6 +37,8 @@ public class VideoUiView extends LinearLayout
     private static String altitude;
     private static String cameraTilt;
     private static String cameraPan;
+    private final UiUpdater uiUpdater = new UiUpdater();
+    private GLCanvas glCanvas;
 
     VideoUiView(Context context, AttributeSet attrs)
     {

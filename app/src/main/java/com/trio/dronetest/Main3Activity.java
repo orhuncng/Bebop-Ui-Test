@@ -32,29 +32,25 @@ public class Main3Activity extends GvrActivity
         ARDeviceControllerListener, ARDeviceControllerStreamListener
 {
     private static final String TAG = "Main3Activity";
-    private VideoUiView uiView;
-    private SceneRenderer scene;
-    public ArrayList<String> DeviceNames = new ArrayList<>();
-    ARDiscoveryDevice trioDrone;
-    ARDiscoveryServicesDevicesListUpdatedReceiver receiver;
-    ARDeviceController deviceController;
-
     private static final float Z_NEAR = 0.1f;
     private static final float Z_FAR = 100.0f;
-
     private static final int VIDEO_WIDTH = 480;
     private static final int VIDEO_HEIGHT = 480;
-
-    Context mContext;
-
-    private H264VideoController h264VideoProvider;
 
     static {
         ARSDK.loadSDKLibs();
     }
 
+    public ArrayList<String> DeviceNames = new ArrayList<>();
+    ARDiscoveryDevice trioDrone;
+    ARDiscoveryServicesDevicesListUpdatedReceiver receiver;
+    ARDeviceController deviceController;
+    Context mContext;
+    private VideoUiView uiView;
+    private SceneRenderer scene;
+    private H264VideoController h264VideoProvider;
     private float[] viewProjectionMatrix;
-
+    private ARDiscoveryService mArdiscoveryService;
     private final ARDiscoveryServicesDevicesListUpdatedReceiverDelegate mDiscoveryDelegate =
             new ARDiscoveryServicesDevicesListUpdatedReceiverDelegate()
             {
@@ -96,6 +92,7 @@ public class Main3Activity extends GvrActivity
                     }
                 }
             };
+    private ServiceConnection mArdiscoveryServiceConnection;
 
     public void initializeGvrView()
     {
@@ -122,9 +119,6 @@ public class Main3Activity extends GvrActivity
 
         viewProjectionMatrix = new float[16];
     }
-
-    private ARDiscoveryService mArdiscoveryService;
-    private ServiceConnection mArdiscoveryServiceConnection;
 
     private void initDiscoveryService()
     {

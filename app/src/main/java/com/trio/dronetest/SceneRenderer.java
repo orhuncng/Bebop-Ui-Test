@@ -13,7 +13,7 @@ import android.util.Log;
 import android.util.Pair;
 import android.view.Surface;
 import android.view.ViewGroup;
-import com.trio.drone.vr.GLUtils;
+import com.trio.drone.vr.util.GLUtils;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -23,54 +23,31 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class SceneRenderer
 {
+    static final int COORDS_PER_VERTEX = 2;
     private static final String TAG = "SceneRenderer";
-
-    // This is the primary interface between the Media Player and the GL Scene. asdasdasdasdas a
-    // sd as dasda ssa
-    private Surface mDroneSurface;
-    private SurfaceTexture mDroneTexture;
-    private Surface uiSurface;
-    private SurfaceTexture uiTexture;
-    private int uiTexId;
-    //private Surface mPhoneSurface;
-    //private SurfaceTexture mPhoneTexture;
-    private final AtomicBoolean droneFrameAvailable = new AtomicBoolean();
-
-    private final AtomicBoolean uiFrameAvailable = new AtomicBoolean();
-    //private final AtomicBoolean phoneFrameAvailable = new AtomicBoolean();
-
-    @Nullable
-    private OnFrameAvailableListener externalFrameListener;
-
-    private int droneTexId;
+    private static final int GL_TEXTURE_EXTERNAL_OES = 0x8D65;
     static float textureVertices[] = {0.0f, 1.0f,  // A. left-bottom
             1.0f, 1.0f,  // B. right-bottom
             0.0f, 0.0f,  // C. left-top
             1.0f, 0.0f   // D. right-top
     };
-    // private int phoneTexId;
-    private final String vertexShaderCode =
-            "attribute vec4 position;" + "attribute vec2 inputTextureCoordinate;" +
-                    "varying vec2 textureCoordinate;" + "void main()" + "{" +
-                    "gl_Position = position;" + "textureCoordinate = inputTextureCoordinate;" + "}";
-
-    private static final int GL_TEXTURE_EXTERNAL_OES = 0x8D65;
-    private FloatBuffer vertexBuffer, textureVerticesBuffer;
-    private ShortBuffer drawListBuffer;
-    static final int COORDS_PER_VERTEX = 2;
-    private final int vertexStride = COORDS_PER_VERTEX * 4;
-    private int mProgram;
-    private int mPositionHandle;
-    private int mTextureCoordHandle;
-
     static float squareVertices[] = { // in counterclockwise order:
             -1.0f, -1.0f,   // 0.left - mid
             1.0f, -1.0f,   // 1. right - mid
             -1.0f, 1.0f,   // 2. left - top
             1.0f, 1.0f,   // 3. right - top
     };
-
-    private short drawOrder[] = {0, 2, 1, 1, 2, 3};
+    //private Surface mPhoneSurface;
+    //private SurfaceTexture mPhoneTexture;
+    private final AtomicBoolean droneFrameAvailable = new AtomicBoolean();
+    private final AtomicBoolean uiFrameAvailable = new AtomicBoolean();
+    // private int phoneTexId;
+    private final String vertexShaderCode =
+            "attribute vec4 position;" + "attribute vec2 inputTextureCoordinate;" +
+                    "varying vec2 textureCoordinate;" + "void main()" + "{" +
+                    "gl_Position = position;" + "textureCoordinate = inputTextureCoordinate;" + "}";
+    //private final AtomicBoolean phoneFrameAvailable = new AtomicBoolean();
+    private final int vertexStride = COORDS_PER_VERTEX * 4;
     private final String fragmentShaderCode =
             "#extension GL_OES_EGL_image_external : require\n" + "precision mediump float;" +
                     "varying vec2 textureCoordinate;" + "uniform samplerExternalOES s_texture;" +
@@ -82,6 +59,22 @@ public final class SceneRenderer
     private final VideoUiView videoUiView;
     @Nullable
     private final Handler uiHandler;
+    // This is the primary interface between the Media Player and the GL Scene. asdasdasdasdas a
+    // sd as dasda ssa
+    private Surface mDroneSurface;
+    private SurfaceTexture mDroneTexture;
+    private Surface uiSurface;
+    private SurfaceTexture uiTexture;
+    private int uiTexId;
+    @Nullable
+    private OnFrameAvailableListener externalFrameListener;
+    private int droneTexId;
+    private FloatBuffer vertexBuffer, textureVerticesBuffer;
+    private ShortBuffer drawListBuffer;
+    private int mProgram;
+    private int mPositionHandle;
+    private int mTextureCoordHandle;
+    private short drawOrder[] = {0, 2, 1, 1, 2, 3};
     private boolean droneCameraEnabled;
 
     private SceneRenderer(GLCanvas glCanvas, VideoUiView videoUiView, Handler uiHandler,

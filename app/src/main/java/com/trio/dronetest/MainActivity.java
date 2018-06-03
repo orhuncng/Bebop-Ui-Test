@@ -26,7 +26,16 @@ public class MainActivity extends AppCompatActivity
         implements WatchServiceCallbacks, BebopEventListener
 {
     Context mContext;
-
+    float[] acceleration = new float[2];
+    float[] accelerationFilter = new float[3];
+    float[] gyroscope = new float[2];
+    float deltaX = 0;
+    float currentTilt = 0f;
+    float currentPan = 0f;
+    private DeviceSensorProvider<HashMap<String, float[]>> liveData;
+    private int count = 0;
+    private boolean mIsBound = false;
+    private ConsumerService mConsumerService = null;
     private final ServiceConnection mConnection = new ServiceConnection()
     {
         @Override
@@ -51,6 +60,7 @@ public class MainActivity extends AppCompatActivity
             Log.e("MainAct", "onServicedisonnected");
         }
     };
+    private int myState = 0;
 
     public void takeOffDrone(View view)
     {
@@ -69,21 +79,6 @@ public class MainActivity extends AppCompatActivity
         Log.e("cancelFlight", "cancelFlight fonksiyonunda");
         BebopBro.getInstance().doEmergencyLanding();
     }
-
-    float[] acceleration = new float[2];
-    float[] accelerationFilter = new float[3];
-    float[] gyroscope = new float[2];
-
-    private DeviceSensorProvider<HashMap<String, float[]>> liveData;
-
-    float deltaX = 0;
-    private int count = 0;
-
-    private boolean mIsBound = false;
-    private ConsumerService mConsumerService = null;
-
-    float currentTilt = 0f;
-    float currentPan = 0f;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -191,8 +186,6 @@ public class MainActivity extends AppCompatActivity
         Intent intent = new Intent(this, SensorActivity.class);
         startActivity(intent);
     }
-
-    private int myState = 0;
 
     public void sendState(View view)
     {

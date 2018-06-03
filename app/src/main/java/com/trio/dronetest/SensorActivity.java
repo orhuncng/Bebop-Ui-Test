@@ -13,7 +13,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import com.trio.drone.R;
 
 import java.util.HashMap;
@@ -23,60 +22,45 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
 {
 
     float DEFAULT_TIME_CONSTANT = 0.18f;
-
-    private SensorManager mSensorManager;
-
     float deltaZ = 0;
-
+    LinearLayout sensorLayout;
+    // Gyro Text Views
+    TextView gyroXTextView;
+    TextView gyroYTextView;
+    TextView gyroZTextView;
+    // Acceleration Text Views
+    TextView acclXTextView;
+    TextView acclYTextView;
+    TextView acclZTextView;
+    // Linear Acceleration Views
+    TextView linearAcclXTextView;
+    TextView linearAcclYTextView;
+    TextView linearAcclZTextView;
+    // Linear Magnetometer Views
+    TextView magnetometerXTextView;
+    TextView magnetometerYTextView;
+    TextView magnetometerZTextView;
+    // Seperator Text
+    TextView seperateGroups;
+    // Seperator Text
+    TextView averageLast;
+    // Acceleration with lowPassFilter Text Views
+    TextView velocityZ;
+    TextView lowPassAcclYTextView;
+    TextView lowPassAcclZTextView;
+    float[] linear_acceleration = new float[3];
+    float[] gravity = new float[3];
+    float[] acceleration = new float[2];
+    float[] accelerationFilter = new float[3];
+    float[] gyroscope = new float[2];
+    float deltaX = 0;
+    private SensorManager mSensorManager;
     // Sensors to used
     private Sensor mGyro;
     private Sensor mAccl;
     private Sensor mLinearAccl;
     private Sensor mMagnet;
-
-    LinearLayout sensorLayout;
-
-    // Gyro Text Views
-    TextView gyroXTextView;
-    TextView gyroYTextView;
-    TextView gyroZTextView;
-
-    // Acceleration Text Views
-    TextView acclXTextView;
-    TextView acclYTextView;
-    TextView acclZTextView;
-
-    // Linear Acceleration Views
-    TextView linearAcclXTextView;
-    TextView linearAcclYTextView;
-    TextView linearAcclZTextView;
-
-    // Linear Magnetometer Views
-    TextView magnetometerXTextView;
-    TextView magnetometerYTextView;
-    TextView magnetometerZTextView;
-
-    // Seperator Text
-    TextView seperateGroups;
-
-    // Seperator Text
-    TextView averageLast;
-
-    // Acceleration with lowPassFilter Text Views
-    TextView velocityZ;
-    TextView lowPassAcclYTextView;
-    TextView lowPassAcclZTextView;
-
-    float[] linear_acceleration = new float[3];
-    float[] gravity = new float[3];
-
-    float[] acceleration = new float[2];
-    float[] accelerationFilter = new float[3];
-    float[] gyroscope = new float[2];
-
     private DeviceSensorProvider<HashMap<String, float[]>> liveData;
-
-    float deltaX = 0;
     private int count = 0;
 
     @Override
@@ -116,7 +100,8 @@ public class SensorActivity extends AppCompatActivity implements SensorEventList
                 if (accelerationFilter != null && accelerationFilter.length == 3) {
                     acclXTextView.setText(Float.toString(accelerationFilter[0]));
                     acclYTextView.setText(Float.toString(accelerationFilter[1]));
-                    acclZTextView.setText("------------------------->>><<<"+ Float.toString(accelerationFilter[2]));
+                    acclZTextView.setText("------------------------->>><<<" +
+                            Float.toString(accelerationFilter[2]));
 
                     //Log.e("filtered", Float.toString(accelerationFilter[0]));
                 }

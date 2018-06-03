@@ -6,7 +6,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-
 import com.trio.drone.data.FilterData;
 import com.trio.drone.data.LowPassData;
 
@@ -63,7 +62,8 @@ public class DeviceSensorProvider<T> extends LiveData<HashMap<String, float[]>>
                 sensorMap.put("accelerationFilter", acceleration);
                 setValue(sensorMap);
 
-            } else {
+            }
+            else {
                 sensorMap.put("acceleration", event.values);
                 setValue(sensorMap);
             }
@@ -72,7 +72,8 @@ public class DeviceSensorProvider<T> extends LiveData<HashMap<String, float[]>>
             sensorMap.put("acceleration", event.values);
             setValue(sensorMap);
 
-        } else if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
+        }
+        else if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
             sensorMap.put("gyroscope", event.values);
             setValue(sensorMap);
         }

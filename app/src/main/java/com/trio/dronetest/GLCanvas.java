@@ -12,9 +12,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GLCanvas
 {
+    private final AtomicBoolean surfaceDirty = new AtomicBoolean();
     private OverlayTexture overlayTexture;
     private Surface surface;
-    private final AtomicBoolean surfaceDirty = new AtomicBoolean();
 
     public static FrameLayout.LayoutParams getLayoutParams()
     {

@@ -15,8 +15,8 @@ import android.view.View;
 import com.badlogic.gdx.graphics.GL20;
 import com.google.vr.sdk.base.*;
 import com.trio.drone.R;
-import com.trio.drone.vr.GLUtils;
 import com.trio.drone.vr.elements.OverlayTexture;
+import com.trio.drone.vr.util.GLUtils;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import java.io.IOException;
@@ -24,9 +24,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Main5Activity extends GvrActivity implements GvrView.StereoRenderer
 {
+    private final AtomicBoolean phoneFrameAvailable = new AtomicBoolean();
     private long frameTime;
     private OverlayView overlayView;
-    private final AtomicBoolean phoneFrameAvailable = new AtomicBoolean();
     private OverlayTexture overlayTexture;
 
     @Override

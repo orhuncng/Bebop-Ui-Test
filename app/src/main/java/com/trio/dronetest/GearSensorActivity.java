@@ -45,7 +45,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.trio.drone.R;
 
 import java.util.ArrayList;

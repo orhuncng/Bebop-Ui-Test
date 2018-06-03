@@ -40,31 +40,34 @@ public class DeviceController implements ARDeviceControllerListener,
 
     public void calibrateAccelerometerAndGyro()
     {
-        if (flyingState == FlyingState.LANDED)
+        if (isRunning && flyingState == FlyingState.LANDED)
             controller.getFeatureARDrone3().sendPilotingFlatTrim();
     }
 
     public void moveToRelative(float dX, float dY, float dZ, float dRotation)
     {
-        controller.getFeatureARDrone3().sendPilotingMoveBy(dX, dY, dZ, dRotation);
+        if (isRunning) controller.getFeatureARDrone3().sendPilotingMoveBy(dX, dY, dZ, dRotation);
     }
 
     public void move(int rollPerc, int pitchPerc, int yawPerc, int gazPerc)
     {
-        controller.getFeatureARDrone3().setPilotingPCMD((byte) 1, (byte) rollPerc,
+        if (isRunning) controller.getFeatureARDrone3().setPilotingPCMD((byte) 1, (byte) rollPerc,
                 (byte) pitchPerc, (byte) yawPerc, (byte) gazPerc, 0);
     }
 
     public void moveCamera(float tilt, float pan)
     {
-        controller.getFeatureARDrone3().sendCameraOrientationV2(tilt, pan);
+        if (isRunning) controller.getFeatureARDrone3().sendCameraOrientationV2(tilt, pan);
     }
 
-    public void doEmergencyLanding() {controller.getFeatureARDrone3().sendPilotingEmergency();}
+    public void doEmergencyLanding()
+    {
+        if (isRunning) controller.getFeatureARDrone3().sendPilotingEmergency();
+    }
 
-    public void takeOff() {controller.getFeatureARDrone3().sendPilotingTakeOff();}
+    public void takeOff() {if (isRunning) controller.getFeatureARDrone3().sendPilotingTakeOff();}
 
-    public void land() {controller.getFeatureARDrone3().sendPilotingLanding();}
+    public void land() {if (isRunning) controller.getFeatureARDrone3().sendPilotingLanding();}
 
     @Override
     public void onStateChanged(ARDeviceController deviceController,
@@ -260,6 +263,7 @@ public class DeviceController implements ARDeviceControllerListener,
     {
         Log.e("configureDecoder", "codec received");
         videoController.configureDecoder(codec);
+
         return ARCONTROLLER_ERROR_ENUM.ARCONTROLLER_OK;
     }
 

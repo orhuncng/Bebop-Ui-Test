@@ -15,6 +15,7 @@ import com.google.vr.sdk.base.HeadTransform;
 import com.google.vr.sdk.base.Viewport;
 import com.trio.drone.bebop.BebopBro;
 import com.trio.drone.vr.Scene;
+import com.trio.drone.vr.util.AnimationState;
 
 public class Main4Activity extends CardBoardAndroidApplication
         implements CardBoardApplicationListener
@@ -38,6 +39,8 @@ public class Main4Activity extends CardBoardAndroidApplication
         config.a = 8;
         config.numSamples = 2;
         initialize(this, config);
+
+        AnimationState.getInstance().start();
     }
 
     @Override
@@ -67,8 +70,7 @@ public class Main4Activity extends CardBoardAndroidApplication
         try {
             camera.setPreviewTexture(scene.getBackgroundTexture());
             camera.startPreview();
-        } catch (IOException ioe) {
-            Log.w("Main5Activity", "CAM LAUNCH FAILED");
+        } catch (IOException ignored) {
         }*/
     }
 

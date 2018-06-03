@@ -36,7 +36,7 @@
                     android:layout_height="match_parent">
 
                 <SurfaceView
-                    android:id="@+id/video_texture_view"
+                        android:id="@+id/video_texture_view"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"/>
             </FrameLayout>
@@ -79,11 +79,11 @@
                         android:text="Gear Sensors"/>
 
                 <Button
-                    android:id="@+id/stateButton"
-                    android:onClick="changeControlState"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="ChangeState" />
+                        android:id="@+id/stateButton"
+                        android:onClick="changeControlState"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ChangeState"/>
             </TableRow>
 
             <TableRow
@@ -126,10 +126,10 @@
                 android:text="Sensors"/>
 
         <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:onClick="sendState"
-            android:text="SendPilotingState" />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="sendState"
+                android:text="SendPilotingState"/>
 
     </LinearLayout>
 

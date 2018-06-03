@@ -1,11 +1,9 @@
-package com.trio.drone.vr;
+package com.trio.drone.vr.util;
 
 import android.content.res.Resources;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.util.Log;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,12 +21,8 @@ import static android.opengl.GLU.gluErrorString;
  */
 public class GLUtils
 {
-    private static final String TAG = "Video360.Utils";
-
     public static final int BYTES_PER_FLOAT = 4;
-
-    private static ShaderProgram defaultLibgdxShader;
-
+    private static final String TAG = "Video360.Utils";
     /**
      * Debug builds should fail quickly. Release versions of the app should have this disabled.
      */
@@ -37,9 +31,7 @@ public class GLUtils
     /**
      * Class only contains static methods.
      */
-    private GLUtils()
-    {
-    }
+    private GLUtils() { }
 
     /**
      * Checks GLES20.glGetError and fails quickly if the state isn't GL_NO_ERROR.
@@ -61,13 +53,6 @@ public class GLUtils
                 throw e;
             }
         }
-    }
-
-    public static ShaderProgram getDefaultLibgdxShader()
-    {
-        if (defaultLibgdxShader == null)
-            defaultLibgdxShader = SpriteBatch.createDefaultShader();
-        return defaultLibgdxShader;
     }
 
     private static int createShader(Resources res, int shaderId, int shaderType)

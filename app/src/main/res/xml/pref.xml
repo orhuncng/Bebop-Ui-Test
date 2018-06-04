@@ -15,10 +15,10 @@
     <PreferenceCategory android:title="Smoothing">
         <ListPreference
                 android:defaultValue="75"
-                android:title="Drone sensors"
+            android:title="Drone sensors"
                 android:entries="@array/pref_smoothing_titles"
                 android:entryValues="@array/pref_smoothing_values"
-                android:key="@string/pref_key_smoothing_drone_sensors"/>
+            android:key="@string/pref_key_smoothing_drone_sensors" />
         <ListPreference
                 android:defaultValue="75"
                 android:title="Smartwatch sensors"
@@ -39,14 +39,14 @@
                 android:singleLine="true"
                 android:title="Max altitude in meters"
                 android:key="@string/pref_key_max_altitude"
-                android:numeric="integer"/>
+            android:numeric="decimal" />
         <EditTextPreference
                 android:defaultValue="@integer/defaultMaxVerticalSpeed"
                 android:selectAllOnFocus="true"
                 android:singleLine="true"
                 android:title="Max vertical speed in m/s"
                 android:key="@string/pref_key_max_vert_speed"
-                android:numeric="integer"/>
+            android:numeric="decimal" />
         <EditTextPreference
                 android:defaultValue="@integer/defaultMaxPitchRoll"
                 android:selectAllOnFocus="true"
@@ -61,80 +61,73 @@
                 android:title="Max rotation speed in degree/s"
                 android:key="@string/pref_key_max_rot_speed"
                 android:numeric="integer"/>
-        <EditTextPreference
-                android:defaultValue="@integer/defaultMaxTilt"
-                android:selectAllOnFocus="true"
-                android:singleLine="true"
-                android:title="Max tilt in degree/s"
-                android:key="@string/pref_key_max_tilt"
-                android:numeric="integer"/>
     </PreferenceCategory>
     <PreferenceCategory android:title="UI alerts">
         <EditTextPreference
-                android:defaultValue="@integer/defaultUIRollLimit"
-                android:selectAllOnFocus="true"
-                android:singleLine="true"
-                android:title="Roll alert limit in degrees"
-                android:key="@string/pref_key_ui_roll_limit"
-                android:numeric="integer"/>
+            android:defaultValue="@integer/defaultUIRollLimit"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Roll alert limit in degrees"
+            android:key="@string/pref_key_ui_roll_limit"
+            android:numeric="integer" />
         <EditTextPreference
-                android:defaultValue="@integer/defaultUIPitchLimit"
-                android:selectAllOnFocus="true"
-                android:singleLine="true"
-                android:title="Pitch alert limit in degrees"
-                android:key="@string/pref_key_ui_pitch_limit"
-                android:numeric="integer"/>
+            android:defaultValue="@integer/defaultUIPitchLimit"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Pitch alert limit in degrees"
+            android:key="@string/pref_key_ui_pitch_limit"
+            android:numeric="integer" />
         <EditTextPreference
-                android:defaultValue="@integer/defaultUIYawLimit"
-                android:selectAllOnFocus="true"
-                android:singleLine="true"
-                android:title="Yaw alert limit in degrees"
-                android:key="@string/pref_key_ui_yaw_limit"
-                android:numeric="integer"/>
+            android:defaultValue="@integer/defaultUIYawLimit"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Yaw alert limit in degrees"
+            android:key="@string/pref_key_ui_yaw_limit"
+            android:numeric="integer" />
         <EditTextPreference
-                android:defaultValue="@integer/defaultUISpeedLimit"
-                android:selectAllOnFocus="true"
-                android:singleLine="true"
-                android:title="Speed alert limit in m/s"
-                android:key="@string/pref_key_ui_speed_limit"
-                android:numeric="decimal"/>
+            android:defaultValue="@integer/defaultUISpeedLimit"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Speed alert limit in m/s"
+            android:key="@string/pref_key_ui_speed_limit"
+            android:numeric="decimal" />
         <EditTextPreference
-                android:defaultValue="@integer/defaultUIAccelLimit"
-                android:selectAllOnFocus="true"
-                android:singleLine="true"
-                android:title="Acceleration alert m/s"
-                android:key="@string/pref_key_ui_accel_limit"
-                android:numeric="decimal"/>
+            android:defaultValue="@integer/defaultUIAccelLimit"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Acceleration alert m/s"
+            android:key="@string/pref_key_ui_accel_limit"
+            android:numeric="decimal" />
         <EditTextPreference
-                android:defaultValue="@integer/defaultUIAltitudeLimit"
-                android:selectAllOnFocus="true"
-                android:singleLine="true"
-                android:title="Altitude alert limit in meters"
-                android:key="@string/pref_key_ui_altitude_limit"
-                android:numeric="decimal"/>
+            android:defaultValue="@integer/defaultUIAltitudeLimit"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Altitude alert limit in meters"
+            android:key="@string/pref_key_ui_altitude_limit"
+            android:numeric="decimal" />
         <EditTextPreference
-                android:defaultValue="@integer/defaultUIVertSpeedLimit"
-                android:selectAllOnFocus="true"
-                android:singleLine="true"
-                android:title="Vertical speed alert limit in m/s"
-                android:key="@string/pref_key_ui_vert_speed_limit"
-                android:numeric="decimal"/>
+            android:defaultValue="@integer/defaultUIVertSpeedLimit"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Vertical speed alert limit in m/s"
+            android:key="@string/pref_key_ui_vert_speed_limit"
+            android:numeric="decimal" />
         <EditTextPreference
-                android:defaultValue="@integer/defaultUIAlertPerc"
-                android:selectAllOnFocus="true"
-                android:singleLine="true"
-                android:title="Alert Percentage"
-                android:key="@string/pref_key_ui_alert_perc"
-                android:numeric="integer"
-                android:summary="Applies to all alert limits. An element enters alert state when its ringValue reaches this percentage compared to its defined alert limit."/>
+            android:defaultValue="@integer/defaultUIAlertPerc"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Alert Percentage"
+            android:key="@string/pref_key_ui_alert_perc"
+            android:numeric="integer"
+            android:summary="Applies to all alert limits. An element enters alert state when its ringValue reaches this percentage compared to its defined alert limit." />
         <EditTextPreference
-                android:defaultValue="@integer/defaultUIHecticAlertPerc"
-                android:selectAllOnFocus="true"
-                android:singleLine="true"
-                android:title="Hectic Alert Percentage"
-                android:key="@string/pref_key_ui_hectic_alert_perc"
-                android:numeric="integer"
-                android:summary="Similar to Alert Percentage. Hectic alerts are more noticable."/>
+            android:defaultValue="@integer/defaultUIHecticAlertPerc"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Hectic Alert Percentage"
+            android:key="@string/pref_key_ui_hectic_alert_perc"
+            android:numeric="integer"
+            android:summary="Similar to Alert Percentage. Hectic alerts are more noticable." />
     </PreferenceCategory>
 
 </PreferenceScreen>

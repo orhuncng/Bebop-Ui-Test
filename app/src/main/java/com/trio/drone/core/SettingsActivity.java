@@ -1,35 +1,35 @@
 package com.trio.drone.core;
 
 import android.os.Bundle;
-import android.preference.*;
+import android.preference.ListPreference;
+import android.preference.Preference;
+import android.preference.PreferenceActivity;
+import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.view.MenuItem;
+
 import com.trio.drone.R;
 import com.trio.drone.data.LowPassData;
 import com.trio.drone.data.SensorSource;
 
-public class SettingsActivity extends PreferenceActivity
-{
+public class SettingsActivity extends PreferenceActivity {
     @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
+    public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) onBackPressed();
         return super.onOptionsItemSelected(item);
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getFragmentManager().beginTransaction().replace(android.R.id.content,
                 new MainPreferenceFragment()).commit();
     }
 
     public static class MainPreferenceFragment extends PreferenceFragment
-            implements Preference.OnPreferenceChangeListener
-    {
+            implements Preference.OnPreferenceChangeListener {
         @Override
-        public void onCreate(final Bundle savedInstanceState)
-        {
+        public void onCreate(final Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref);
 
@@ -42,7 +42,6 @@ public class SettingsActivity extends PreferenceActivity
             setListener(findPreference(getString(R.string.pref_key_max_vert_speed)));
             setListener(findPreference(getString(R.string.pref_key_max_pitch_roll)));
             setListener(findPreference(getString(R.string.pref_key_max_rot_speed)));
-            setListener(findPreference(getString(R.string.pref_key_max_tilt)));
             setListener(findPreference(getString(R.string.pref_key_ui_roll_limit)));
             setListener(findPreference(getString(R.string.pref_key_ui_pitch_limit)));
             setListener(findPreference(getString(R.string.pref_key_ui_yaw_limit)));
@@ -55,8 +54,7 @@ public class SettingsActivity extends PreferenceActivity
         }
 
         @Override
-        public boolean onPreferenceChange(Preference preference, Object newValue)
-        {
+        public boolean onPreferenceChange(Preference preference, Object newValue) {
             String stringValue = newValue.toString();
 
             if (preference instanceof ListPreference) {
@@ -65,8 +63,7 @@ public class SettingsActivity extends PreferenceActivity
 
                 preference.setSummary(
                         index >= 0 ? listPreference.getEntries()[index] : null);
-            }
-            else {
+            } else {
                 preference.setSummary(stringValue);
             }
 
@@ -85,8 +82,7 @@ public class SettingsActivity extends PreferenceActivity
             return true;
         }
 
-        private void setListener(Preference preference)
-        {
+        private void setListener(Preference preference) {
             preference.setOnPreferenceChangeListener(this);
             onPreferenceChange(preference, PreferenceManager.getDefaultSharedPreferences(
                     preference.getContext()).getString(preference.getKey(), ""));

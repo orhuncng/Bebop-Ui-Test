@@ -7,6 +7,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.KeyEvent;
+
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.badlogic.gdx.backends.android.CardBoardAndroidApplication;
 import com.badlogic.gdx.backends.android.CardBoardApplicationListener;
@@ -90,8 +91,7 @@ public class Main4Activity extends CardBoardAndroidApplication
     public void onRendererShutdown() { scene.shutdown(); }
 
     @Override
-    public void create()
-    {
+    public void create() {
         GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         GLES20.glEnable(GL20.GL_DEPTH_TEST);
         GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_DST_ALPHA);
@@ -121,16 +121,14 @@ public class Main4Activity extends CardBoardAndroidApplication
     }
 
     @Override
-    public void onCardboardTrigger()
-    {
+    public void onCardboardTrigger() {
         if (BebopBro.get().getControlState() == ControlState.CAMERA_LOOKUP)
             BebopBro.get().setControlState(ControlState.PILOTING);
         else
             BebopBro.get().setControlState(ControlState.CAMERA_LOOKUP);
     }
 
-    public void whatevs()
-    {
+    public void whatevs() {
         if (BebopBro.get().getControlState() == ControlState.CAMERA_LOOKUP)
             BebopBro.get().setControlState(ControlState.PILOTING);
         else

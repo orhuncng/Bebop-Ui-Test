@@ -2,6 +2,7 @@ package com.trio.drone.vr.elements;
 
 import android.content.res.Resources;
 import android.util.DisplayMetrics;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.trio.drone.bebop.ControlState;
@@ -77,19 +78,16 @@ public class OperatingState implements SceneListener
     {
         GdxUtils.get().getFont24().setColor(flyingStateColors.get(flyingState));
         GdxUtils.get().getFont24().draw(batch, flyingStateLabels.get(flyingState),
-                centerX + 10, centerY);
+                centerX, centerY);
 
         if (controlState == ControlState.PILOTING) {
             GdxUtils.get().getFont18().setColor(Color.LIME);
             GdxUtils.get().getFont18().draw(batch, controlStateLabels.get(controlState),
                     centerX + 10f, centerY - 35f);
-        }
-        else {
+        } else {
             GdxUtils.get().getFont18().setColor(Color.ORANGE);
             GdxUtils.get().getFont18().draw(batch, controlStateLabels.get(controlState),
-                    centerX - 30f, centerY - 35f);
-            GdxUtils.get().getFont18().draw(batch, controlStateLabels.get(controlState),
-                    centerX - 30f, centerY - 35f);
+                    centerX - 30, centerY - 35f);
         }
 
         GdxUtils.get().resetFont18Color();

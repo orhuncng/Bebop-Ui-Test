@@ -1,98 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                             xmlns:app="http://schemas.android.com/apk/res-auto"
-                                             xmlns:tools="http://schemas.android.com/tools"
-                                             android:layout_width="match_parent"
-                                             android:layout_height="match_parent"
-                                             tools:context="com.trio.dronetest.MainActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.trio.dronetest.MainActivity">
 
     <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            android:elevation="4dp"
-            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
     <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="123dp"
-            android:layout_marginTop="61dp"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/toolbar"
-            tools:ignore="MissingConstraints">
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="123dp"
+        android:layout_marginTop="61dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        tools:ignore="MissingConstraints">
 
         <TableLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:columnCount="3"
-                android:orientation="vertical"
-                android:rowCount="3">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:columnCount="3"
+            android:orientation="vertical"
+            android:rowCount="3">
 
             <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
                 <Button
-                        android:id="@+id/stateButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:onClick="changeControlState"
-                        android:text="ChangeState"/>
+                    android:id="@+id/stateButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="changeControlState"
+                    android:text="ChangeState" />
 
                 <Button
-                        android:id="@+id/takeOffBtn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:onClick="takeOffDrone"
-                        android:text="TAKEOFF"
-                        tools:layout_editor_absoluteX="211dp"
-                        tools:layout_editor_absoluteY="379dp"/>
+                    android:id="@+id/takeOffBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="takeOffDrone"
+                    android:text="TAKEOFF"
+                    tools:layout_editor_absoluteX="211dp"
+                    tools:layout_editor_absoluteY="379dp" />
 
                 <Button
-                        android:id="@+id/landingBtn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:onClick="landDrone"
-                        android:text="LANDING"
-                        tools:layout_editor_absoluteX="16dp"
-                        tools:layout_editor_absoluteY="143dp"/>
+                    android:id="@+id/landingBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="landDrone"
+                    android:text="LANDING"
+                    tools:layout_editor_absoluteX="16dp"
+                    tools:layout_editor_absoluteY="143dp" />
 
             </TableRow>
         </TableLayout>
 
         <LinearLayout
-                android:layout_width="368dp"
-                android:layout_height="231dp"
-                android:orientation="vertical"
-                tools:layout_editor_absoluteX="8dp"
-                tools:layout_editor_absoluteY="264dp">
+            android:layout_width="368dp"
+            android:layout_height="231dp"
+            android:orientation="vertical"
+            tools:layout_editor_absoluteX="8dp"
+            tools:layout_editor_absoluteY="264dp">
 
             <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
                 <SurfaceView
-                        android:id="@+id/video_texture_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"/>
+                    android:id="@+id/video_texture_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
             </FrameLayout>
 
         </LinearLayout>
 
         <Button
-                android:id="@+id/cancelBtn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:onClick="cancelFlight"
-                android:text="CANCEL"
-                tools:layout_editor_absoluteX="16dp"
-                tools:layout_editor_absoluteY="191dp"/>
+            android:id="@+id/cancelBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="cancelFlight"
+            android:text="CANCEL"
+            tools:layout_editor_absoluteX="16dp"
+            tools:layout_editor_absoluteY="191dp" />
 
     </LinearLayout>
 

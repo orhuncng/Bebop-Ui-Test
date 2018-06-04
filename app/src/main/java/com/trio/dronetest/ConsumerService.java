@@ -43,6 +43,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
+
 import com.samsung.android.sdk.SsdkUnsupportedException;
 import com.samsung.android.sdk.accessory.SA;
 import com.samsung.android.sdk.accessory.SAAgent;
@@ -52,6 +53,7 @@ import com.trio.drone.R;
 import com.trio.drone.data.FilterData;
 import com.trio.drone.data.LowPassData;
 import com.trio.drone.data.SensorSource;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -102,8 +104,7 @@ import java.util.Iterator;
  * </code>
  */
 
-public class ConsumerService extends SAAgent
-{
+public class ConsumerService extends SAAgent {
     private static final String TAG = "HelloAccessory(C)";
     private static final Class<ServiceConnection> SASOCKET_CLASS = ServiceConnection.class;
     private final IBinder mBinder = new LocalBinder();
@@ -115,19 +116,16 @@ public class ConsumerService extends SAAgent
     private FilterData filterData = new LowPassData(SensorSource.WATCH);
     private float[] watchGravity = new float[]{0.0F, 0.0F, 0.0F};
 
-    public ConsumerService()
-    {
+    public ConsumerService() {
         super(TAG, SASOCKET_CLASS);
     }
 
-    public void setCallbacks(WatchServiceCallbacks callbacks)
-    {
+    public void setCallbacks(WatchServiceCallbacks callbacks) {
         serviceCallbacks = callbacks;
     }
 
     @Override
-    public void onCreate()
-    {
+    public void onCreate() {
         super.onCreate();
 
         /****************************************************
@@ -175,8 +173,7 @@ public class ConsumerService extends SAAgent
     }
 
     @Override
-    public void onDestroy()
-    {
+    public void onDestroy() {
         /***************************************************
          * Example codes for Android O OS (stopForeground) *
          ***************************************************/
@@ -187,44 +184,36 @@ public class ConsumerService extends SAAgent
     }
 
     @Override
-    protected void onFindPeerAgentsResponse(SAPeerAgent[] peerAgents, int result)
-    {
+    protected void onFindPeerAgentsResponse(SAPeerAgent[] peerAgents, int result) {
         if ((result == SAAgent.PEER_AGENT_FOUND) && (peerAgents != null)) {
             for (SAPeerAgent peerAgent : peerAgents)
                 requestServiceConnection(peerAgent);
-        }
-        else if (result == SAAgent.FINDPEER_DEVICE_NOT_CONNECTED) {
+        } else if (result == SAAgent.FINDPEER_DEVICE_NOT_CONNECTED) {
             Toast.makeText(getApplicationContext(), "FINDPEER_DEVICE_NOT_CONNECTED",
                     Toast.LENGTH_LONG).show();
             updateTextView("Disconnected");
-        }
-        else if (result == SAAgent.FINDPEER_SERVICE_NOT_FOUND) {
+        } else if (result == SAAgent.FINDPEER_SERVICE_NOT_FOUND) {
             Toast.makeText(getApplicationContext(), "FINDPEER_SERVICE_NOT_FOUND", Toast.LENGTH_LONG)
-                 .show();
+                    .show();
             updateTextView("Disconnected");
-        }
-        else {
+        } else {
             Toast.makeText(getApplicationContext(), R.string.NoPeersFound, Toast.LENGTH_LONG)
-                 .show();
+                    .show();
         }
     }
 
     @Override
-    protected void onPeerAgentsUpdated(SAPeerAgent[] peerAgents, int result)
-    {
+    protected void onPeerAgentsUpdated(SAPeerAgent[] peerAgents, int result) {
         final SAPeerAgent[] peers = peerAgents;
         final int status = result;
-        mHandler.post(new Runnable()
-        {
+        mHandler.post(new Runnable() {
             @Override
-            public void run()
-            {
+            public void run() {
                 if (peers != null) {
                     if (status == SAAgent.PEER_AGENT_AVAILABLE) {
                         Toast.makeText(getApplicationContext(), "PEER_AGENT_AVAILABLE",
                                 Toast.LENGTH_LONG).show();
-                    }
-                    else {
+                    } else {
                         Toast.makeText(getApplicationContext(), "PEER_AGENT_UNAVAILABLE",
                                 Toast.LENGTH_LONG).show();
                     }
@@ -234,52 +223,43 @@ public class ConsumerService extends SAAgent
     }
 
     @Override
-    protected void onServiceConnectionRequested(SAPeerAgent peerAgent)
-    {
+    protected void onServiceConnectionRequested(SAPeerAgent peerAgent) {
         if (peerAgent != null) {
             acceptServiceConnectionRequest(peerAgent);
         }
     }
 
     @Override
-    protected void onServiceConnectionResponse(SAPeerAgent peerAgent, SASocket socket, int result)
-    {
+    protected void onServiceConnectionResponse(SAPeerAgent peerAgent, SASocket socket, int result) {
         if (result == SAAgent.CONNECTION_SUCCESS) {
             mConnectionHandler = (ServiceConnection) socket;
             updateTextView("Connected");
-        }
-        else if (result == SAAgent.CONNECTION_ALREADY_EXIST) {
+        } else if (result == SAAgent.CONNECTION_ALREADY_EXIST) {
             updateTextView("Connected");
             Toast.makeText(getBaseContext(), "CONNECTION_ALREADY_EXIST", Toast.LENGTH_LONG).show();
-        }
-        else if (result == SAAgent.CONNECTION_DUPLICATE_REQUEST) {
+        } else if (result == SAAgent.CONNECTION_DUPLICATE_REQUEST) {
             Toast.makeText(getBaseContext(), "CONNECTION_DUPLICATE_REQUEST", Toast.LENGTH_LONG)
-                 .show();
-        }
-        else {
+                    .show();
+        } else {
             Toast.makeText(getBaseContext(), R.string.ConnectionFailure, Toast.LENGTH_LONG).show();
         }
     }
 
     @Override
-    protected void onError(SAPeerAgent peerAgent, String errorMessage, int errorCode)
-    {
+    protected void onError(SAPeerAgent peerAgent, String errorMessage, int errorCode) {
         super.onError(peerAgent, errorMessage, errorCode);
     }
 
     @Override
-    public IBinder onBind(Intent intent)
-    {
+    public IBinder onBind(Intent intent) {
         return mBinder;
     }
 
-    public void findPeers()
-    {
+    public void findPeers() {
         findPeerAgents();
     }
 
-    public boolean sendData(final String data)
-    {
+    public boolean sendData(final String data) {
         boolean retvalue = false;
         if (mConnectionHandler != null) {
             try {
@@ -293,8 +273,7 @@ public class ConsumerService extends SAAgent
         return retvalue;
     }
 
-    public boolean sendState(final String data)
-    {
+    public boolean sendState(final String data) {
         boolean retvalue = false;
         if (mConnectionHandler != null) {
             try {
@@ -308,20 +287,17 @@ public class ConsumerService extends SAAgent
         return retvalue;
     }
 
-    public boolean closeConnection()
-    {
+    public boolean closeConnection() {
         if (mConnectionHandler != null) {
             mConnectionHandler.close();
             mConnectionHandler = null;
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
 
-    private boolean processUnsupportedException(SsdkUnsupportedException e)
-    {
+    private boolean processUnsupportedException(SsdkUnsupportedException e) {
         e.printStackTrace();
         int errType = e.getType();
         if (errType == SsdkUnsupportedException.VENDOR_NOT_SUPPORTED ||
@@ -334,14 +310,11 @@ public class ConsumerService extends SAAgent
              * resources, stop Service threads, close UI thread, etc.)
              */
             stopSelf();
-        }
-        else if (errType == SsdkUnsupportedException.LIBRARY_NOT_INSTALLED) {
+        } else if (errType == SsdkUnsupportedException.LIBRARY_NOT_INSTALLED) {
             Log.e(TAG, "You need to install Samsung Accessory SDK to use this application.");
-        }
-        else if (errType == SsdkUnsupportedException.LIBRARY_UPDATE_IS_REQUIRED) {
+        } else if (errType == SsdkUnsupportedException.LIBRARY_UPDATE_IS_REQUIRED) {
             Log.e(TAG, "You need to update Samsung Accessory SDK to use this application.");
-        }
-        else if (errType == SsdkUnsupportedException.LIBRARY_UPDATE_IS_RECOMMENDED) {
+        } else if (errType == SsdkUnsupportedException.LIBRARY_UPDATE_IS_RECOMMENDED) {
             Log.e(TAG,
                     "We recommend that you update your Samsung Accessory SDK before using this " +
                             "application.");
@@ -350,44 +323,34 @@ public class ConsumerService extends SAAgent
         return true;
     }
 
-    private void updateTextView(final String str)
-    {
-        mHandler.post(new Runnable()
-        {
+    private void updateTextView(final String str) {
+        mHandler.post(new Runnable() {
             @Override
-            public void run()
-            {
+            public void run() {
                 //GearSensorActivity.updateTextView(str);
             }
         });
     }
 
-    private void addGyroXMessage(final String str)
-    {
-        mHandler.postDelayed(new Runnable()
-        {
+    private void addGyroXMessage(final String str) {
+        mHandler.postDelayed(new Runnable() {
             @Override
-            public void run()
-            {
+            public void run() {
                 GearSensorActivity.addGyroXMessage(str);
             }
         }, 500);
     }
 
-    private void addGyroYMessage(final String str)
-    {
-        mHandler.postDelayed(new Runnable()
-        {
+    private void addGyroYMessage(final String str) {
+        mHandler.postDelayed(new Runnable() {
             @Override
-            public void run()
-            {
+            public void run() {
                 GearSensorActivity.addGyroYMessage(str);
             }
         }, 500);
     }
 
-    private void receivedRotateDrone(final String str)
-    {
+    private void receivedRotateDrone(final String str) {
         Log.e("receivedRotateDrone", str);
         int dir = 100;
         if (str.equals("CCW")) {
@@ -399,8 +362,7 @@ public class ConsumerService extends SAAgent
         }
     }
 
-    private void receivedLandDrone()
-    {
+    private void receivedLandDrone() {
         Log.e("receivedLandDrone", "Land Drone received from watch");
 
         if (serviceCallbacks != null) {
@@ -408,8 +370,7 @@ public class ConsumerService extends SAAgent
         }
     }
 
-    private void receivedTakeOffDrone()
-    {
+    private void receivedTakeOffDrone() {
         Log.e("receivedTakeOffDrone", "TakeOff Drone received from watch");
 
         if (serviceCallbacks != null) {
@@ -417,8 +378,7 @@ public class ConsumerService extends SAAgent
         }
     }
 
-    private void receivedEmergencyDrone()
-    {
+    private void receivedEmergencyDrone() {
         Log.e("receivedEmergencyDrone", "Emergency Drone received from watch");
 
         if (serviceCallbacks != null) {
@@ -426,8 +386,7 @@ public class ConsumerService extends SAAgent
         }
     }
 
-    private void receivedAcceleroData(float x, float y, float z)
-    {
+    private void receivedAcceleroData(float x, float y, float z) {
         //Log.e("receivedAcceleroData", "Accelero data received from watch");
 
         if (serviceCallbacks != null) {
@@ -440,33 +399,26 @@ public class ConsumerService extends SAAgent
         }
     }
 
-    private void addGyroZMessage(final String str)
-    {
-        mHandler.postDelayed(new Runnable()
-        {
+    private void addGyroZMessage(final String str) {
+        mHandler.postDelayed(new Runnable() {
             @Override
-            public void run()
-            {
+            public void run() {
                 GearSensorActivity.addGyroZMessage(str);
             }
         }, 500);
     }
 
-    public class ServiceConnection extends SASocket
-    {
-        public ServiceConnection()
-        {
+    public class ServiceConnection extends SASocket {
+        public ServiceConnection() {
             super(ServiceConnection.class.getName());
         }
 
         @Override
-        public void onError(int channelId, String errorMessage, int errorCode)
-        {
+        public void onError(int channelId, String errorMessage, int errorCode) {
         }
 
         @Override
-        public void onReceive(int channelId, byte[] data)
-        {
+        public void onReceive(int channelId, byte[] data) {
             final String message = new String(data);
             //Log.e("X", message);
             //rotateDrone(message);
@@ -490,23 +442,19 @@ public class ConsumerService extends SAAgent
                         addGyroXMessage(obj.get(obj.names().getString(1)).toString());
                         addGyroYMessage(obj.get(obj.names().getString(2)).toString());
                         addGyroZMessage(obj.get(obj.names().getString(3)).toString());
-                    }
-                    else if (obj.getString(key).equals("rotary")) {
+                    } else if (obj.getString(key).equals("rotary")) {
                         receivedRotateDrone(obj.get(obj.names().getString(1)).toString());
-                    }
-                    else if (obj.getString(key).equals("flightState")) {
+                    } else if (obj.getString(key).equals("flightState")) {
                         if (obj.get(obj.names().getString(1)).toString().equals("0")) {
                             receivedLandDrone();
-                        }
-                        else {
+                        } else {
+                            Log.e("adsasdasdasdasda", "sdasdasd");
                             receivedTakeOffDrone();
                         }
 
-                    }
-                    else if (obj.getString(key).equals("emergency")) {
+                    } else if (obj.getString(key).equals("emergency")) {
                         receivedEmergencyDrone();
-                    }
-                    else if (obj.getString(key).equals("accelero")) {
+                    } else if (obj.getString(key).equals("accelero")) {
                         float x = Float.parseFloat(obj.get(obj.names().getString(1)).toString());
                         float y = Float.parseFloat(obj.get(obj.names().getString(2)).toString());
                         float z = Float.parseFloat(obj.get(obj.names().getString(3)).toString());
@@ -530,17 +478,14 @@ public class ConsumerService extends SAAgent
         }
 
         @Override
-        protected void onServiceConnectionLost(int reason)
-        {
+        protected void onServiceConnectionLost(int reason) {
             updateTextView("Disconnected");
             closeConnection();
         }
     }
 
-    public class LocalBinder extends Binder
-    {
-        public ConsumerService getService()
-        {
+    public class LocalBinder extends Binder {
+        public ConsumerService getService() {
             return ConsumerService.this;
         }
     }

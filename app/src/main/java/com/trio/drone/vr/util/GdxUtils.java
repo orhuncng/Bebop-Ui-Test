@@ -30,7 +30,7 @@ public class GdxUtils
         font18 = createBitmapFont(18);
     }
 
-    public static GdxUtils getInstance()
+    public static GdxUtils get()
     {
         if (instance == null) instance = new GdxUtils();
         return instance;

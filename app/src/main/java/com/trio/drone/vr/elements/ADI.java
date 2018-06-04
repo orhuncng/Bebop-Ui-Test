@@ -10,16 +10,10 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.trio.drone.vr.SceneListener;
 import com.trio.drone.vr.util.AnimationState;
 import com.trio.drone.vr.util.GdxUtils;
+import com.trio.drone.vr.util.LimitedData;
 
 public class ADI implements SceneListener
 {
-    private static final float PITCH_BLINK_LIMIT = 45f;
-    private static final float PITCH_HECTIC_BLINK_LIMIT = 65f;
-    private static final float ROLL_BLINK_LIMIT = 30f;
-    private static final float ROLL_HECTIC_BLINK_LIMIT = 45f;
-    private static final float YAW_BLINK_LIMIT = 25f;
-    private static final float YAW_HECTIC_BLINK_LIMIT = 35f;
-
     private static final float TOTAL_DEGREES = 230f;
     private static final float SIZE = 300f;
     private static final float WIDTH_COEFF = 0.75f;
@@ -30,9 +24,9 @@ public class ADI implements SceneListener
     private Sprite rollPointerSprite;
     private Sprite yawSprite;
 
-    private float roll;
-    private float pitch;
-    private float yaw;
+    private LimitedData roll = new LimitedData();
+    private LimitedData pitch = new LimitedData();
+    private LimitedData yaw = new LimitedData();
 
     private float pitchRange;
     private float pitchCenter;
@@ -43,11 +37,17 @@ public class ADI implements SceneListener
 
     private ShaderProgram pitchShader;
 
-    public void setRoll(float roll) { if (roll <= 180f && roll >= -180f) this.roll = roll; }
+    public void setRoll(float value) { if (value <= 180f && value >= -180f) roll.setValue(value); }
 
-    public void setPitch(float pitch) { if (pitch <= 90f && pitch >= -90f) this.pitch = pitch; }
+    public void setPitch(float value) { if (value <= 90f && value >= -90f) pitch.setValue(value); }
 
-    public void setYaw(float yaw) { if (yaw <= 180f && yaw >= -180f) this.yaw = yaw; }
+    public void setYaw(float value) { if (value <= 180f && value >= -180f) yaw.setValue(value); }
+
+    public void setRollLimit(float limit) { roll.setLimit(limit); }
+
+    public void setPitchLimit(float limit) { pitch.setLimit(limit); }
+
+    public void setYawLimit(float limit) { yaw.setLimit(limit); }
 
     @Override
     public void create(DisplayMetrics metrics, Resources res)
@@ -55,7 +55,7 @@ public class ADI implements SceneListener
         centerX = metrics.widthPixels / 2f;
         float centerY = (metrics.heightPixels / 2f) - 150f;
 
-        pitchSprite = new Sprite(GdxUtils.getInstance().createSprite("pitch"));
+        pitchSprite = new Sprite(GdxUtils.get().createSprite("pitch"));
 
         centerV = (pitchSprite.getV() + pitchSprite.getV2()) / 2f;
         degreeInV = (pitchSprite.getV2() - pitchSprite.getV()) / TOTAL_DEGREES;
@@ -67,16 +67,16 @@ public class ADI implements SceneListener
         pitchRange = (pitchSprite.getHeight() / pitchSprite.getRegionHeight()) / 2f;
 
         float rollPosY = centerY - (SIZE * .6f);
-        rollSprite = new Sprite(GdxUtils.getInstance().createSprite("roll"));
+        rollSprite = new Sprite(GdxUtils.get().createSprite("roll"));
         rollSprite.setCenter(centerX, rollPosY);
 
-        rollPointerSprite = new Sprite(GdxUtils.getInstance().createSprite("roll_pointer"));
+        rollPointerSprite = new Sprite(GdxUtils.get().createSprite("roll_pointer"));
         rollPointerSprite.setCenter(centerX, rollPosY + ROLL_POINTER_MARGIN);
         rollPointerSprite.setOriginCenter();
         rollPointerSprite.setOrigin(rollPointerSprite.getOriginX(),
                 centerY - rollPosY + ROLL_POINTER_MARGIN);
 
-        yawSprite = new Sprite((GdxUtils.getInstance().createSprite("aircraft")));
+        yawSprite = new Sprite((GdxUtils.get().createSprite("aircraft")));
         yawSprite.setCenter(centerX, centerY);
         yawSprite.setOriginCenter();
 
@@ -91,37 +91,37 @@ public class ADI implements SceneListener
     @Override
     public void update()
     {
-        pitchCenter = centerV - (pitch * degreeInV);
+        pitchCenter = centerV - (pitch.getValue() * degreeInV);
         pitchSprite.setV(pitchCenter - pitchRange);
         pitchSprite.setV2(pitchCenter + pitchRange);
 
-        pitchSprite.setRotation(roll);
-        rollPointerSprite.setRotation(roll);
-        yawSprite.setCenterX(centerX + SIZE * (yaw / 180f));
+        pitchSprite.setRotation(roll.getValue());
+        rollPointerSprite.setRotation(roll.getValue());
+        yawSprite.setCenterX(centerX + SIZE * (yaw.getValue() / 180f));
 
-        if (Math.abs(pitch) > PITCH_HECTIC_BLINK_LIMIT) {
-            pitchSprite.setAlpha(AnimationState.getInstance().getHecticBlink());
-            pitchSprite.setScale(AnimationState.getInstance().getHecticBackstreets());
+        if (pitch.inHecticAlertState()) {
+            pitchSprite.setAlpha(AnimationState.get().getHecticBlink());
+            pitchSprite.setScale(AnimationState.get().getHecticBackstreets());
         }
-        else if (Math.abs(pitch) > PITCH_BLINK_LIMIT) {
-            pitchSprite.setAlpha(AnimationState.getInstance().getBlink());
-            pitchSprite.setScale(AnimationState.getInstance().getBackstreets());
+        else if (pitch.inAlertState()) {
+            pitchSprite.setAlpha(AnimationState.get().getBlink());
+            pitchSprite.setScale(AnimationState.get().getBackstreets());
         }
         else {
             pitchSprite.setAlpha(1f);
             pitchSprite.setScale(1f);
         }
 
-        if (Math.abs(roll) > ROLL_HECTIC_BLINK_LIMIT) {
-            rollSprite.setAlpha(AnimationState.getInstance().getHecticBlink());
-            rollPointerSprite.setScale(AnimationState.getInstance().getHecticBackstreets());
+        if (roll.inHecticAlertState()) {
+            rollSprite.setAlpha(AnimationState.get().getHecticBlink());
+            rollPointerSprite.setScale(AnimationState.get().getHecticBackstreets());
             rollPointerSprite.setColor(0.8f, 0.2f, 0f,
-                    AnimationState.getInstance().getHecticBlink());
+                    AnimationState.get().getHecticBlink());
         }
-        else if (Math.abs(roll) > ROLL_BLINK_LIMIT) {
-            rollSprite.setAlpha(AnimationState.getInstance().getHecticBlink());
-            rollPointerSprite.setScale(AnimationState.getInstance().getBackstreets());
-            rollPointerSprite.setColor(0.7f, 0.3f, 0f, AnimationState.getInstance().getBlink());
+        else if (roll.inAlertState()) {
+            rollSprite.setAlpha(AnimationState.get().getHecticBlink());
+            rollPointerSprite.setScale(AnimationState.get().getBackstreets());
+            rollPointerSprite.setColor(0.7f, 0.3f, 0f, AnimationState.get().getBlink());
         }
         else {
             rollSprite.setAlpha(1f);
@@ -130,13 +130,13 @@ public class ADI implements SceneListener
             rollPointerSprite.setColor(Color.WHITE);
         }
 
-        if (Math.abs(yaw) > YAW_HECTIC_BLINK_LIMIT) {
-            yawSprite.setColor(0.8f, 0.2f, 0f, AnimationState.getInstance().getHecticBlink());
-            yawSprite.setScale(AnimationState.getInstance().getHecticBackstreets());
+        if (yaw.inHecticAlertState()) {
+            yawSprite.setColor(0.8f, 0.2f, 0f, AnimationState.get().getHecticBlink());
+            yawSprite.setScale(AnimationState.get().getHecticBackstreets());
         }
-        else if (Math.abs(yaw) > YAW_BLINK_LIMIT) {
-            yawSprite.setColor(0.7f, 0.3f, 0f, AnimationState.getInstance().getBlink());
-            yawSprite.setScale(AnimationState.getInstance().getBackstreets());
+        else if (yaw.inAlertState()) {
+            yawSprite.setColor(0.7f, 0.3f, 0f, AnimationState.get().getBlink());
+            yawSprite.setScale(AnimationState.get().getBackstreets());
         }
         else {
             yawSprite.setColor(Color.WHITE);
@@ -153,7 +153,7 @@ public class ADI implements SceneListener
         pitchShader.setUniformf("alphaRadius", pitchRange);
         pitchSprite.draw(batch);
 
-        batch.setShader(GdxUtils.getInstance().getDefaultShader());
+        batch.setShader(GdxUtils.get().getDefaultShader());
 
         rollSprite.draw(batch);
         rollPointerSprite.draw(batch);

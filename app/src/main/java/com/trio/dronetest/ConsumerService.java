@@ -43,7 +43,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
-
 import com.samsung.android.sdk.SsdkUnsupportedException;
 import com.samsung.android.sdk.accessory.SA;
 import com.samsung.android.sdk.accessory.SAAgent;
@@ -52,7 +51,7 @@ import com.samsung.android.sdk.accessory.SASocket;
 import com.trio.drone.R;
 import com.trio.drone.data.FilterData;
 import com.trio.drone.data.LowPassData;
-
+import com.trio.drone.data.SensorSource;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -113,7 +112,7 @@ public class ConsumerService extends SAAgent
     private MainActivity droneCtrlObj;
     private WatchServiceCallbacks serviceCallbacks;
 
-    private FilterData filterData = new LowPassData();
+    private FilterData filterData = new LowPassData(SensorSource.WATCH);
     private float[] watchGravity = new float[]{0.0F, 0.0F, 0.0F};
 
     public ConsumerService()
@@ -427,7 +426,8 @@ public class ConsumerService extends SAAgent
         }
     }
 
-    private void receivedAcceleroData(float x, float y, float z) {
+    private void receivedAcceleroData(float x, float y, float z)
+    {
         //Log.e("receivedAcceleroData", "Accelero data received from watch");
 
         if (serviceCallbacks != null) {
@@ -505,8 +505,8 @@ public class ConsumerService extends SAAgent
                     }
                     else if (obj.getString(key).equals("emergency")) {
                         receivedEmergencyDrone();
-                    } else if (obj.getString(key).equals("accelero"))
-                    {
+                    }
+                    else if (obj.getString(key).equals("accelero")) {
                         float x = Float.parseFloat(obj.get(obj.names().getString(1)).toString());
                         float y = Float.parseFloat(obj.get(obj.names().getString(2)).toString());
                         float z = Float.parseFloat(obj.get(obj.names().getString(3)).toString());

@@ -75,17 +75,25 @@ public class OperatingState implements SceneListener
     @Override
     public void draw(SpriteBatch batch)
     {
-        GdxUtils.getInstance().getFont24().setColor(flyingStateColors.get(flyingState));
-        GdxUtils.getInstance().getFont24().draw(batch, flyingStateLabels.get(flyingState),
+        GdxUtils.get().getFont24().setColor(flyingStateColors.get(flyingState));
+        GdxUtils.get().getFont24().draw(batch, flyingStateLabels.get(flyingState),
                 centerX + 10, centerY);
 
-        GdxUtils.getInstance().getFont18().setColor(
-                controlState == ControlState.PILOTING ? Color.LIME : Color.ORANGE);
-        GdxUtils.getInstance().getFont18().draw(batch, controlStateLabels.get(controlState),
-                centerX - 30f, centerY - 35f);
+        if (controlState == ControlState.PILOTING) {
+            GdxUtils.get().getFont18().setColor(Color.LIME);
+            GdxUtils.get().getFont18().draw(batch, controlStateLabels.get(controlState),
+                    centerX + 10f, centerY - 35f);
+        }
+        else {
+            GdxUtils.get().getFont18().setColor(Color.ORANGE);
+            GdxUtils.get().getFont18().draw(batch, controlStateLabels.get(controlState),
+                    centerX - 30f, centerY - 35f);
+            GdxUtils.get().getFont18().draw(batch, controlStateLabels.get(controlState),
+                    centerX - 30f, centerY - 35f);
+        }
 
-        GdxUtils.getInstance().resetFont18Color();
-        GdxUtils.getInstance().resetFont24Color();
+        GdxUtils.get().resetFont18Color();
+        GdxUtils.get().resetFont24Color();
     }
 
     @Override

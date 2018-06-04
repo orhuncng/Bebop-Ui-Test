@@ -14,18 +14,21 @@ import java.util.Map;
 
 public class Wifi implements SceneListener
 {
+    private static final int RSSI_DISCONNECTED = -100;
+
     private Sprite sprite;
-    private int rssi;
+    private int rssi = RSSI_DISCONNECTED;
     private RssiLevel rssiLevel;
     private Map<RssiLevel, String> rssiLabels;
     private SparseArray<RssiLevel> rssiLevelLimits;
 
     public Wifi()
     {
-        rssiLevel = RssiLevel.AMAZING;
+        rssiLevel = RssiLevel.DISCONNECTED;
 
         rssiLabels = new HashMap<>();
 
+        rssiLabels.put(RssiLevel.DISCONNECTED, "DISCONNECTED");
         rssiLabels.put(RssiLevel.POOR, "POOR");
         rssiLabels.put(RssiLevel.NOT_GOOD, "NOT GOOD");
         rssiLabels.put(RssiLevel.NORMAL, "NORMAL");
@@ -34,6 +37,7 @@ public class Wifi implements SceneListener
 
         rssiLevelLimits = new SparseArray<>();
 
+        rssiLevelLimits.put(RSSI_DISCONNECTED, RssiLevel.DISCONNECTED);
         rssiLevelLimits.put(-90, RssiLevel.POOR);
         rssiLevelLimits.put(-80, RssiLevel.NOT_GOOD);
         rssiLevelLimits.put(-70, RssiLevel.NORMAL);
@@ -45,7 +49,7 @@ public class Wifi implements SceneListener
     {
         this.rssi = rssi;
 
-        rssiLevel = RssiLevel.POOR;
+        rssiLevel = RssiLevel.DISCONNECTED;
 
         for (int i = 0; i < rssiLevelLimits.size(); i++)
             if (rssi > rssiLevelLimits.keyAt(i))
@@ -58,7 +62,7 @@ public class Wifi implements SceneListener
         float centerX = (metrics.widthPixels / 2f) + 130f;
         float centerY = (metrics.heightPixels / 2f) + 5f;
 
-        sprite = new Sprite(GdxUtils.getInstance().createSprite("wifi"));
+        sprite = new Sprite(GdxUtils.get().createSprite("wifi"));
         sprite.setPosition(centerX, centerY);
     }
 
@@ -68,22 +72,25 @@ public class Wifi implements SceneListener
     @Override
     public void draw(SpriteBatch batch)
     {
+        if (rssiLevel != RssiLevel.DISCONNECTED)
+            GdxUtils.get().getFont18().draw(batch, "RSSI: " + String.valueOf(rssi),
+                    sprite.getX() + 40f, sprite.getY() + 10f);
+
+        Color color = Color.LIME;
+
+        if (rssiLevel == RssiLevel.POOR || rssiLevel == RssiLevel.DISCONNECTED)
+            color = Color.SCARLET;
+        else if (rssiLevel == RssiLevel.NOT_GOOD)
+            color = Color.ORANGE;
+
+        GdxUtils.get().getFont18().setColor(color);
+        sprite.setColor(color);
+
+        GdxUtils.get().getFont18().draw(batch, rssiLabels.get(rssiLevel),
+                sprite.getX() + 40f, sprite.getY() + 30f);
         sprite.draw(batch);
 
-        GdxUtils.getInstance().getFont18().draw(batch, "RSSI: " + String.valueOf(rssi),
-                sprite.getX() + 40f, sprite.getY() + 10f);
-
-        if (rssiLevel == RssiLevel.POOR)
-            GdxUtils.getInstance().getFont18().setColor(Color.SCARLET);
-        else if (rssiLevel == RssiLevel.NOT_GOOD)
-            GdxUtils.getInstance().getFont18().setColor(Color.ORANGE);
-        else
-            GdxUtils.getInstance().getFont18().setColor(Color.LIME);
-
-        GdxUtils.getInstance().getFont18().draw(batch, rssiLabels.get(rssiLevel),
-                sprite.getX() + 40f, sprite.getY() + 30f);
-
-        GdxUtils.getInstance().resetFont18Color();
+        GdxUtils.get().resetFont18Color();
     }
 
     @Override
@@ -91,6 +98,6 @@ public class Wifi implements SceneListener
 
     private enum RssiLevel
     {
-        AMAZING, VERY_GOOD, NORMAL, NOT_GOOD, POOR
+        AMAZING, VERY_GOOD, NORMAL, NOT_GOOD, POOR, DISCONNECTED
     }
 }

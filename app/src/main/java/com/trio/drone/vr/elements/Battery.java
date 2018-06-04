@@ -27,12 +27,12 @@ public class Battery implements SceneListener
         float centerX = (metrics.widthPixels / 2f) - 200f;
         float centerY = (metrics.heightPixels / 2f) - 20f;
 
-        sprite = new Sprite(GdxUtils.getInstance().createSprite("battery"));
+        sprite = new Sprite(GdxUtils.get().createSprite("battery"));
         sprite.setPosition(centerX, centerY);
         levelSpriteHeight = sprite.getHeight();
         sprite.setOriginCenter();
 
-        levelSprite = new Sprite(GdxUtils.getInstance().createSprite("battery_level"));
+        levelSprite = new Sprite(GdxUtils.get().createSprite("battery_level"));
         levelSprite.setPosition(centerX, centerY + 8f);
         levelSprite.setOriginCenter();
 
@@ -50,12 +50,12 @@ public class Battery implements SceneListener
         levelSprite.setSize(levelSprite.getWidth(), levelSpriteHeight * level);
 
         if (level < HECTIC_BLINK_LIMIT) {
-            sprite.setColor(0.8f, 0.2f, 0f, AnimationState.getInstance().getHecticBlink());
-            levelSprite.setAlpha(AnimationState.getInstance().getHecticBlink());
+            sprite.setColor(0.8f, 0.2f, 0f, AnimationState.get().getHecticBlink());
+            levelSprite.setAlpha(AnimationState.get().getHecticBlink());
         }
         else if (level < BLINK_LIMIT) {
-            sprite.setColor(0.7f, 0.3f, 0f, AnimationState.getInstance().getBlink());
-            levelSprite.setAlpha(AnimationState.getInstance().getBlink());
+            sprite.setColor(0.7f, 0.3f, 0f, AnimationState.get().getBlink());
+            levelSprite.setAlpha(AnimationState.get().getBlink());
         }
         else sprite.setColor(Color.WHITE);
     }
@@ -65,7 +65,7 @@ public class Battery implements SceneListener
     {
         levelSprite.draw(batch);
         sprite.draw(batch);
-        GdxUtils.getInstance().getFont18().draw(batch, String.valueOf((int) level * 100) + "%",
+        GdxUtils.get().getFont18().draw(batch, String.valueOf((int) level * 100) + "%",
                 sprite.getX(), sprite.getY() + 53f);
     }
 

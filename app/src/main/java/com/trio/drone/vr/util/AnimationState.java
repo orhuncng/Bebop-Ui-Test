@@ -29,7 +29,6 @@ public class AnimationState
 
     private AnimationState()
     {
-
         blink = ValueAnimator.ofFloat(BLINK_START, BLINK_END);
         blink.setRepeatCount(ValueAnimator.INFINITE);
         blink.setRepeatMode(ValueAnimator.REVERSE);
@@ -55,7 +54,7 @@ public class AnimationState
         hecticBackstreets.setInterpolator(new LinearInterpolator());
     }
 
-    public static AnimationState getInstance()
+    public static AnimationState get()
     {
         return instance;
     }

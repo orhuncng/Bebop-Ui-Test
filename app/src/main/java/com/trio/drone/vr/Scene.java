@@ -18,6 +18,8 @@ import java.util.List;
 
 public class Scene implements SceneMediator, BebopEventListener
 {
+    static final float BATCH_SCALE = 0.75f;
+
     private List<SceneListener> listeners = new ArrayList<>();
     private OverlayTexture background;
     private SpriteBatch batch;
@@ -62,9 +64,11 @@ public class Scene implements SceneMediator, BebopEventListener
     {
         metrics.widthPixels /= 2f;
 
-        Matrix4 asd = batch.getTransformMatrix().scale(0.5f, 0.5f, 1f);
-        Matrix4 asdasd = asd.translate(1f,1,0f);
-        batch.setTransformMatrix(asdasd);
+        float posX = (1f - BATCH_SCALE) * metrics.widthPixels / 2f;
+        float posY = (1f - BATCH_SCALE) * metrics.heightPixels / 2f;
+
+        batch.getTransformMatrix().setToTranslationAndScaling(
+                posX, posY, 0f, BATCH_SCALE, BATCH_SCALE, 1f);
 
         for (SceneListener l : listeners) l.create(metrics, res);
     }
@@ -89,7 +93,7 @@ public class Scene implements SceneMediator, BebopEventListener
     }
 
     @Override
-    public void onBatteryStateChanged(int batteryLevel) { battery.setLevel((float) batteryLevel); }
+    public void onBatteryStateChanged(int batteryLevel) { battery.setLevel((float) batteryLevel / 100f); }
 
     @Override
     public void onWifiSignalChanged(int rssi) { wifi.setRssi(rssi); }

@@ -18,7 +18,7 @@ public class Ring implements SceneListener
     private static final float OUTLIER_HECTIC_BLINK_LIMIT = 0.6f;
 
     private static final float OUTLIER_MARGIN_X = 5f;
-    private static final float RING_BORDER_MARGIN_X = 50f;
+    private static final float RING_BORDER_MARGIN_X = 300f;
 
     private static final float TEXT_MARGIN_X = 80f;
     private static final float TEXT_LABEL_MARGIN_Y = 40f;
@@ -101,7 +101,7 @@ public class Ring implements SceneListener
             textCenterX = centerX - TEXT_MARGIN_X;
         }
 
-        centerY = metrics.heightPixels / 2f;
+        centerY = (metrics.heightPixels / 2f) - 150f;
 
         sprite = new Sprite(GdxUtils.getInstance().createSprite("rings"));
         sprite.setCenter(centerX, centerY);

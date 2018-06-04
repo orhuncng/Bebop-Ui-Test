@@ -24,8 +24,8 @@ public class Battery implements SceneListener
     @Override
     public void create(DisplayMetrics metrics, Resources res)
     {
-        float centerX = metrics.widthPixels / 8f;
-        float centerY = metrics.heightPixels / 8f;
+        float centerX = (metrics.widthPixels / 2f) - 200f;
+        float centerY = (metrics.heightPixels / 2f) - 20f;
 
         sprite = new Sprite(GdxUtils.getInstance().createSprite("battery"));
         sprite.setPosition(centerX, centerY);

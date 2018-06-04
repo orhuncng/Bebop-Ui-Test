@@ -53,7 +53,7 @@ public class ADI implements SceneListener
     public void create(DisplayMetrics metrics, Resources res)
     {
         centerX = metrics.widthPixels / 2f;
-        float centerY = metrics.heightPixels / 2f;
+        float centerY = (metrics.heightPixels / 2f) - 150f;
 
         pitchSprite = new Sprite(GdxUtils.getInstance().createSprite("pitch"));
 

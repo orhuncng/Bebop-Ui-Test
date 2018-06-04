@@ -55,8 +55,8 @@ public class Wifi implements SceneListener
     @Override
     public void create(DisplayMetrics metrics, Resources res)
     {
-        float centerX = metrics.widthPixels * 3f / 4f;
-        float centerY = 25f + metrics.heightPixels / 8f;
+        float centerX = (metrics.widthPixels / 2f) + 130f;
+        float centerY = (metrics.heightPixels / 2f) + 5f;
 
         sprite = new Sprite(GdxUtils.getInstance().createSprite("wifi"));
         sprite.setPosition(centerX, centerY);

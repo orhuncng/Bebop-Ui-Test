@@ -7,6 +7,9 @@ import android.opengl.GLES20;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
+
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.badlogic.gdx.backends.android.CardBoardAndroidApplication;
 import com.badlogic.gdx.backends.android.CardBoardApplicationListener;
@@ -16,6 +19,7 @@ import com.google.vr.sdk.base.Eye;
 import com.google.vr.sdk.base.HeadTransform;
 import com.google.vr.sdk.base.Viewport;
 import com.trio.drone.bebop.BebopBro;
+import com.trio.drone.bebop.ControlState;
 import com.trio.drone.vr.Scene;
 import com.trio.drone.vr.util.AnimationState;
 
@@ -36,6 +40,8 @@ public class Main4Activity extends CardBoardAndroidApplication
                 requestPermissions(new String[]{Manifest.permission.CAMERA}, 1);
             }
         }
+
+
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
         config.r = 8;
         config.g = 8;
@@ -43,6 +49,8 @@ public class Main4Activity extends CardBoardAndroidApplication
         config.a = 8;
         config.numSamples = 2;
         initialize(this, config);
+
+        getGvrView().getGvrViewerParams().setHasMagnet(true);
 
         BebopBro.getInstance().onCreate(getApplicationContext());
 
@@ -112,5 +120,23 @@ public class Main4Activity extends CardBoardAndroidApplication
     public void onRendererShutdown() { scene.shutdown(); }
 
     @Override
-    public void onCardboardTrigger() { }
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        whatevs();
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public void onCardboardTrigger() {
+        if (BebopBro.getInstance().getControlState() == ControlState.CAMERA_LOOKUP)
+            BebopBro.getInstance().setControlState(ControlState.PILOTING);
+        else
+            BebopBro.getInstance().setControlState(ControlState.CAMERA_LOOKUP);
+    }
+
+    public void whatevs() {
+        if (BebopBro.getInstance().getControlState() == ControlState.CAMERA_LOOKUP)
+            BebopBro.getInstance().setControlState(ControlState.PILOTING);
+        else
+            BebopBro.getInstance().setControlState(ControlState.CAMERA_LOOKUP);
+    }
 }

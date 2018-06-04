@@ -6,6 +6,8 @@ import android.opengl.GLES20;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.view.KeyEvent;
+
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.badlogic.gdx.backends.android.CardBoardAndroidApplication;
 import com.badlogic.gdx.backends.android.CardBoardApplicationListener;
@@ -14,8 +16,13 @@ import com.google.vr.sdk.base.Eye;
 import com.google.vr.sdk.base.HeadTransform;
 import com.google.vr.sdk.base.Viewport;
 import com.trio.drone.bebop.BebopBro;
+import com.trio.drone.bebop.ControlState;
+import com.trio.drone.bebop.FlyingState;
 import com.trio.drone.vr.Scene;
 import com.trio.drone.vr.util.AnimationState;
+
+import java.net.BindException;
+import java.security.Key;
 
 public class VRActivity extends CardBoardAndroidApplication
         implements CardBoardApplicationListener
@@ -95,4 +102,26 @@ public class VRActivity extends CardBoardAndroidApplication
 
     @Override
     public void onCardboardTrigger() { }
+
+    @Override
+    public void onBackPressed()
+    {
+        BebopBro.getInstance().setControlState(ControlState.CAMERA_LOOKUP);
+        super.onBackPressed();
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_UP)
+            BebopBro.getInstance().toggleControlState();
+        else if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)
+        {
+            if (BebopBro.getInstance().getFlyingState() == FlyingState.LANDED)
+                BebopBro.getInstance().takeOff();
+            else BebopBro.getInstance().land();
+        }
+        else return super.dispatchKeyEvent(event);
+
+        return true;
+    }
 }

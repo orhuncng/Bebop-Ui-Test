@@ -66,7 +66,12 @@
         <activity
             android:name="com.trio.dronetest.Main4Activity"
             android:hardwareAccelerated="true"
-            android:screenOrientation="landscape"></activity>
+            android:screenOrientation="landscape">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name="com.trio.dronetest.Main5Activity"
             android:hardwareAccelerated="true"
@@ -76,10 +81,6 @@
             android:name="com.trio.dronetest.Main6Activity"
             android:label="@string/title_activity_main6"
             android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity android:name="com.trio.dronetest.GearIntroActivity"
             android:label="How to Fly - Gear" />

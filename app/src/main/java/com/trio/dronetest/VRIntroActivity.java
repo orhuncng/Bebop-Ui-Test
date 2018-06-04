@@ -21,10 +21,10 @@ public class VRIntroActivity extends AppIntro {
 
         // Instead of fragments, you can also use our default slide
         // Just set a title, description, background and image. AppIntro will do the rest.
-        addSlide(AppIntroFragment.newInstance("Wifi Connection", "Connect your smartphone to Drone by Wifi", R.drawable.bluetooth_image, Color.parseColor("#0277BD")));
-        addSlide(AppIntroFragment.newInstance("Cardboard", "Prepare your cardboard ", R.drawable.android_logo, Color.parseColor("#0288D1")));
-        addSlide(AppIntroFragment.newInstance("TakeOff", "Drone can be takeoff after tutorial", R.drawable.watch_arm, Color.parseColor("#039BE5")));
-        addSlide(AppIntroFragment.newInstance("Place Drone", "After takeoff place your drone to cardboard ", R.drawable.drone_bebop, Color.parseColor("#03A9F4")));
+        addSlide(AppIntroFragment.newInstance("Wifi Connection", "Connect your smartphone to Drone by Wifi", R.drawable.wi_fi_image, Color.parseColor("#0277BD")));
+        addSlide(AppIntroFragment.newInstance("Cardboard", "Prepare your cardboard ", R.drawable.cardboard_image, Color.parseColor("#0288D1")));
+        addSlide(AppIntroFragment.newInstance("TakeOff", "Drone can be takeoff after tutorial", R.drawable.drone_bebop, Color.parseColor("#039BE5")));
+        addSlide(AppIntroFragment.newInstance("Place Drone", "After takeoff place your drone to cardboard and FLY with VR controller", R.drawable.screen_image, Color.parseColor("#03A9F4")));
 
         // OPTIONAL METHODS
         // Override bar/separator color.

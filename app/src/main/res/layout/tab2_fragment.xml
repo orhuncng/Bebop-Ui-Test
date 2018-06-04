@@ -7,6 +7,9 @@
         android:id="@+id/button2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="50dp"
+        android:background="@drawable/round_button"
+        android:elevation="0dp"
         android:onClick="onClickBtn2"
         android:text="Start Vr Controller" />
 </LinearLayout>

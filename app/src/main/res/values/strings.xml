@@ -29,7 +29,6 @@
     <string name="pref_key_max_altitude">max_altitude</string>
     <string name="pref_key_max_vert_speed">max_vert_speed</string>
     <string name="pref_key_max_pitch_roll">max_pitch_roll</string>
-    <string name="pref_key_max_tilt">max_tilt</string>
     <string name="pref_key_max_rot_speed">max_rot_speed</string>
     <string name="pref_key_ui_roll_limit">ui_roll_limit</string>
     <string name="pref_key_ui_pitch_limit">ui_pitch_limit</string>

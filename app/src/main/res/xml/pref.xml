@@ -39,14 +39,14 @@
                 android:singleLine="true"
                 android:title="Max altitude in meters"
                 android:key="@string/pref_key_max_altitude"
-                android:numeric="integer"/>
+            android:numeric="decimal" />
         <EditTextPreference
                 android:defaultValue="@integer/defaultMaxVerticalSpeed"
                 android:selectAllOnFocus="true"
                 android:singleLine="true"
                 android:title="Max vertical speed in m/s"
                 android:key="@string/pref_key_max_vert_speed"
-                android:numeric="integer"/>
+            android:numeric="decimal" />
         <EditTextPreference
                 android:defaultValue="@integer/defaultMaxPitchRoll"
                 android:selectAllOnFocus="true"
@@ -60,13 +60,6 @@
                 android:singleLine="true"
                 android:title="Max rotation speed in degree/s"
                 android:key="@string/pref_key_max_rot_speed"
-                android:numeric="integer"/>
-        <EditTextPreference
-                android:defaultValue="@integer/defaultMaxTilt"
-                android:selectAllOnFocus="true"
-                android:singleLine="true"
-                android:title="Max tilt in degree/s"
-                android:key="@string/pref_key_max_tilt"
                 android:numeric="integer"/>
     </PreferenceCategory>
     <PreferenceCategory android:title="UI alerts">

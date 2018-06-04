@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <integer name="defaultMaxAltitude">2</integer>
-    <integer name="defaultMaxTilt">5</integer>
     <integer name="defaultMaxVerticalSpeed">1</integer>
     <integer name="defaultMaxRotationSpeed">5</integer>
     <integer name="defaultMaxPitchRoll">5</integer>

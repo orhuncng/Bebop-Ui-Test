@@ -1,9 +1,13 @@
 package com.trio.drone.bebop;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.Resources;
+import android.preference.PreferenceManager;
 import android.view.Surface;
 
 import com.parrot.arsdk.ARSDK;
+import com.trio.drone.R;
 import com.trio.drone.bebop.controller.DeviceController;
 import com.trio.drone.bebop.strategy.CameraLookupControlStrategy;
 import com.trio.drone.bebop.strategy.DroneControlStrategy;
@@ -14,7 +18,7 @@ import com.trio.drone.data.SensorSource;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BebopBro implements BebopMediator
+public class BebopBro implements BebopMediator, SharedPreferences.OnSharedPreferenceChangeListener
 {
     private static final int VIDEO_WIDTH = 640;
     private static final int VIDEO_HEIGHT = 368;
@@ -26,6 +30,7 @@ public class BebopBro implements BebopMediator
     private ControlState controlState = ControlState.CAMERA_LOOKUP;
     private List<BebopEventListener> listeners = new ArrayList<>();
     private DroneControlStrategy controlStrategy = new CameraLookupControlStrategy();
+    private Resources resources;
 
     private LowPassData lpSpeed = new LowPassData(SensorSource.DRONE);
     private LowPassData lpOrient = new LowPassData(SensorSource.DRONE);
@@ -46,8 +51,12 @@ public class BebopBro implements BebopMediator
     @Override
     public void onCreate(Context context)
     {
-        if (controller == null)
+        if (controller == null) {
             controller = new DeviceController(context, this, VIDEO_WIDTH, VIDEO_HEIGHT);
+            resources = context.getResources();
+            PreferenceManager.getDefaultSharedPreferences(context)
+                    .registerOnSharedPreferenceChangeListener(this);
+        }
     }
 
     // controller and drone state
@@ -186,5 +195,17 @@ public class BebopBro implements BebopMediator
     public void onControllerStateChanged(boolean isRunning)
     {
         for (BebopEventListener ls : listeners) ls.onControllerStateChanged(isRunning);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals(resources.getString(R.string.pref_key_max_altitude)))
+            controller.setMaxAltitude(sharedPreferences.getFloat(key, 1));
+        else if (key.equals(resources.getString(R.string.pref_key_max_vert_speed)))
+            controller.setMaxVertSpeed(sharedPreferences.getFloat(key, 1));
+        else if (key.equals(resources.getString(R.string.pref_key_max_pitch_roll)))
+            controller.setMaxPitchRoll(sharedPreferences.getInt(key, 1));
+        else if (key.equals(resources.getString(R.string.pref_key_max_rot_speed)))
+            controller.setMaxRotationSpeed(sharedPreferences.getInt(key, 1));
     }
 }

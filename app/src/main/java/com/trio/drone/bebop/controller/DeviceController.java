@@ -3,9 +3,22 @@ package com.trio.drone.bebop.controller;
 import android.content.Context;
 import android.util.Log;
 import android.view.Surface;
+
 import com.parrot.arsdk.arcommands.ARCOMMANDS_ARDRONE3_PILOTINGEVENT_MOVEBYEND_ERROR_ENUM;
 import com.parrot.arsdk.arcommands.ARCOMMANDS_ARDRONE3_PILOTINGSTATE_FLYINGSTATECHANGED_STATE_ENUM;
-import com.parrot.arsdk.arcontroller.*;
+import com.parrot.arsdk.arcontroller.ARCONTROLLER_DEVICE_STATE_ENUM;
+import com.parrot.arsdk.arcontroller.ARCONTROLLER_DICTIONARY_KEY_ENUM;
+import com.parrot.arsdk.arcontroller.ARCONTROLLER_ERROR_ENUM;
+import com.parrot.arsdk.arcontroller.ARControllerArgumentDictionary;
+import com.parrot.arsdk.arcontroller.ARControllerCodec;
+import com.parrot.arsdk.arcontroller.ARControllerDictionary;
+import com.parrot.arsdk.arcontroller.ARControllerException;
+import com.parrot.arsdk.arcontroller.ARDeviceController;
+import com.parrot.arsdk.arcontroller.ARDeviceControllerListener;
+import com.parrot.arsdk.arcontroller.ARDeviceControllerStreamListener;
+import com.parrot.arsdk.arcontroller.ARFeatureARDrone3;
+import com.parrot.arsdk.arcontroller.ARFeatureCommon;
+import com.parrot.arsdk.arcontroller.ARFrame;
 import com.parrot.arsdk.ardiscovery.ARDISCOVERY_PRODUCT_ENUM;
 import com.parrot.arsdk.ardiscovery.ARDiscoveryDevice;
 import com.parrot.arsdk.ardiscovery.receivers.ARDiscoveryServicesDevicesListUpdatedReceiverDelegate;
@@ -68,6 +81,26 @@ public class DeviceController implements ARDeviceControllerListener,
     public void takeOff() {if (isRunning) controller.getFeatureARDrone3().sendPilotingTakeOff();}
 
     public void land() {if (isRunning) controller.getFeatureARDrone3().sendPilotingLanding();}
+
+    public void setMaxAltitude(float altitude) {
+        if (isRunning)
+            controller.getFeatureARDrone3().sendPilotingSettingsMaxAltitude(altitude);
+    }
+
+    public void setMaxVertSpeed(float vertSpeed) {
+        if (isRunning)
+            controller.getFeatureARDrone3().sendSpeedSettingsMaxRotationSpeed(vertSpeed);
+    }
+
+    public void setMaxPitchRoll(float pitchRoll) {
+        if (isRunning)
+            controller.getFeatureARDrone3().sendPilotingSettingsMaxTilt(pitchRoll);
+    }
+
+    public void setMaxRotationSpeed(float rotationSpeed) {
+        if (isRunning)
+            controller.getFeatureARDrone3().sendSpeedSettingsMaxVerticalSpeed(rotationSpeed);
+    }
 
     @Override
     public void onStateChanged(ARDeviceController deviceController,

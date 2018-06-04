@@ -13,7 +13,9 @@ public class LowPassData implements FilterData
     private float[] history = new float[3];
     private SensorSource source;
 
-    public LowPassData(SensorSource source) { this.source = source; }
+    public LowPassData(SensorSource source) {
+        this.source = source;
+    }
 
     public static void setSmoothingCoeff(float coeff, SensorSource source)
     {
@@ -31,13 +33,14 @@ public class LowPassData implements FilterData
     }
 
     @Override
-    public float get(float newValue, int index)
-    {
+    public float get(float newValue, int index) {
         float coeff = smoothingCoeffs.get(source);
         history[index] = coeff * history[index] + (1f - coeff) * newValue;
         return history[index];
     }
 
     @Override
-    public float get(float newValue) { return get(newValue, 0); }
+    public float get(float newValue) {
+        return get(newValue, 0);
+    }
 }

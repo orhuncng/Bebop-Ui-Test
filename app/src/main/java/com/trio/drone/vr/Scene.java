@@ -5,13 +5,20 @@ import android.content.res.Resources;
 import android.graphics.SurfaceTexture;
 import android.util.DisplayMetrics;
 import android.view.Surface;
+
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.trio.drone.R;
 import com.trio.drone.bebop.BebopEventListener;
 import com.trio.drone.bebop.ControlState;
 import com.trio.drone.bebop.FlyingState;
 import com.trio.drone.bebop.RelativeMotionResult;
-import com.trio.drone.vr.elements.*;
+import com.trio.drone.vr.elements.ADI;
+import com.trio.drone.vr.elements.Battery;
+import com.trio.drone.vr.elements.Location;
+import com.trio.drone.vr.elements.OperatingState;
+import com.trio.drone.vr.elements.OverlayTexture;
+import com.trio.drone.vr.elements.Ring;
+import com.trio.drone.vr.elements.Wifi;
 import com.trio.drone.vr.util.LimitedData;
 
 import java.util.ArrayList;
@@ -100,8 +107,7 @@ public class Scene implements SceneMediator, BebopEventListener,
     }
 
     @Override
-    public void onBatteryStateChanged(int batteryLevel)
-    {
+    public void onBatteryStateChanged(int batteryLevel) {
         battery.setLevel((float) batteryLevel / 100f);
     }
 
@@ -153,7 +159,9 @@ public class Scene implements SceneMediator, BebopEventListener,
     }
 
     @Override
-    public void onRelativeAltitudeChanged(float altitude) { altitudeRing.setRingValue(altitude); }
+    public void onRelativeAltitudeChanged(float altitude) {
+        altitudeRing.setRingValue(altitude);
+    }
 
     @Override
     public void onCameraOrientationChanged(float tiltPerc, float panPerc) { }
@@ -165,8 +173,7 @@ public class Scene implements SceneMediator, BebopEventListener,
     public void onControllerStateChanged(boolean isRunning) { }
 
     @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key)
-    {
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(resources.getString(R.string.pref_key_ui_roll_limit)))
             adi.setRollLimit((float) sharedPreferences.getInt(key, 1));
         else if (key.equals(resources.getString(R.string.pref_key_ui_pitch_limit)))

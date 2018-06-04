@@ -1,8 +1,13 @@
 package com.trio.drone.core;
 
 import android.os.Bundle;
-import android.preference.*;
+import android.preference.ListPreference;
+import android.preference.Preference;
+import android.preference.PreferenceActivity;
+import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.view.MenuItem;
+
 import com.trio.drone.R;
 import com.trio.drone.data.LowPassData;
 import com.trio.drone.data.SensorSource;
@@ -55,8 +60,7 @@ public class SettingsActivity extends PreferenceActivity
         }
 
         @Override
-        public boolean onPreferenceChange(Preference preference, Object newValue)
-        {
+        public boolean onPreferenceChange(Preference preference, Object newValue) {
             String stringValue = newValue.toString();
 
             if (preference instanceof ListPreference) {
@@ -65,8 +69,7 @@ public class SettingsActivity extends PreferenceActivity
 
                 preference.setSummary(
                         index >= 0 ? listPreference.getEntries()[index] : null);
-            }
-            else {
+            } else {
                 preference.setSummary(stringValue);
             }
 
@@ -85,8 +88,7 @@ public class SettingsActivity extends PreferenceActivity
             return true;
         }
 
-        private void setListener(Preference preference)
-        {
+        private void setListener(Preference preference) {
             preference.setOnPreferenceChangeListener(this);
             onPreferenceChange(preference, PreferenceManager.getDefaultSharedPreferences(
                     preference.getContext()).getString(preference.getKey(), ""));

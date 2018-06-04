@@ -2,6 +2,7 @@ package com.trio.drone.vr.elements;
 
 import android.content.res.Resources;
 import android.util.DisplayMetrics;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -37,17 +38,29 @@ public class ADI implements SceneListener
 
     private ShaderProgram pitchShader;
 
-    public void setRoll(float value) { if (value <= 180f && value >= -180f) roll.setValue(value); }
+    public void setRoll(float value) {
+        if (value <= 180f && value >= -180f) roll.setValue(value);
+    }
 
-    public void setPitch(float value) { if (value <= 90f && value >= -90f) pitch.setValue(value); }
+    public void setPitch(float value) {
+        if (value <= 90f && value >= -90f) pitch.setValue(value);
+    }
 
-    public void setYaw(float value) { if (value <= 180f && value >= -180f) yaw.setValue(value); }
+    public void setYaw(float value) {
+        if (value <= 180f && value >= -180f) yaw.setValue(value);
+    }
 
-    public void setRollLimit(float limit) { roll.setLimit(limit); }
+    public void setRollLimit(float limit) {
+        roll.setLimit(limit);
+    }
 
-    public void setPitchLimit(float limit) { pitch.setLimit(limit); }
+    public void setPitchLimit(float limit) {
+        pitch.setLimit(limit);
+    }
 
-    public void setYawLimit(float limit) { yaw.setLimit(limit); }
+    public void setYawLimit(float limit) {
+        yaw.setLimit(limit);
+    }
 
     @Override
     public void create(DisplayMetrics metrics, Resources res)
@@ -102,8 +115,7 @@ public class ADI implements SceneListener
         if (pitch.inHecticAlertState()) {
             pitchSprite.setAlpha(AnimationState.get().getHecticBlink());
             pitchSprite.setScale(AnimationState.get().getHecticBackstreets());
-        }
-        else if (pitch.inAlertState()) {
+        } else if (pitch.inAlertState()) {
             pitchSprite.setAlpha(AnimationState.get().getBlink());
             pitchSprite.setScale(AnimationState.get().getBackstreets());
         }
@@ -117,8 +129,7 @@ public class ADI implements SceneListener
             rollPointerSprite.setScale(AnimationState.get().getHecticBackstreets());
             rollPointerSprite.setColor(0.8f, 0.2f, 0f,
                     AnimationState.get().getHecticBlink());
-        }
-        else if (roll.inAlertState()) {
+        } else if (roll.inAlertState()) {
             rollSprite.setAlpha(AnimationState.get().getHecticBlink());
             rollPointerSprite.setScale(AnimationState.get().getBackstreets());
             rollPointerSprite.setColor(0.7f, 0.3f, 0f, AnimationState.get().getBlink());
@@ -133,8 +144,7 @@ public class ADI implements SceneListener
         if (yaw.inHecticAlertState()) {
             yawSprite.setColor(0.8f, 0.2f, 0f, AnimationState.get().getHecticBlink());
             yawSprite.setScale(AnimationState.get().getHecticBackstreets());
-        }
-        else if (yaw.inAlertState()) {
+        } else if (yaw.inAlertState()) {
             yawSprite.setColor(0.7f, 0.3f, 0f, AnimationState.get().getBlink());
             yawSprite.setScale(AnimationState.get().getBackstreets());
         }

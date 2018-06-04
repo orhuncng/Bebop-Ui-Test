@@ -1,6 +1,5 @@
 package com.trio.drone.data;
 
-public enum SensorSource
-{
+public enum SensorSource {
     DRONE, PHONE, WATCH
 }

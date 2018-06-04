@@ -6,6 +6,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+
 import com.trio.drone.data.FilterData;
 import com.trio.drone.data.LowPassData;
 import com.trio.drone.data.SensorSource;

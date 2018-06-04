@@ -2,6 +2,7 @@ package com.trio.drone.bebop;
 
 import android.content.Context;
 import android.view.Surface;
+
 import com.parrot.arsdk.ARSDK;
 import com.trio.drone.bebop.controller.DeviceController;
 import com.trio.drone.bebop.strategy.CameraLookupControlStrategy;
@@ -32,7 +33,9 @@ public class BebopBro implements BebopMediator
 
     private BebopBro() { }
 
-    public static BebopBro get() { return instance; }
+    public static BebopBro get() {
+        return instance;
+    }
 
     public static int getVideoWidth() { return VIDEO_WIDTH; }
 

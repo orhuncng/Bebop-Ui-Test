@@ -16,8 +16,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SurfaceView;
 import android.view.View;
+
 import com.trio.drone.R;
-import com.trio.drone.bebop.*;
+import com.trio.drone.bebop.BebopBro;
+import com.trio.drone.bebop.BebopEventListener;
+import com.trio.drone.bebop.ControlState;
+import com.trio.drone.bebop.FlyingState;
+import com.trio.drone.bebop.RelativeMotionResult;
 import com.trio.drone.core.SettingsActivity;
 
 import java.util.HashMap;
@@ -130,8 +135,7 @@ public class MainActivity extends AppCompatActivity
 
                         if (Math.abs(tiltMovement) > 5) {
                             //BebopBro.get().move(0, toDegreeTilt, 0, 0);
-                        }
-                        else {
+                        } else {
                             //Log.e("No Cam current", Float.toString(currentTilt));
                         }
                         float interpolatedPan = Math.round(-10 * accelerationFilter[1]);
@@ -141,8 +145,7 @@ public class MainActivity extends AppCompatActivity
                         if (Math.abs(panMovement) > 5) {
                             //BebopBro.get().move(-toDegreePan, 0, 0, 0);
                         }
-                    }
-                    else if (BebopBro.get().getControlState() == ControlState.PILOTING) {
+                    } else if (BebopBro.get().getControlState() == ControlState.PILOTING) {
                         deltaX = deltaX + accelerationFilter[2];
                         //Log.e("Gidilen Yol", Float.toString(deltaX));
 
@@ -235,8 +238,7 @@ public class MainActivity extends AppCompatActivity
         Log.e("watchRotateDron", "rotate drone received " + dir);
         if (watchDataZ > 4.5f) {
             BebopBro.get().move(0, 0, dir, 0);
-        }
-        else {
+        } else {
             BebopBro.get().move(0, 0, 0, dir);
         }
 
@@ -265,8 +267,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void watchAcceleroMoveDrone(float[] watchData)
-    {
+    public void watchAcceleroMoveDrone(float[] watchData) {
         //Log.e("watchAccelero", "accelero received ");
         watchDataZ = watchData[2];
         if (BebopBro.get().getControlState() == ControlState.CAMERA_LOOKUP) {
@@ -283,8 +284,7 @@ public class MainActivity extends AppCompatActivity
             if (Math.abs(tiltMovement) > 5) {
                 BebopBro.get().move(0, toDegreeTilt, 0, 0);
                 Log.e("Move", "bigger 5");
-            }
-            else
+            } else
                 Log.e("No Cam current", Float.toString(currentTilt));
 
             float interpolatedPan = Math.round(-10 * watchData[1]);
@@ -294,8 +294,7 @@ public class MainActivity extends AppCompatActivity
             if (Math.abs(panMovement) > 5) {
                 BebopBro.get().move(-toDegreePan, 0, 0, 0);
             }
-        }
-        else if (BebopBro.get().getControlState() == ControlState.PILOTING) {
+        } else if (BebopBro.get().getControlState() == ControlState.PILOTING) {
             deltaX = deltaX + watchData[0];
             //Log.e("Gidilen Yol", Float.toString(deltaX));
 

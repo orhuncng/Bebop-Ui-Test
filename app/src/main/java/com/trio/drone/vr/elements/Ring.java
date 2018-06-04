@@ -2,6 +2,7 @@ package com.trio.drone.vr.elements;
 
 import android.content.res.Resources;
 import android.util.DisplayMetrics;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -38,7 +39,7 @@ public class Ring implements SceneListener
     private String outlierLabel;
 
     public Ring(String label, String unit, String outlierLabel,
-            String outlinerUnit, boolean leftAligned)
+                String outlinerUnit, boolean leftAligned)
     {
         this.leftAligned = leftAligned;
         this.label = label;
@@ -47,13 +48,21 @@ public class Ring implements SceneListener
         outlierUnit = " " + outlinerUnit;
     }
 
-    public void setRingValue(float value) { ringValue.setValue(value); }
+    public void setRingValue(float value) {
+        ringValue.setValue(value);
+    }
 
-    public void setOutlierValue(float value) { outlierValue.setValue(value); }
+    public void setOutlierValue(float value) {
+        outlierValue.setValue(value);
+    }
 
-    public void setRingValueLimit(float limit) { ringValue.setLimit(limit); }
+    public void setRingValueLimit(float limit) {
+        ringValue.setLimit(limit);
+    }
 
-    public void setOutlierValueLimit(float limit) { outlierValue.setLimit(limit); }
+    public void setOutlierValueLimit(float limit) {
+        outlierValue.setLimit(limit);
+    }
 
     @Override
     public void create(DisplayMetrics metrics, Resources res)
@@ -103,8 +112,7 @@ public class Ring implements SceneListener
         if (ringValue.inHecticAlertState()) {
             sprite.setScale(AnimationState.get().getHecticBackstreets());
             sprite.setColor(0.8f, 0.2f, 0f, AnimationState.get().getHecticBlink());
-        }
-        else if (ringValue.inAlertState()) {
+        } else if (ringValue.inAlertState()) {
             sprite.setScale(AnimationState.get().getBackstreets());
             sprite.setColor(0.7f, 0.3f, 0f, AnimationState.get().getBlink());
         }
@@ -116,8 +124,7 @@ public class Ring implements SceneListener
         if (outlierValue.inHecticAlertState()) {
             outlierSprite.setScale(AnimationState.get().getHecticBackstreets());
             outlierSprite.setColor(0.8f, 0.2f, 0f, AnimationState.get().getHecticBlink());
-        }
-        else if (outlierValue.inAlertState()) {
+        } else if (outlierValue.inAlertState()) {
             outlierSprite.setScale(AnimationState.get().getBackstreets());
             outlierSprite.setColor(0.7f, 0.3f, 0f, AnimationState.get().getBlink());
         }
@@ -139,8 +146,7 @@ public class Ring implements SceneListener
         if (ringValue.inHecticAlertState()) {
             font24.setColor(1f, 0.3f, 0f, 1f);
             font18.setColor(1f, 0.3f, 0f, 1f);
-        }
-        else if (ringValue.inAlertState()) {
+        } else if (ringValue.inAlertState()) {
             font24.setColor(.95f, 0.4f, 0f, 1f);
             font18.setColor(.95f, 0.4f, 0f, 1f);
         }

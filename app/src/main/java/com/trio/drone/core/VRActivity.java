@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.view.KeyEvent;
+
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.badlogic.gdx.backends.android.CardBoardAndroidApplication;
 import com.badlogic.gdx.backends.android.CardBoardApplicationListener;
@@ -108,8 +109,7 @@ public class VRActivity extends CardBoardAndroidApplication
     }
 
     @Override
-    public void create()
-    {
+    public void create() {
         GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         GLES20.glEnable(GL20.GL_DEPTH_TEST);
         GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_DST_ALPHA);
@@ -125,6 +125,6 @@ public class VRActivity extends CardBoardAndroidApplication
         BebopBro.get().setVideoSurface(scene.getBackgroundSurface());
 
         PreferenceManager.getDefaultSharedPreferences(this)
-                         .registerOnSharedPreferenceChangeListener(scene);
+                .registerOnSharedPreferenceChangeListener(scene);
     }
 }

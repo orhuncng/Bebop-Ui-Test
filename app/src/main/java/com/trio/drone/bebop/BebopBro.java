@@ -105,6 +105,12 @@ public class BebopBro implements BebopMediator
         }
     }
 
+    public void toggleControlState()
+    {
+        setControlState(controlState == ControlState.PILOTING ?
+                ControlState.CAMERA_LOOKUP : ControlState.PILOTING);
+    }
+
     // Notifications to listeners
 
     @Override

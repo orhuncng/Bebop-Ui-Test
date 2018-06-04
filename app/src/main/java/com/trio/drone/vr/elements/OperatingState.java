@@ -66,7 +66,7 @@ public class OperatingState implements SceneListener
     public void create(DisplayMetrics metrics, Resources res)
     {
         centerX = (metrics.widthPixels / 2f) - 50f;
-        centerY = metrics.heightPixels * 0.8f;
+        centerY = (metrics.heightPixels / 2f) + 40f;
     }
 
     @Override
@@ -77,7 +77,7 @@ public class OperatingState implements SceneListener
     {
         GdxUtils.getInstance().getFont24().setColor(flyingStateColors.get(flyingState));
         GdxUtils.getInstance().getFont24().draw(batch, flyingStateLabels.get(flyingState),
-                centerX - 5f, centerY);
+                centerX + 10, centerY);
 
         GdxUtils.getInstance().getFont18().setColor(
                 controlState == ControlState.PILOTING ? Color.LIME : Color.ORANGE);

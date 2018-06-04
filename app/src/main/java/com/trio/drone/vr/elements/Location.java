@@ -24,8 +24,8 @@ public class Location implements SceneListener
     @Override
     public void create(DisplayMetrics metrics, Resources res)
     {
-        centerX = (metrics.widthPixels / 2f) - 110f;
-        centerY = metrics.heightPixels * 0.12f;
+        centerX = (metrics.widthPixels / 2f) - 100f;
+        centerY = (metrics.heightPixels / 2f) - 450f;
     }
 
     @Override

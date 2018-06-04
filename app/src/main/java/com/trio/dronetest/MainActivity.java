@@ -16,13 +16,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SurfaceView;
 import android.view.View;
-
 import com.trio.drone.R;
-import com.trio.drone.bebop.BebopBro;
-import com.trio.drone.bebop.BebopEventListener;
-import com.trio.drone.bebop.ControlState;
-import com.trio.drone.bebop.FlyingState;
-import com.trio.drone.bebop.RelativeMotionResult;
+import com.trio.drone.bebop.*;
 import com.trio.drone.core.SettingsActivity;
 
 import java.util.HashMap;
@@ -71,19 +66,19 @@ public class MainActivity extends AppCompatActivity
     public void takeOffDrone(View view)
     {
         Log.e("TakeOffDrone", "TakeOff fonksiyonunda");
-        BebopBro.getInstance().takeOff();
+        BebopBro.get().takeOff();
     }
 
     public void landDrone(View view)
     {
         Log.e("landDrone", "landDrone fonksiyonunda");
-        BebopBro.getInstance().land();
+        BebopBro.get().land();
     }
 
     public void cancelFlight(View view)
     {
         Log.e("cancelFlight", "cancelFlight fonksiyonunda");
-        BebopBro.getInstance().doEmergencyLanding();
+        BebopBro.get().doEmergencyLanding();
     }
 
     @Override
@@ -94,11 +89,11 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         SurfaceView videoTextureView = findViewById(R.id.video_texture_view);
 
-        BebopBro.getInstance().onCreate(getApplicationContext());
+        BebopBro.get().onCreate(getApplicationContext());
         //Surface surface = new Surface(videoTextureView.getHolder().getSurface());
-        BebopBro.getInstance().setVideoSurface(videoTextureView.getHolder().getSurface());
+        BebopBro.get().setVideoSurface(videoTextureView.getHolder().getSurface());
 
-        BebopBro.getInstance().register(this);
+        BebopBro.get().register(this);
 
         System.out.println("ON CREATE");
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
@@ -126,26 +121,28 @@ public class MainActivity extends AppCompatActivity
 
                 if (accelerationFilter != null && accelerationFilter.length == 3) {
 
-                    if (BebopBro.getInstance().getControlState() == ControlState.CAMERA_LOOKUP) {
+                    if (BebopBro.get().getControlState() == ControlState.CAMERA_LOOKUP) {
 
                         float interpolatedTilt = Math.round(-10 * accelerationFilter[2]);
                         int tiltMovement = Math.round(currentTilt - interpolatedTilt);
                         int toDegreeTilt = Math.round(interpolatedTilt);
 
 
-                        if (Math.abs(tiltMovement) > 5){
-                            //BebopBro.getInstance().move(0, toDegreeTilt, 0, 0);
-                        } else {
+                        if (Math.abs(tiltMovement) > 5) {
+                            //BebopBro.get().move(0, toDegreeTilt, 0, 0);
+                        }
+                        else {
                             //Log.e("No Cam current", Float.toString(currentTilt));
                         }
                         float interpolatedPan = Math.round(-10 * accelerationFilter[1]);
                         int panMovement = Math.round(currentPan - interpolatedPan);
                         int toDegreePan = Math.round(interpolatedPan);
 
-                        if (Math.abs(panMovement) > 5){
-                            //BebopBro.getInstance().move(-toDegreePan, 0, 0, 0);
+                        if (Math.abs(panMovement) > 5) {
+                            //BebopBro.get().move(-toDegreePan, 0, 0, 0);
                         }
-                    } else if (BebopBro.getInstance().getControlState() == ControlState.PILOTING) {
+                    }
+                    else if (BebopBro.get().getControlState() == ControlState.PILOTING) {
                         deltaX = deltaX + accelerationFilter[2];
                         //Log.e("Gidilen Yol", Float.toString(deltaX));
 
@@ -155,7 +152,7 @@ public class MainActivity extends AppCompatActivity
 
                         //Log.e("Piloting roll", Integer.toString(roll));
                         //Log.e("Piloting pitch", Integer.toString(pitch));
-                        //BebopBro.getInstance().move(roll, pitch, 0, 0);
+                        //BebopBro.get().move(roll, pitch, 0, 0);
                     }
                 }
 
@@ -226,10 +223,10 @@ public class MainActivity extends AppCompatActivity
     public void changeControlState(View view)
     {
         Log.e("Change State", "State tuşu basıldı");
-        if (BebopBro.getInstance().getControlState() == ControlState.CAMERA_LOOKUP)
-            BebopBro.getInstance().setControlState(ControlState.PILOTING);
-        else if (BebopBro.getInstance().getControlState() == ControlState.PILOTING)
-            BebopBro.getInstance().setControlState(ControlState.CAMERA_LOOKUP);
+        if (BebopBro.get().getControlState() == ControlState.CAMERA_LOOKUP)
+            BebopBro.get().setControlState(ControlState.PILOTING);
+        else if (BebopBro.get().getControlState() == ControlState.PILOTING)
+            BebopBro.get().setControlState(ControlState.CAMERA_LOOKUP);
     }
 
     @Override
@@ -237,9 +234,10 @@ public class MainActivity extends AppCompatActivity
     {
         Log.e("watchRotateDron", "rotate drone received " + dir);
         if (watchDataZ > 4.5f) {
-            BebopBro.getInstance().move(0, 0, dir, 0);
-        } else {
-            BebopBro.getInstance().move(0, 0, 0, dir);
+            BebopBro.get().move(0, 0, dir, 0);
+        }
+        else {
+            BebopBro.get().move(0, 0, 0, dir);
         }
 
 
@@ -249,28 +247,29 @@ public class MainActivity extends AppCompatActivity
     public void watchTakeOffDrone()
     {
         Log.e("watchTakeOff", "takeoff received ");
-        BebopBro.getInstance().takeOff();
+        BebopBro.get().takeOff();
     }
 
     @Override
     public void watchLandDrone()
     {
         Log.e("watchTakeOff", "land received ");
-        BebopBro.getInstance().land();
+        BebopBro.get().land();
     }
 
     @Override
     public void watchEmergencyDrone()
     {
         Log.e("watchEmergency", "emergency received ");
-        BebopBro.getInstance().doEmergencyLanding();
+        BebopBro.get().doEmergencyLanding();
     }
 
     @Override
-    public void watchAcceleroMoveDrone(float[] watchData) {
+    public void watchAcceleroMoveDrone(float[] watchData)
+    {
         //Log.e("watchAccelero", "accelero received ");
         watchDataZ = watchData[2];
-        if (BebopBro.getInstance().getControlState() == ControlState.CAMERA_LOOKUP) {
+        if (BebopBro.get().getControlState() == ControlState.CAMERA_LOOKUP) {
 
             float interpolatedTilt = Math.round(10 * watchData[0]);
             int tiltMovement = Math.round(currentTilt - interpolatedTilt);
@@ -282,9 +281,10 @@ public class MainActivity extends AppCompatActivity
             Log.e("Tilt Move", Float.toString(currentTilt));
 
             if (Math.abs(tiltMovement) > 5) {
-                BebopBro.getInstance().move(0, toDegreeTilt, 0, 0);
+                BebopBro.get().move(0, toDegreeTilt, 0, 0);
                 Log.e("Move", "bigger 5");
-            } else
+            }
+            else
                 Log.e("No Cam current", Float.toString(currentTilt));
 
             float interpolatedPan = Math.round(-10 * watchData[1]);
@@ -292,9 +292,10 @@ public class MainActivity extends AppCompatActivity
             int toDegreePan = Math.round(interpolatedPan);
 
             if (Math.abs(panMovement) > 5) {
-                BebopBro.getInstance().move(-toDegreePan, 0, 0, 0);
+                BebopBro.get().move(-toDegreePan, 0, 0, 0);
             }
-        } else if (BebopBro.getInstance().getControlState() == ControlState.PILOTING) {
+        }
+        else if (BebopBro.get().getControlState() == ControlState.PILOTING) {
             deltaX = deltaX + watchData[0];
             //Log.e("Gidilen Yol", Float.toString(deltaX));
 
@@ -304,7 +305,7 @@ public class MainActivity extends AppCompatActivity
 
             Log.e("Piloting roll", Integer.toString(roll));
             Log.e("Piloting pitch", Integer.toString(pitch));
-            BebopBro.getInstance().move(roll, pitch, 0, 0);
+            BebopBro.get().move(roll, pitch, 0, 0);
         }
     }
 
@@ -339,7 +340,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onControlStateChanged(ControlState controlState)
     {
-        
+
     }
 
     @Override

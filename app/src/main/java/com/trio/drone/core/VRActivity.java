@@ -1,13 +1,14 @@
 package com.trio.drone.core;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.opengl.GLES20;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.view.KeyEvent;
-
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.badlogic.gdx.backends.android.CardBoardAndroidApplication;
 import com.badlogic.gdx.backends.android.CardBoardApplicationListener;
@@ -20,9 +21,6 @@ import com.trio.drone.bebop.ControlState;
 import com.trio.drone.bebop.FlyingState;
 import com.trio.drone.vr.Scene;
 import com.trio.drone.vr.util.AnimationState;
-
-import java.net.BindException;
-import java.security.Key;
 
 public class VRActivity extends CardBoardAndroidApplication
         implements CardBoardApplicationListener
@@ -47,26 +45,17 @@ public class VRActivity extends CardBoardAndroidApplication
         config.numSamples = 2;
         initialize(this, config);
 
-        BebopBro.getInstance().onCreate(getApplicationContext());
-
-        AnimationState.getInstance().start();
+        BebopBro.get().onCreate(getApplicationContext());
+        AnimationState.get().start();
     }
 
     @Override
-    public void create()
+    public void onBackPressed()
     {
-        GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-        GLES20.glEnable(GL20.GL_DEPTH_TEST);
-        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_DST_ALPHA);
-        GLES20.glEnable(GLES20.GL_BLEND);
-
-        DisplayMetrics metrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(metrics);
-
-        scene = new Scene(BebopBro.getVideoWidth(), BebopBro.getVideoHeight());
-        scene.create(metrics, getResources());
-        BebopBro.getInstance().register(scene);
-        BebopBro.getInstance().setVideoSurface(scene.getBackgroundSurface());
+        BebopBro.get().setControlState(ControlState.CAMERA_LOOKUP);
+        super.onBackPressed();
+        startActivity(new Intent(VRActivity.this, SettingsActivity.class));
+        finish();
     }
 
     @Override
@@ -104,24 +93,38 @@ public class VRActivity extends CardBoardAndroidApplication
     public void onCardboardTrigger() { }
 
     @Override
-    public void onBackPressed()
+    public boolean onKeyDown(int keyCode, KeyEvent event)
     {
-        BebopBro.getInstance().setControlState(ControlState.CAMERA_LOOKUP);
-        super.onBackPressed();
-    }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_VOLUME_UP)
-            BebopBro.getInstance().toggleControlState();
-        else if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)
-        {
-            if (BebopBro.getInstance().getFlyingState() == FlyingState.LANDED)
-                BebopBro.getInstance().takeOff();
-            else BebopBro.getInstance().land();
+            BebopBro.get().toggleControlState();
+        else if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+            if (BebopBro.get().getFlyingState() == FlyingState.LANDED)
+                BebopBro.get().takeOff();
+            else BebopBro.get().land();
         }
         else return super.dispatchKeyEvent(event);
 
         return true;
+    }
+
+    @Override
+    public void create()
+    {
+        GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+        GLES20.glEnable(GL20.GL_DEPTH_TEST);
+        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_DST_ALPHA);
+        GLES20.glEnable(GLES20.GL_BLEND);
+
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
+        scene = new Scene(BebopBro.getVideoWidth(), BebopBro.getVideoHeight());
+        scene.create(metrics, getResources());
+
+        BebopBro.get().register(scene);
+        BebopBro.get().setVideoSurface(scene.getBackgroundSurface());
+
+        PreferenceManager.getDefaultSharedPreferences(this)
+                         .registerOnSharedPreferenceChangeListener(scene);
     }
 }

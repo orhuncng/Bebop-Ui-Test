@@ -7,6 +7,8 @@ import com.trio.drone.bebop.controller.DeviceController;
 import com.trio.drone.bebop.strategy.CameraLookupControlStrategy;
 import com.trio.drone.bebop.strategy.DroneControlStrategy;
 import com.trio.drone.bebop.strategy.PilotingControlStrategy;
+import com.trio.drone.data.LowPassData;
+import com.trio.drone.data.SensorSource;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,9 +26,13 @@ public class BebopBro implements BebopMediator
     private List<BebopEventListener> listeners = new ArrayList<>();
     private DroneControlStrategy controlStrategy = new CameraLookupControlStrategy();
 
+    private LowPassData lpSpeed = new LowPassData(SensorSource.DRONE);
+    private LowPassData lpOrient = new LowPassData(SensorSource.DRONE);
+    private LowPassData lpAltitude = new LowPassData(SensorSource.DRONE);
+
     private BebopBro() { }
 
-    public static BebopBro getInstance() { return instance; }
+    public static BebopBro get() { return instance; }
 
     public static int getVideoWidth() { return VIDEO_WIDTH; }
 
@@ -143,19 +149,22 @@ public class BebopBro implements BebopMediator
     @Override
     public void onSpeedChanged(float x, float y, float z)
     {
-        for (BebopEventListener ls : listeners) ls.onSpeedChanged(x, y, z);
+        for (BebopEventListener ls : listeners)
+            ls.onSpeedChanged(lpSpeed.get(x), lpSpeed.get(y), lpSpeed.get(z));
     }
 
     @Override
     public void onOrientationChanged(float roll, float pitch, float yaw)
     {
-        for (BebopEventListener ls : listeners) ls.onOrientationChanged(roll, pitch, yaw);
+        for (BebopEventListener ls : listeners)
+            ls.onOrientationChanged(lpOrient.get(roll), lpOrient.get(pitch), lpOrient.get(yaw));
     }
 
     @Override
     public void onRelativeAltitudeChanged(float altitude)
     {
-        for (BebopEventListener ls : listeners) ls.onRelativeAltitudeChanged(altitude);
+        for (BebopEventListener ls : listeners)
+            ls.onRelativeAltitudeChanged(lpAltitude.get(altitude));
     }
 
     @Override

@@ -1,28 +1,43 @@
 package com.trio.drone.data;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by Hp on 1.06.2018.
  */
 
 public class LowPassData implements FilterData
 {
-    private static float smoothingPerc = 0f;
+    private static Map<SensorSource, Float> smoothingCoeffs = new HashMap<>();
     private float[] history = new float[3];
+    private SensorSource source;
 
-    public static void setSmoothingPerc(float smoothingPerc)
+    public LowPassData(SensorSource source) { this.source = source; }
+
+    public static void setSmoothingCoeff(float coeff, SensorSource source)
     {
-        LowPassData.smoothingPerc = smoothingPerc / 100f;
+        smoothingCoeffs.put(source, coeff / 100f);
     }
 
     @Override
     public float[] get(float[] newValues)
     {
-        //Log.e("raw", Float.toString(newValues[2]));
-        history[0] = smoothingPerc * history[0] + (1f - smoothingPerc) * newValues[0];
-        history[1] = smoothingPerc * history[1] + (1f - smoothingPerc) * newValues[1];
-        history[2] = smoothingPerc * history[2] + (1f - smoothingPerc) * newValues[2];
+        get(newValues[0], 0);
+        get(newValues[1], 1);
+        get(newValues[2], 2);
 
-        //Log.e("filtered", Float.toString(history[2]));
         return history;
     }
+
+    @Override
+    public float get(float newValue, int index)
+    {
+        float coeff = smoothingCoeffs.get(source);
+        history[index] = coeff * history[index] + (1f - coeff) * newValue;
+        return history[index];
+    }
+
+    @Override
+    public float get(float newValue) { return get(newValue, 0); }
 }

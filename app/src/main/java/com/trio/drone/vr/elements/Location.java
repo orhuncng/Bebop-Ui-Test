@@ -34,13 +34,13 @@ public class Location implements SceneListener
     @Override
     public void draw(SpriteBatch batch)
     {
-        GdxUtils.getInstance().getFont18().draw(batch, "LATITUDE: " + String.valueOf(latitude),
+        GdxUtils.get().getFont18().draw(batch, "LATITUDE: " + String.valueOf(latitude),
                 centerX, centerY + 60f);
 
-        GdxUtils.getInstance().getFont18().draw(batch, "LONGITUDE: " + String.valueOf(longitude),
+        GdxUtils.get().getFont18().draw(batch, "LONGITUDE: " + String.valueOf(longitude),
                 centerX - 18f, centerY + 30f);
 
-        GdxUtils.getInstance().getFont18().draw(batch, "GPS ALTITUDE: " + String.valueOf(altitude),
+        GdxUtils.get().getFont18().draw(batch, "GPS ALTITUDE: " + String.valueOf(altitude),
                 centerX - 40f, centerY);
     }
 

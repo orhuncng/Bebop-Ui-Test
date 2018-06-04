@@ -1,22 +1,24 @@
 package com.trio.drone.vr;
 
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.SurfaceTexture;
 import android.util.DisplayMetrics;
 import android.view.Surface;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Quaternion;
+import com.trio.drone.R;
 import com.trio.drone.bebop.BebopEventListener;
 import com.trio.drone.bebop.ControlState;
 import com.trio.drone.bebop.FlyingState;
 import com.trio.drone.bebop.RelativeMotionResult;
 import com.trio.drone.vr.elements.*;
+import com.trio.drone.vr.util.LimitedData;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Scene implements SceneMediator, BebopEventListener
+public class Scene implements SceneMediator, BebopEventListener,
+        SharedPreferences.OnSharedPreferenceChangeListener
 {
     static final float BATCH_SCALE = 0.75f;
 
@@ -25,14 +27,17 @@ public class Scene implements SceneMediator, BebopEventListener
     private SpriteBatch batch;
 
     private ADI adi = new ADI();
-    private Ring altitudeRing = new Ring(1.5f, 0.4f, "ALTITUDE", "m", "VERT SPD", "m/s", false);
-    private Ring speedRing = new Ring(0.7f, 1f, "SPEED", "m/s", "ACCEL", "", true);
+    private Ring altitudeRing = new Ring("ALTITUDE", "m", "VERT SPD", "m/s", false);
+    private Ring speedRing = new Ring("SPEED", "m/s", "ACCEL", "m/s", true);
     private Battery battery = new Battery();
     private Wifi wifi = new Wifi();
     private Location location = new Location();
     private OperatingState operatingState = new OperatingState();
 
-    private float prevSpeed;
+    private long speedEventTime = System.currentTimeMillis();
+    private float prevSpeed = 0f;
+
+    private Resources resources;
 
     public Scene(int width, int height)
     {
@@ -64,6 +69,8 @@ public class Scene implements SceneMediator, BebopEventListener
     {
         metrics.widthPixels /= 2f;
 
+        resources = res;
+
         float posX = (1f - BATCH_SCALE) * metrics.widthPixels / 2f;
         float posY = (1f - BATCH_SCALE) * metrics.heightPixels / 2f;
 
@@ -93,7 +100,10 @@ public class Scene implements SceneMediator, BebopEventListener
     }
 
     @Override
-    public void onBatteryStateChanged(int batteryLevel) { battery.setLevel((float) batteryLevel / 100f); }
+    public void onBatteryStateChanged(int batteryLevel)
+    {
+        battery.setLevel((float) batteryLevel / 100f);
+    }
 
     @Override
     public void onWifiSignalChanged(int rssi) { wifi.setRssi(rssi); }
@@ -121,10 +131,16 @@ public class Scene implements SceneMediator, BebopEventListener
     @Override
     public void onSpeedChanged(float x, float y, float z)
     {
+
         float currentSpeed = (float) Math.sqrt(((double) (x * x + y * y)));
-        speedRing.setValue(currentSpeed);
-        speedRing.setOutlierValue(currentSpeed - prevSpeed);
+        speedRing.setRingValue(currentSpeed);
+
+        long elapsedTime = System.currentTimeMillis() - speedEventTime;
+        speedRing.setOutlierValue((currentSpeed - prevSpeed) / (elapsedTime / 1000.f));
+
+        speedEventTime = elapsedTime;
         prevSpeed = currentSpeed;
+
         altitudeRing.setOutlierValue(z);
     }
 
@@ -137,7 +153,7 @@ public class Scene implements SceneMediator, BebopEventListener
     }
 
     @Override
-    public void onRelativeAltitudeChanged(float altitude) { altitudeRing.setValue(altitude); }
+    public void onRelativeAltitudeChanged(float altitude) { altitudeRing.setRingValue(altitude); }
 
     @Override
     public void onCameraOrientationChanged(float tiltPerc, float panPerc) { }
@@ -147,4 +163,25 @@ public class Scene implements SceneMediator, BebopEventListener
 
     @Override
     public void onControllerStateChanged(boolean isRunning) { }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key)
+    {
+        if (key.equals(resources.getString(R.string.pref_key_ui_roll_limit)))
+            adi.setRollLimit((float) sharedPreferences.getInt(key, 1));
+        else if (key.equals(resources.getString(R.string.pref_key_ui_pitch_limit)))
+            adi.setPitchLimit((float) sharedPreferences.getInt(key, 1));
+        else if (key.equals(resources.getString(R.string.pref_key_ui_yaw_limit)))
+            adi.setYawLimit((float) sharedPreferences.getInt(key, 1));
+        else if (key.equals(resources.getString(R.string.pref_key_ui_speed_limit)))
+            speedRing.setRingValueLimit(sharedPreferences.getFloat(key, 1));
+        else if (key.equals(resources.getString(R.string.pref_key_ui_accel_limit)))
+            speedRing.setOutlierValueLimit(sharedPreferences.getFloat(key, 1));
+        else if (key.equals(resources.getString(R.string.pref_key_ui_altitude_limit)))
+            altitudeRing.setRingValueLimit(sharedPreferences.getFloat(key, 1));
+        else if (key.equals(resources.getString(R.string.pref_key_ui_vert_speed_limit)))
+            LimitedData.setAlertLimit((float) sharedPreferences.getInt(key, 1));
+        else if (key.equals(resources.getString(R.string.pref_key_ui_hectic_alert_perc)))
+            LimitedData.setHecticAlertLimit((float) sharedPreferences.getInt(key, 1));
+    }
 }

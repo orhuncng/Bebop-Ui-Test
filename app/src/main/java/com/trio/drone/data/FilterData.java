@@ -7,4 +7,8 @@ package com.trio.drone.data;
 public interface FilterData
 {
     float[] get(float[] newValues);
+
+    float get(float newValue, int index);
+
+    float get(float newValue);
 }

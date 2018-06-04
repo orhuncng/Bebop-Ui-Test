@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 import com.trio.drone.R;
+import com.trio.drone.bebop.BebopBro;
 import com.trio.drone.core.SettingsActivity;
 
 
@@ -40,6 +41,9 @@ public class Main6Activity extends AppCompatActivity {
         tabLayout.setupWithViewPager(mViewPager);
 
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
+
+        BebopBro.get().onCreate(getApplicationContext());
+
     }
 
 

@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import com.github.paolorotolo.appintro.AppIntro;
 import com.github.paolorotolo.appintro.AppIntroFragment;
 import com.trio.drone.R;
+import com.trio.drone.core.VrMenuActivity;
 
 /**
  * Created by orhun on 6/3/2018.
@@ -45,7 +46,7 @@ public class VRIntroActivity extends AppIntro {
     public void onSkipPressed(Fragment currentFragment) {
         super.onSkipPressed(currentFragment);
         // Do something when users tap on Skip button.
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, VrMenuActivity.class);
         startActivity(intent);
     }
 
@@ -53,7 +54,7 @@ public class VRIntroActivity extends AppIntro {
     public void onDonePressed(Fragment currentFragment) {
         super.onDonePressed(currentFragment);
         // Do something when users tap on Done button.
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, VrMenuActivity.class);
         startActivity(intent);
     }
 

@@ -18,8 +18,7 @@ import java.util.HashMap;
  */
 
 public class DeviceSensorProvider<T> extends LiveData<HashMap<String, float[]>>
-        implements SensorEventListener
-{
+        implements SensorEventListener {
 
     private HashMap<String, float[]> sensorMap = new HashMap();
 
@@ -35,36 +34,30 @@ public class DeviceSensorProvider<T> extends LiveData<HashMap<String, float[]>>
     private boolean axisInverted = false;
 
 
-    public DeviceSensorProvider(Context context)
-    {
+    public DeviceSensorProvider(Context context) {
         mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
     }
 
 
     @Override
-    protected void onActive()
-    {
+    protected void onActive() {
         registerSensors(sensorFrequency);
     }
 
     @Override
-    protected void onInactive()
-    {
-
+    protected void onInactive() {
         unregisterSensors();
     }
 
     @Override
-    public void onSensorChanged(SensorEvent event)
-    {
+    public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             if (filterActive) {
                 acceleration = filterData.get(event.values);
 
                 sensorMap.put("accelerationFilter", acceleration);
                 setValue(sensorMap);
-            }
-            else {
+            } else {
                 sensorMap.put("acceleration", event.values);
                 setValue(sensorMap);
             }
@@ -73,21 +66,18 @@ public class DeviceSensorProvider<T> extends LiveData<HashMap<String, float[]>>
             sensorMap.put("acceleration", event.values);
             setValue(sensorMap);
 
-        }
-        else if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
+        } else if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
             sensorMap.put("gyroscope", event.values);
             setValue(sensorMap);
         }
     }
 
     @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy)
-    {
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
     }
 
-    private void registerSensors(int sensorDelay)
-    {
+    private void registerSensors(int sensorDelay) {
         // Register for sensor updates.
         mSensorManager
                 .registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
@@ -97,14 +87,12 @@ public class DeviceSensorProvider<T> extends LiveData<HashMap<String, float[]>>
                         sensorFrequency);
     }
 
-    private void unregisterSensors()
-    {
+    private void unregisterSensors() {
         // Unregister for sensor updates.
         mSensorManager.unregisterListener(this);
     }
 
-    private float[] invert(float[] values)
-    {
+    private float[] invert(float[] values) {
         for (int i = 0; i < 3; i++) {
             values[i] = -values[i];
         }

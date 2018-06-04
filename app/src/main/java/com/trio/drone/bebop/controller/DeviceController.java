@@ -27,8 +27,7 @@ import com.trio.drone.bebop.FlyingState;
 import com.trio.drone.bebop.RelativeMotionResult;
 
 public class DeviceController implements ARDeviceControllerListener,
-        ARDeviceControllerStreamListener, ARDiscoveryServicesDevicesListUpdatedReceiverDelegate
-{
+        ARDeviceControllerStreamListener, ARDiscoveryServicesDevicesListUpdatedReceiverDelegate {
     private DiscoveryService discoveryService;
     private H264VideoController videoController;
     private ARDeviceController controller;
@@ -37,50 +36,57 @@ public class DeviceController implements ARDeviceControllerListener,
     private FlyingState flyingState = FlyingState.LANDED;
 
     public DeviceController(Context context, BebopMediator mediator, int videoWidth, int
-            videoHeight)
-    {
+            videoHeight) {
         this.mediator = mediator;
         discoveryService = new DiscoveryService(context);
         discoveryService.registerReceiver(this);
         videoController = new H264VideoController(videoWidth, videoHeight);
     }
 
-    public void setVideoSurface(Surface surface) {videoController.setVideoSurface(surface);}
+    public void startVideo(Surface surface) {
+        videoController.setVideoSurface(surface);
+        if (isRunning) {
+            controller.startVideoStream();
+        }
+    }
 
-    public boolean IsRunning() { return isRunning; }
+    public boolean IsRunning() {
+        return isRunning;
+    }
 
-    public FlyingState GetFlyingState() { return flyingState; }
+    public FlyingState GetFlyingState() {
+        return flyingState;
+    }
 
-    public void calibrateAccelerometerAndGyro()
-    {
+    public void calibrateAccelerometerAndGyro() {
         if (isRunning && flyingState == FlyingState.LANDED)
             controller.getFeatureARDrone3().sendPilotingFlatTrim();
     }
 
-    public void moveToRelative(float dX, float dY, float dZ, float dRotation)
-    {
+    public void moveToRelative(float dX, float dY, float dZ, float dRotation) {
         if (isRunning) controller.getFeatureARDrone3().sendPilotingMoveBy(dX, dY, dZ, dRotation);
     }
 
-    public void move(int rollPerc, int pitchPerc, int yawPerc, int gazPerc)
-    {
+    public void move(int rollPerc, int pitchPerc, int yawPerc, int gazPerc) {
         if (isRunning) controller.getFeatureARDrone3().setPilotingPCMD((byte) 1, (byte) rollPerc,
                 (byte) pitchPerc, (byte) yawPerc, (byte) gazPerc, 0);
     }
 
-    public void moveCamera(float tilt, float pan)
-    {
+    public void moveCamera(float tilt, float pan) {
         if (isRunning) controller.getFeatureARDrone3().sendCameraOrientationV2(tilt, pan);
     }
 
-    public void doEmergencyLanding()
-    {
+    public void doEmergencyLanding() {
         if (isRunning) controller.getFeatureARDrone3().sendPilotingEmergency();
     }
 
-    public void takeOff() {if (isRunning) controller.getFeatureARDrone3().sendPilotingTakeOff();}
+    public void takeOff() {
+        if (isRunning) controller.getFeatureARDrone3().sendPilotingTakeOff();
+    }
 
-    public void land() {if (isRunning) controller.getFeatureARDrone3().sendPilotingLanding();}
+    public void land() {
+        if (isRunning) controller.getFeatureARDrone3().sendPilotingLanding();
+    }
 
     public void setMaxAltitude(float altitude) {
         if (isRunning)
@@ -104,33 +110,21 @@ public class DeviceController implements ARDeviceControllerListener,
 
     @Override
     public void onStateChanged(ARDeviceController deviceController,
-            ARCONTROLLER_DEVICE_STATE_ENUM newState, ARCONTROLLER_ERROR_ENUM error)
-    {
+                               ARCONTROLLER_DEVICE_STATE_ENUM newState, ARCONTROLLER_ERROR_ENUM error) {
         isRunning =
                 (newState == ARCONTROLLER_DEVICE_STATE_ENUM.ARCONTROLLER_DEVICE_STATE_RUNNING);
-
-        if (isRunning) { controller.startVideoStream(); }
-        else {
-            try {
-                controller.stopVideoStream();
-            } catch (ARControllerException e) {
-                e.printStackTrace();
-            }
-        }
-
         mediator.onControllerStateChanged(isRunning);
     }
 
     @Override
     public void onExtensionStateChanged(ARDeviceController deviceController,
-            ARCONTROLLER_DEVICE_STATE_ENUM newState, ARDISCOVERY_PRODUCT_ENUM product, String name,
-            ARCONTROLLER_ERROR_ENUM error)
-    { }
+                                        ARCONTROLLER_DEVICE_STATE_ENUM newState, ARDISCOVERY_PRODUCT_ENUM product, String name,
+                                        ARCONTROLLER_ERROR_ENUM error) {
+    }
 
     @Override
     public void onCommandReceived(ARDeviceController deviceController,
-            ARCONTROLLER_DICTIONARY_KEY_ENUM commandKey, ARControllerDictionary elementDictionary)
-    {
+                                  ARCONTROLLER_DICTIONARY_KEY_ENUM commandKey, ARControllerDictionary elementDictionary) {
         ARControllerArgumentDictionary<Object> args = (elementDictionary == null) ? null :
                 elementDictionary.get(ARControllerDictionary.ARCONTROLLER_DICTIONARY_SINGLE_KEY);
 
@@ -292,8 +286,7 @@ public class DeviceController implements ARDeviceControllerListener,
 
     @Override
     public ARCONTROLLER_ERROR_ENUM configureDecoder(ARDeviceController deviceController,
-            ARControllerCodec codec)
-    {
+                                                    ARControllerCodec codec) {
         Log.e("configureDecoder", "codec received");
         videoController.configureDecoder(codec);
 
@@ -302,18 +295,17 @@ public class DeviceController implements ARDeviceControllerListener,
 
     @Override
     public ARCONTROLLER_ERROR_ENUM onFrameReceived(ARDeviceController deviceController,
-            ARFrame frame)
-    {
+                                                   ARFrame frame) {
         videoController.displayFrame(frame);
         return ARCONTROLLER_ERROR_ENUM.ARCONTROLLER_OK;
     }
 
     @Override
-    public void onFrameTimeout(ARDeviceController deviceController) { }
+    public void onFrameTimeout(ARDeviceController deviceController) {
+    }
 
     @Override
-    public void onServicesDevicesListUpdated()
-    {
+    public void onServicesDevicesListUpdated() {
         ARDiscoveryDevice device = discoveryService.getDevice();
 
         if (device != null) {

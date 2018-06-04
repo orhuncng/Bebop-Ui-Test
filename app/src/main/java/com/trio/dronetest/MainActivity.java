@@ -28,8 +28,7 @@ import com.trio.drone.core.SettingsActivity;
 import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity
-        implements WatchServiceCallbacks, BebopEventListener
-{
+        implements WatchServiceCallbacks, BebopEventListener {
     Context mContext;
     float[] acceleration = new float[2];
     float[] accelerationFilter = new float[3];
@@ -42,11 +41,9 @@ public class MainActivity extends AppCompatActivity
     private boolean mIsBound = false;
     float watchDataZ = 0;
     private ConsumerService mConsumerService = null;
-    private final ServiceConnection mConnection = new ServiceConnection()
-    {
+    private final ServiceConnection mConnection = new ServiceConnection() {
         @Override
-        public void onServiceConnected(ComponentName className, IBinder service)
-        {
+        public void onServiceConnected(ComponentName className, IBinder service) {
             mConsumerService = ((ConsumerService.LocalBinder) service).getService();
             //updateTextView("onServiceConnected");
             Log.e("MainAct", "onServiceConnected");
@@ -58,8 +55,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         @Override
-        public void onServiceDisconnected(ComponentName className)
-        {
+        public void onServiceDisconnected(ComponentName className) {
             mConsumerService = null;
             mIsBound = false;
             //updateTextView("onServiceDisconnected");
@@ -68,27 +64,23 @@ public class MainActivity extends AppCompatActivity
     };
     private int myState = 0;
 
-    public void takeOffDrone(View view)
-    {
+    public void takeOffDrone(View view) {
         Log.e("TakeOffDrone", "TakeOff fonksiyonunda");
         BebopBro.get().takeOff();
     }
 
-    public void landDrone(View view)
-    {
+    public void landDrone(View view) {
         Log.e("landDrone", "landDrone fonksiyonunda");
         BebopBro.get().land();
     }
 
-    public void cancelFlight(View view)
-    {
+    public void cancelFlight(View view) {
         Log.e("cancelFlight", "cancelFlight fonksiyonunda");
         BebopBro.get().doEmergencyLanding();
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mContext = this;
         setContentView(R.layout.activity_main);
@@ -109,11 +101,9 @@ public class MainActivity extends AppCompatActivity
         DeviceSensorViewModel model = ViewModelProviders.of(this).get(DeviceSensorViewModel.class);
         liveData = model.getDeviceSensorListener();
 
-        liveData.observe(this, new Observer<HashMap<String, float[]>>()
-        {
+        liveData.observe(this, new Observer<HashMap<String, float[]>>() {
             @Override
-            public void onChanged(@Nullable HashMap<String, float[]> sensorData)
-            {
+            public void onChanged(@Nullable HashMap<String, float[]> sensorData) {
                 acceleration = sensorData.get("acceleration");
                 accelerationFilter = sensorData.get("accelerationFilter");
                 gyroscope = sensorData.get("gyroscope");
@@ -164,15 +154,13 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
+    public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
+    public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
         if (id == R.id.action_settings) {
@@ -184,23 +172,20 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    public void openSensor(View view)
-    {
+    public void openSensor(View view) {
         Log.e("openSensor", "OpenSensore basıldı");
 
         Intent intent = new Intent(this, SensorActivity.class);
         startActivity(intent);
     }
 
-    public void sendState(View view)
-    {
+    public void sendState(View view) {
         Log.e("sendState", "SendState basıldı");
         String deneme = "";
         if (myState == 0) {
             myState = 1;
             deneme = "1";
-        }
-        else {
+        } else {
             myState = 0;
             deneme = "0";
         }
@@ -208,23 +193,20 @@ public class MainActivity extends AppCompatActivity
         if (mIsBound == true && mConsumerService != null) {
             if (mConsumerService.sendState(deneme)) {
                 Log.e("sendState", "SendState gitti");
-            }
-            else {
+            } else {
                 Log.e("sendState", "SendState gitmedi");
             }
         }
     }
 
-    public void openGearSensor(View view)
-    {
+    public void openGearSensor(View view) {
         Log.e("openGearSensor", "OpenGearSensore basıldı");
 
         Intent intent = new Intent(this, GearSensorActivity.class);
         startActivity(intent);
     }
 
-    public void changeControlState(View view)
-    {
+    public void changeControlState(View view) {
         Log.e("Change State", "State tuşu basıldı");
         if (BebopBro.get().getControlState() == ControlState.CAMERA_LOOKUP)
             BebopBro.get().setControlState(ControlState.PILOTING);
@@ -233,8 +215,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void watchRotateDrone(int dir)
-    {
+    public void watchRotateDrone(int dir) {
         Log.e("watchRotateDron", "rotate drone received " + dir);
         if (watchDataZ > 4.5f) {
             BebopBro.get().move(0, 0, dir, 0);
@@ -246,22 +227,19 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void watchTakeOffDrone()
-    {
+    public void watchTakeOffDrone() {
         Log.e("watchTakeOff", "takeoff received ");
         BebopBro.get().takeOff();
     }
 
     @Override
-    public void watchLandDrone()
-    {
+    public void watchLandDrone() {
         Log.e("watchTakeOff", "land received ");
         BebopBro.get().land();
     }
 
     @Override
-    public void watchEmergencyDrone()
-    {
+    public void watchEmergencyDrone() {
         Log.e("watchEmergency", "emergency received ");
         BebopBro.get().doEmergencyLanding();
     }
@@ -276,10 +254,10 @@ public class MainActivity extends AppCompatActivity
             int tiltMovement = Math.round(currentTilt - interpolatedTilt);
             int toDegreeTilt = Math.round(interpolatedTilt);
 
-            Log.e("interpolated", Float.toString(interpolatedTilt));
-            Log.e("tiltMovement", Integer.toString(tiltMovement));
-            Log.e("toDegree", Integer.toString(toDegreeTilt));
-            Log.e("Tilt Move", Float.toString(currentTilt));
+            //Log.e("interpolated", Float.toString(interpolatedTilt));
+            //Log.e("tiltMovement", Integer.toString(tiltMovement));
+            //Log.e("toDegree", Integer.toString(toDegreeTilt));
+            //Log.e("Tilt Move", Float.toString(currentTilt));
 
             if (Math.abs(tiltMovement) > 5) {
                 BebopBro.get().move(0, toDegreeTilt, 0, 0);
@@ -298,77 +276,67 @@ public class MainActivity extends AppCompatActivity
             deltaX = deltaX + watchData[0];
             //Log.e("Gidilen Yol", Float.toString(deltaX));
 
-            int pitch = Math.round(watchData[0]);
+            int pitch = 5 * Math.round(watchData[0]);
             int roll = Math.round(watchData[1]);
             //int pitch = Math.round(accelerationFilter[0]);
 
-            Log.e("Piloting roll", Integer.toString(roll));
-            Log.e("Piloting pitch", Integer.toString(pitch));
-            BebopBro.get().move(roll, pitch, 0, 0);
+            //Log.e("Piloting roll", Integer.toString(roll));
+            //Log.e("Piloting pitch", Integer.toString(pitch));
+            BebopBro.get().move(roll, -pitch, 0, 0);
         }
     }
 
     @Override
-    public void onBatteryStateChanged(int batteryLevel)
-    {
+    public void onBatteryStateChanged(int batteryLevel) {
 
     }
 
     @Override
-    public void onWifiSignalChanged(int rssi)
-    {
+    public void onWifiSignalChanged(int rssi) {
 
     }
 
     @Override
-    public void onFlyingStateChanged(FlyingState flyingState)
-    {
+    public void onFlyingStateChanged(FlyingState flyingState) {
 
         String state = (flyingState == FlyingState.LANDED) ? "1" : "0";
 
         if (mIsBound == true && mConsumerService != null) {
             if (mConsumerService.sendState(state)) {
                 Log.e("sendFlyingState", "SendState gitti");
-            }
-            else {
+            } else {
                 Log.e("sendFlyingState", "SendState gitmedi");
             }
         }
     }
 
     @Override
-    public void onControlStateChanged(ControlState controlState)
-    {
+    public void onControlStateChanged(ControlState controlState) {
 
     }
 
     @Override
-    public void onPositionChanged(float latitude, float longitude, float altitude)
-    {
+    public void onPositionChanged(float latitude, float longitude, float altitude) {
 
     }
 
     @Override
-    public void onSpeedChanged(float x, float y, float z)
-    {
+    public void onSpeedChanged(float x, float y, float z) {
 
     }
 
     @Override
-    public void onOrientationChanged(float roll, float pitch, float yaw)
-    {
+    public void onOrientationChanged(float roll, float pitch, float yaw) {
 
     }
 
     @Override
-    public void onRelativeAltitudeChanged(float altitude)
-    {
+    public void onRelativeAltitudeChanged(float altitude) {
 
     }
 
     @Override
-    public void onCameraOrientationChanged(float tiltPerc, float panPerc)
-    {
+    public void onCameraOrientationChanged(float tiltPerc, float panPerc) {
         //Log.e("Camera tilt: ", Integer.toString(tiltPerc));
         //Log.e("Camera pan: ", Integer.toString(panPerc));
         currentTilt = tiltPerc;
@@ -377,23 +345,19 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onRelativeMotionEnded(float dX, float dY, float dZ, RelativeMotionResult result)
-    {
+    public void onRelativeMotionEnded(float dX, float dY, float dZ, RelativeMotionResult result) {
 
     }
 
     @Override
-    public void onControllerStateChanged(boolean isRunning)
-    {
+    public void onControllerStateChanged(boolean isRunning) {
 
     }
 
-    public void stopVideo(View view)
-    {
+    public void stopVideo(View view) {
     }
 
 
-    public void startVideo(View view)
-    {
+    public void startVideo(View view) {
     }
 }

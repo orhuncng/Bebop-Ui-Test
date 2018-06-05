@@ -12,7 +12,7 @@ public class LimitedData {
     }
 
     public static void setHecticAlertLimit(float limit) {
-        hecticAlertLimit = limit;
+        hecticAlertLimit = limit / 100f;
     }
 
     public static float getAlertLimit() {
@@ -20,7 +20,7 @@ public class LimitedData {
     }
 
     public static void setAlertLimit(float limit) {
-        alertLimit = limit;
+        alertLimit = limit / 100f;
     }
 
     public float getValue() {

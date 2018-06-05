@@ -133,14 +133,11 @@ public class VRActivity extends CardBoardAndroidApplication
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
-        scene = new Scene(BebopBro.getVideoWidth(), BebopBro.getVideoHeight());
+        scene = new Scene(getApplicationContext(), BebopBro.getVideoWidth(), BebopBro.getVideoHeight());
         scene.create(metrics, getResources());
 
         BebopBro.get().register(scene);
         BebopBro.get().setVideoSurface(scene.getBackgroundSurface());
-
-        PreferenceManager.getDefaultSharedPreferences(this)
-                .registerOnSharedPreferenceChangeListener(scene);
     }
 
     @Override

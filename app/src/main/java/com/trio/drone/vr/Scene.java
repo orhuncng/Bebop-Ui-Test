@@ -1,8 +1,10 @@
 package com.trio.drone.vr;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.SurfaceTexture;
+import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.view.Surface;
 
@@ -46,8 +48,10 @@ public class Scene implements SceneMediator, BebopEventListener,
 
     private Resources resources;
 
-    public Scene(int width, int height)
+    public Scene(Context context, int width, int height)
     {
+        resources = context.getResources();
+
         batch = new SpriteBatch();
         background = new OverlayTexture(false, .01f, width, height);
 
@@ -59,6 +63,18 @@ public class Scene implements SceneMediator, BebopEventListener,
         register(wifi);
         register(location);
         register(operatingState);
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        prefs.registerOnSharedPreferenceChangeListener(this);
+
+        onSharedPreferenceChanged(prefs, context.getString(R.string.pref_key_ui_roll_limit));
+        onSharedPreferenceChanged(prefs, context.getString(R.string.pref_key_ui_pitch_limit));
+        onSharedPreferenceChanged(prefs, context.getString(R.string.pref_key_ui_yaw_limit));
+        onSharedPreferenceChanged(prefs, context.getString(R.string.pref_key_ui_speed_limit));
+        onSharedPreferenceChanged(prefs, context.getString(R.string.pref_key_ui_accel_limit));
+        onSharedPreferenceChanged(prefs, context.getString(R.string.pref_key_ui_altitude_limit));
+        onSharedPreferenceChanged(prefs, context.getString(R.string.pref_key_ui_vert_speed_limit));
+        onSharedPreferenceChanged(prefs, context.getString(R.string.pref_key_ui_hectic_alert_perc));
     }
 
     public SurfaceTexture getBackgroundTexture() { return background.getTexture(); }
@@ -75,8 +91,6 @@ public class Scene implements SceneMediator, BebopEventListener,
     public void create(DisplayMetrics metrics, Resources res)
     {
         metrics.widthPixels /= 2f;
-
-        resources = res;
 
         float posX = (1f - BATCH_SCALE) * metrics.widthPixels / 2f;
         float posY = (1f - BATCH_SCALE) * metrics.heightPixels / 2f;
@@ -175,20 +189,22 @@ public class Scene implements SceneMediator, BebopEventListener,
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(resources.getString(R.string.pref_key_ui_roll_limit)))
-            adi.setRollLimit((float) sharedPreferences.getInt(key, 1));
+            adi.setRollLimit(Float.valueOf(sharedPreferences.getString(key, "1")));
         else if (key.equals(resources.getString(R.string.pref_key_ui_pitch_limit)))
-            adi.setPitchLimit((float) sharedPreferences.getInt(key, 1));
+            adi.setPitchLimit(Float.valueOf(sharedPreferences.getString(key, "1")));
         else if (key.equals(resources.getString(R.string.pref_key_ui_yaw_limit)))
-            adi.setYawLimit((float) sharedPreferences.getInt(key, 1));
+            adi.setYawLimit(Float.valueOf(sharedPreferences.getString(key, "1")));
         else if (key.equals(resources.getString(R.string.pref_key_ui_speed_limit)))
-            speedRing.setRingValueLimit(sharedPreferences.getFloat(key, 1));
+            speedRing.setRingValueLimit(Float.valueOf(sharedPreferences.getString(key, "1")));
         else if (key.equals(resources.getString(R.string.pref_key_ui_accel_limit)))
-            speedRing.setOutlierValueLimit(sharedPreferences.getFloat(key, 1));
+            speedRing.setOutlierValueLimit(Float.valueOf(sharedPreferences.getString(key, "1")));
         else if (key.equals(resources.getString(R.string.pref_key_ui_altitude_limit)))
-            altitudeRing.setRingValueLimit(sharedPreferences.getFloat(key, 1));
+            altitudeRing.setRingValueLimit(Float.valueOf(sharedPreferences.getString(key, "1")));
         else if (key.equals(resources.getString(R.string.pref_key_ui_vert_speed_limit)))
-            LimitedData.setAlertLimit((float) sharedPreferences.getInt(key, 1));
+            altitudeRing.setOutlierValueLimit(Float.valueOf(sharedPreferences.getString(key, "1")));
+        else if (key.equals(resources.getString(R.string.pref_key_ui_alert_perc)))
+            LimitedData.setAlertLimit(Float.valueOf(sharedPreferences.getString(key, "1")));
         else if (key.equals(resources.getString(R.string.pref_key_ui_hectic_alert_perc)))
-            LimitedData.setHecticAlertLimit((float) sharedPreferences.getInt(key, 1));
+            LimitedData.setHecticAlertLimit(Float.valueOf(sharedPreferences.getString(key, "1")));
     }
 }

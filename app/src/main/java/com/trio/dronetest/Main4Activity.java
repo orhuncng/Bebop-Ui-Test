@@ -100,7 +100,7 @@ public class Main4Activity extends CardBoardAndroidApplication
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
-        scene = new Scene(BebopBro.getVideoWidth(), BebopBro.getVideoHeight());
+        scene = new Scene(this, BebopBro.getVideoWidth(), BebopBro.getVideoHeight());
         scene.create(metrics, getResources());
         BebopBro.get().register(scene);
         BebopBro.get().setVideoSurface(scene.getBackgroundSurface());

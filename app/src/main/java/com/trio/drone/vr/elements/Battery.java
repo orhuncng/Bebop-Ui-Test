@@ -66,7 +66,7 @@ public class Battery implements SceneListener
     {
         levelSprite.draw(batch);
         sprite.draw(batch);
-        GdxUtils.get().getFont18().draw(batch, String.valueOf((int) level * 100) + "%",
+        GdxUtils.get().getFont18().draw(batch, String.valueOf((int)(level * 100)) + "%",
                 sprite.getX(), sprite.getY() + 53f);
     }
 

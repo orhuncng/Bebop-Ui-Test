@@ -23,7 +23,6 @@ public class VrMenuActivity extends AppCompatActivity {
 
     public void takeOffDrone(View view) {
         Log.e("TakeOffDrone", "TakeOff fonksiyonunda");
-        BebopBro.get().takeOff();
         Intent intent = new Intent(this, VRActivity.class);
         startActivity(intent);
     }

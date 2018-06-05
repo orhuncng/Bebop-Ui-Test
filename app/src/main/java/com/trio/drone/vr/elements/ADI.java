@@ -130,7 +130,7 @@ public class ADI implements SceneListener
             rollPointerSprite.setColor(0.8f, 0.2f, 0f,
                     AnimationState.get().getHecticBlink());
         } else if (roll.inAlertState()) {
-            rollSprite.setAlpha(AnimationState.get().getHecticBlink());
+            rollSprite.setAlpha(AnimationState.get().getBlink());
             rollPointerSprite.setScale(AnimationState.get().getBackstreets());
             rollPointerSprite.setColor(0.7f, 0.3f, 0f, AnimationState.get().getBlink());
         }

@@ -12,6 +12,8 @@ import com.trio.drone.vr.util.AnimationState;
 import com.trio.drone.vr.util.GdxUtils;
 import com.trio.drone.vr.util.LimitedData;
 
+import java.util.Locale;
+
 public class Ring implements SceneListener
 {
     private static final float RING_BORDER_MARGIN_X = 300f;
@@ -152,7 +154,7 @@ public class Ring implements SceneListener
         }
 
         font18.draw(batch, label, textCenterX, centerY + TEXT_LABEL_MARGIN_Y);
-        font24.draw(batch, String.valueOf(ringValue.getValue()) + unit,
+        font24.draw(batch, String.format(Locale.US, "%.1f", ringValue.getValue()) + unit,
                 textCenterX, centerY + TEXT_MARGIN_Y);
 
         GdxUtils.get().resetFont24Color();
@@ -164,7 +166,7 @@ public class Ring implements SceneListener
             font18.setColor(.95f, 0.4f, 0f, 1f);
 
         font18.draw(batch, outlierLabel, textCenterX, centerY + TEXT_OUTLIER_LABEL_MARGIN_Y);
-        font18.draw(batch, String.valueOf(outlierValue.getValue()) + outlierUnit,
+        font18.draw(batch, String.format(Locale.US, "%.1f", outlierValue.getValue()) + outlierUnit,
                 textCenterX, centerY + TEXT_OUTLIER_MARGIN_Y);
 
         GdxUtils.get().resetFont18Color();

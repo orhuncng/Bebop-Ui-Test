@@ -36,6 +36,8 @@ public class LowPassData implements FilterData {
 
     @Override
     public float get(float newValue, int index) {
+        if (source == SensorSource.DRONE)
+            return newValue;
         float coeff = smoothingCoeffs.get(source);
         history[index] = coeff * history[index] + (1f - coeff) * newValue;
         return history[index];

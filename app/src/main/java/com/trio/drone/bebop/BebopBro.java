@@ -175,13 +175,14 @@ public class BebopBro implements BebopMediator, SharedPreferences.OnSharedPrefer
     @Override
     public void onSpeedChanged(float x, float y, float z) {
         for (BebopEventListener ls : listeners)
-            ls.onSpeedChanged(lpSpeed.get(x), lpSpeed.get(y), lpSpeed.get(z));
+            ls.onSpeedChanged(lpSpeed.get(x, 0), lpSpeed.get(y, 1), lpSpeed.get(z, 2));
     }
 
     @Override
     public void onOrientationChanged(float roll, float pitch, float yaw) {
         for (BebopEventListener ls : listeners)
-            ls.onOrientationChanged(lpOrient.get(roll), lpOrient.get(pitch), lpOrient.get(yaw));
+            ls.onOrientationChanged(lpOrient.get(roll, 0),
+                    lpOrient.get(pitch, 1), lpOrient.get(yaw, 2));
     }
 
     @Override

@@ -2,6 +2,13 @@
 
 VR Drone Controller for Bebop2
 
+# Details
+
+Detailed documentation can be found under
+
+[a link](https://github.com/orhuncng/Bebop-Ui-Test/raw/master/Drone%20Final%20Report.docx)
+
+
 ## Project Description
 
 This project can be used for controlling drones and providing avionics systems user interface. Currently Parrot Bebop2 drone is added to project but controlling and interface are abstracted from drone environment so that new drones can be easily added to the project.

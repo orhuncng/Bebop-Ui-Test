@@ -6,7 +6,7 @@ VR Drone Controller for Bebop2
 
 Detailed documentation can be found under
 
-[Download Document](https://github.com/orhuncng/Bebop-Ui-Test/raw/master/Drone%20Final%20Report.docx)
+[Download Document](https://github.com/orhuncng/Bebop-Ui-Test/raw/master/Drone%20Detailed%20Document.docx)
 
 
 ## Project Description

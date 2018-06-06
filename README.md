@@ -40,11 +40,11 @@ Will be provided
 
 ## Authors
 
-* **Özkan Yumşak** - *Initial work* - *Fancy Avionic User Interface*
+* **Özkan Yumşak** - *Initial work* - *Fancy Avionic User Interface* - *Architecture Design* - *Application development*
 
-* **Oğuz Bilgen** - *Initial work* - *Super cool gear S3 controller*
+* **Oğuz Bilgen** - *Initial work* - *Super cool gear S3 controller* - *Smartphone and Gear Communications* -*Application development*
 
-* **Orhun Altunlu** - *Initial work* - *Smooth VR SmartPhone Controller*
+* **Orhun Altunlu** - *Initial work* - *Smooth VR SmartPhone Controller* - *Application development*
 
 ## License
 
